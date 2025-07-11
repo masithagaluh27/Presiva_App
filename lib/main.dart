@@ -6,7 +6,7 @@ import 'package:presiva/screens/auth/forgot_password_screen.dart';
 import 'package:presiva/screens/auth/login_screen.dart';
 import 'package:presiva/screens/auth/register_screen.dart';
 import 'package:presiva/screens/auth/reset_password_with_otp.dart';
-import 'package:presiva/screens/main_botoom_navigation_bar.dart';
+import 'package:presiva/screens/main_botom_navigation_bar.dart';
 import 'package:presiva/screens/splash_screen.dart';
 
 void main() {

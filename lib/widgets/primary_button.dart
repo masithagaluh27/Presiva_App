@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:presiva/constant/app_colors.dart'; // Penting: pastikan ini diimpor
+// import 'package:presiva/constant/app_colors.dart'; // Jika Anda ingin menggunakan AppColors
 
 class PrimaryButton extends StatelessWidget {
   final String label;
@@ -15,16 +15,12 @@ class PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 56, // Tinggi standar tombol
+      height: 56,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              AppColors
-                  .primaryLight, // <<< INI PENTING: Warna tombol diatur di sini
-          foregroundColor:
-              AppColors
-                  .textDark, // Warna teks tombol menyesuaikan screenshot (hitam)
+          backgroundColor: Colors.black, // Latar belakang hitam
+          foregroundColor: Colors.white, // Teks putih
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

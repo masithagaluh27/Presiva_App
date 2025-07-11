@@ -77,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen>
             children: [
               // Ikon alarm dengan warna emas/bronze
               const Icon(
-                Icons.panorama_photosphere_select_outlined,
+                Icons.app_registration,
                 size: 90,
                 color: AppColors.gold,
               ),
