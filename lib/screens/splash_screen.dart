@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import 'package:flutter/material.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart';
@@ -69,24 +68,41 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background, // Latar belakang Deep Navy Blue
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(Icons.access_alarm, size: 90, color: AppColors.primary),
-              SizedBox(height: 20),
-              Text('ClockIn', style: AppTextStyles.heading),
-              SizedBox(height: 10),
+            children: [
+              // Ikon alarm dengan warna emas/bronze
+              const Icon(
+                Icons.panorama_photosphere_select_outlined,
+                size: 90,
+                color: AppColors.gold,
+              ),
+              const SizedBox(height: 20),
+              // Teks 'PRESIVA APP' dengan gaya heading dan warna emas/bronze
+              Text(
+                'PRESIVA APP',
+                style: AppTextStyles.heading.copyWith(
+                  color: AppColors.gold, // Terapkan warna emas/bronze di sini
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Teks tagline dengan gaya normal dan warna teks terang (misal: abu-abu muda)
               Text(
                 'Welcome to the future of attendance!',
                 textAlign: TextAlign.center,
-                style: AppTextStyles.normal,
+                style: AppTextStyles.normal.copyWith(
+                  color:
+                      AppColors
+                          .textLight, // Warna abu-abu muda agar kontras dengan background gelap
+                ),
               ),
-              SizedBox(height: 30),
-              CircularProgressIndicator(color: AppColors.primary),
+              const SizedBox(height: 30),
+              // CircularProgressIndicator dengan warna emas/bronze
+              const CircularProgressIndicator(color: AppColors.primaryLight),
             ],
           ),
         ),

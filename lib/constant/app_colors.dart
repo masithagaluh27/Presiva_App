@@ -7,6 +7,7 @@ class AppColors {
   static const Color primaryLight = Color(
     0xFFEBD6FB,
   ); // Ini akan menggantikan biru di beberapa tempat
+  static const Color gold = Color(0xffA98C4E);
 
   // Backgrounds
   static const Color background = Color(0xFFF9FAFB); // Very light gray
