@@ -18,20 +18,22 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final ApiService _apiService = ApiService();
+  final ApiService _apiService = ApiService(); // Instantiate your ApiService
 
   bool _isPasswordVisible = false;
-  bool _isLoading = false;
+  bool _isLoading = false; // Add loading state
 
   @override
   void initState() {
     super.initState();
+    // Defer the session check and navigation until after the first frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkSession();
     });
   }
 
   Future<void> _checkSession() async {
+    // Check if a token exists in ApiService (which means a user is logged in)
     final isLoggedIn = ApiService.getToken() != null;
     if (isLoggedIn) {
       if (mounted) {
@@ -43,22 +45,24 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = true;
+        _isLoading = true; // Set loading to true
       });
 
       final String email = _emailController.text.trim();
       final String password = _passwordController.text.trim();
 
+      // Call the login method from ApiService
       final ApiResponse<AuthData> response = await _apiService.login(
         email: email,
         password: password,
       );
 
       setState(() {
-        _isLoading = false;
+        _isLoading = false; // Set loading to false
       });
 
       if (response.statusCode == 200 && response.data != null) {
+        // Login successful
         if (mounted) {
           ScaffoldMessenger.of(
             context,
@@ -66,6 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.pushReplacementNamed(context, AppRoutes.main);
         }
       } else {
+        // Login failed, show error message
         String errorMessage = response.message;
         if (response.errors != null) {
           response.errors!.forEach((key, value) {
@@ -90,260 +95,123 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Tinggi gambar header, sesuaikan jika perlu
-    final double imageHeight =
-        MediaQuery.of(context).size.height *
-        0.35; // 35% dari tinggi layar untuk gambar atas
-
     return Scaffold(
-      // Tidak perlu backgroundColor di Scaffold karena Stack akan menutupi seluruhnya
-      body: Stack(
-        // Menggunakan Stack untuk menumpuk elemen
-        children: [
-          // Latar belakang gambar Shaun the Sheep penuh layar
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/shaun.jpeg', // Path gambar Shaun Anda
-              fit: BoxFit.cover, // Memastikan gambar menutupi seluruh layar
-            ),
-          ),
-          // Overlay semi-transparan untuk "shadow" pada background
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(
-                0.6,
-              ), // Meningkatkan opasitas untuk shadow yang lebih kuat
-            ),
-          ),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Icon(Icons.lock, size: 100, color: AppColors.primary),
+                ),
+                const SizedBox(height: 20),
+                // Menggunakan AppTextStyles.heading2()
+                Text("Welcome Back", style: AppTextStyles.heading2()),
+                const SizedBox(height: 10),
+                // Menggunakan AppTextStyles.body2()
+                Text("Login to continue", style: AppTextStyles.body2()),
+                const SizedBox(height: 30),
 
-          // Konten utama yang berisi logo, kartu putih, dan formulir
-          Positioned.fill(
-            child: SafeArea(
-              // Pastikan konten tidak terpotong oleh notch/status bar
-              child: Column(
-                children: [
-                  // Ruang kosong di atas kartu putih agar ada jarak dari atas layar
-                  // Disesuaikan agar logo lingkaran berada di tengah area transisi
-                  SizedBox(
-                    height: imageHeight - 60,
-                  ), // Sesuaikan angka 60 untuk posisi kartu relatif terhadap gambar
-                  // Kartu putih dengan radius dan konten formulir
-                  Expanded(
-                    // Memastikan kartu putih mengisi sisa ruang ke bawah
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color:
-                            AppColors.card, // Latar belakang putih untuk form
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(
-                            30,
-                          ), // Sudut membulat di kiri atas
-                          topRight: Radius.circular(
-                            30,
-                          ), // Sudut membulat di kanan atas
-                        ),
-                        boxShadow: [
-                          // Tambahkan bayangan lembut
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: 5,
-                            blurRadius: 10,
-                            offset: const Offset(0, -5), // Bayangan ke atas
-                          ),
-                        ],
-                      ),
-                      child: SingleChildScrollView(
-                        // Tetap gunakan SingleChildScrollView di dalam kartu
-                        // <<< PERUBAHAN DI SINI: MENINGKATKAN PADDING VERTIKAL BAGIAN BAWAH
-                        padding: const EdgeInsets.fromLTRB(
-                          24,
-                          40,
-                          24,
-                          80,
-                        ), // Padding atas 40, bawah 80
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // Logo Shaun the Sheep kecil di dalam kartu (lingkaran)
-                              // Posisikan logo sedikit ke atas agar tumpang tindih dengan background
-                              Transform.translate(
-                                offset: const Offset(
-                                  0.0,
-                                  -80.0,
-                                ), // Mengangkat logo ke atas
-                                child: Container(
-                                  width:
-                                      120, // Ukuran container untuk lingkaran
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color:
-                                        AppColors
-                                            .card, // Background putih untuk lingkaran logo
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        spreadRadius: 3,
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ClipOval(
-                                    child: Image.asset(
-                                      'assets/images/shaun_logo_small.png', // Path logo kecil Shaun Anda
-                                      height:
-                                          100, // Ukuran gambar di dalam lingkaran
-                                      width: 100,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Sesuaikan spasi setelah logo yang diangkat
-                              const SizedBox(
-                                height: -60,
-                              ), // Mengurangi spasi karena logo sudah diangkat
-                              // Judul "Login in to Presiva"
-                              Text(
-                                "Login in to Presiva",
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.heading.copyWith(
-                                  color: AppColors.textDark,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
+                // Email
+                CustomInputField(
+                  controller: _emailController,
+                  hintText: 'Email',
+                  icon: Icons.email_outlined,
+                  customValidator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email cannot be empty';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
 
-                              // Deskripsi
-                              Text(
-                                "Securely access your email, calendar, and files -- all in one place.",
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.normal.copyWith(
-                                  color: AppColors.textLight,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 30),
-
-                              // Email Input
-                              CustomInputField(
-                                controller: _emailController,
-                                hintText: 'Email Address',
-                                icon: Icons.email_outlined,
-                                customValidator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Email tidak boleh kosong';
-                                  }
-                                  if (!RegExp(
-                                    r'^[^@]+@[^@]+\.[^@]+',
-                                  ).hasMatch(value)) {
-                                    return 'Masukkan alamat email yang valid';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 20),
-
-                              // Password Input
-                              CustomInputField(
-                                controller: _passwordController,
-                                hintText: 'Password',
-                                icon: Icons.lock_outline,
-                                isPassword: true,
-                                obscureText: !_isPasswordVisible,
-                                toggleVisibility: () {
-                                  setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  });
-                                },
-                                customValidator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Password tidak boleh kosong';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 10),
-
-                              // Tombol Lupa Password
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      AppRoutes.forgotPassword,
-                                    );
-                                  },
-                                  child: Text(
-                                    'Forgot your Password?',
-                                    style: TextStyle(
-                                      color: AppColors.primaryLight,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-
-                              // Tombol Login
-                              _isLoading
-                                  ? const Center(
-                                    child: CircularProgressIndicator(
-                                      color: AppColors.primaryLight,
-                                    ),
-                                  )
-                                  : PrimaryButton(
-                                    label: 'Log In',
-                                    onPressed: _login,
-                                  ),
-                              const SizedBox(height: 20),
-
-                              // Teks "Don't have an account? Create an account"
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Don't have an account? ",
-                                    style: AppTextStyles.normal.copyWith(
-                                      color: AppColors.textDark,
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap:
-                                        () => Navigator.pushNamed(
-                                          context,
-                                          AppRoutes.register,
-                                        ),
-                                    child: Text(
-                                      "Create an account",
-                                      style: TextStyle(
-                                        color: AppColors.primaryLight,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              // Tambahkan SizedBox di bagian paling bawah untuk memastikan scrollable
-                              const SizedBox(
-                                height: 20,
-                              ), // Tambahan padding di paling bawah
-                            ],
-                          ),
-                        ),
+                // Password
+                CustomInputField(
+                  controller: _passwordController,
+                  hintText: 'Password',
+                  icon: Icons.lock_outline,
+                  isPassword: true,
+                  obscureText: !_isPasswordVisible,
+                  toggleVisibility: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                  customValidator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Password cannot be empty';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10), // Added spacing
+                // --- Forgot Password Button ---
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigate to the Forgot Password screen
+                      Navigator.pushNamed(context, AppRoutes.forgotPassword);
+                    },
+                    child: Text(
+                      // Menggunakan AppTextStyles.body3() atau caption()
+                      "Forgot Password?",
+                      style: AppTextStyles.body3(
+                        // Atau caption(), pilih yang sesuai
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+
+                // --- End Forgot Password Button ---
+                const SizedBox(height: 30),
+
+                // Login Button
+                _isLoading
+                    ? const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    )
+                    : PrimaryButton(label: 'Login', onPressed: _login),
+                const SizedBox(height: 20),
+
+                // Go to register
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account? ",
+                      style: AppTextStyles.body2(
+                        color: AppColors.textDark,
+                      ), // Menggunakan AppTextStyles.body2()
+                    ),
+                    GestureDetector(
+                      onTap:
+                          () =>
+                              Navigator.pushNamed(context, AppRoutes.register),
+                      child: Text(
+                        "Sign up",
+                        style: AppTextStyles.body2(
+                          // Menggunakan AppTextStyles.body2()
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

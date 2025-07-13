@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For date formatting
-import 'package:presiva/constant/app_colors.dart';
+import 'package:presiva/constant/app_colors.dart'; // Assuming this defines your color palette
 import 'package:presiva/models/app_models.dart';
 import 'package:presiva/services/api_Services.dart';
 
@@ -25,7 +25,6 @@ class _RequestScreenState extends State<RequestScreen> {
   @override
   void initState() {
     super.initState();
-    // No location-related initialization needed
   }
 
   @override
@@ -51,6 +50,13 @@ class _RequestScreenState extends State<RequestScreen> {
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primary, // Button text color
+              ),
+            ),
+            // You can also customize other aspects here for a more refined look
+            // For example, shape of the date picker dialog
+            dialogTheme: DialogTheme(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
               ),
             ),
           ),
@@ -128,53 +134,92 @@ class _RequestScreenState extends State<RequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor:
+          AppColors.background, // Use your defined background color
       appBar: AppBar(
-        title: const Text('New Request'),
+        title: const Text(
+          'New Request',
+          style: TextStyle(
+            fontWeight: FontWeight.bold, // Make app bar title bold
+          ),
+        ),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        elevation: 4.0, // Add a subtle shadow
+        shadowColor: AppColors.primary.withOpacity(0.3), // Shadow color
+        centerTitle: true, // Center the title
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        // Added SingleChildScrollView
+        padding: const EdgeInsets.symmetric(
+          horizontal: 24.0,
+          vertical: 20.0,
+        ), // Increased padding
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Date Picker using CustomDateInputField
-            CustomDateInputField(
-              labelText: 'Select Date',
-              icon: Icons.calendar_today,
-              selectedDate: _selectedDate,
-              onTap: () => _selectDate(context),
-              hintText: 'No date chosen', // Optional hint text
-            ),
-            const SizedBox(height: 20),
-
-            // Reason Text Field using CustomInputField
-            CustomInputField(
-              controller: _reasonController,
-              labelText:
-                  'Reason for Request', // This becomes the floating label
-              hintText:
-                  'e.g., Annual leave, sick leave, personal matters', // This remains the hint text inside the field
-              icon: Icons.edit_note,
-              maxLines: 3, // Allow multiline input
-              keyboardType:
-                  TextInputType.multiline, // Set keyboard to multiline
-              fillColor: AppColors.inputFill, // Match previous fillColor
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
-              ), // Adjusted vertical padding
-              customValidator: (value) {
-                // Use customValidator for specific validation
-                if (value == null || value.trim().isEmpty) {
-                  return 'Reason cannot be empty';
-                }
-                return null;
-              },
+            Text(
+              'Fill out the form to submit your leave or absence request.',
+              style: TextStyle(
+                fontSize: 16.0,
+                color: AppColors.textDark.withOpacity(0.7),
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
 
+            // Date Picker using CustomDateInputField
+            // Wrapped in a Container for a card-like effect
+            _buildInputContainer(
+              child: CustomDateInputField(
+                labelText: 'Select Date',
+                icon: Icons.calendar_today,
+                selectedDate: _selectedDate,
+                onTap: () => _selectDate(context),
+                hintText: 'Tap to choose a date', // More engaging hint text
+              ),
+            ),
+            const SizedBox(height: 25), // Increased spacing
+            // Reason Text Field using CustomInputField
+            // Wrapped in a Container for a card-like effect
+            _buildInputContainer(
+              child: CustomInputField(
+                controller: _reasonController,
+                labelText:
+                    'Reason for Request', // This becomes the floating label
+                hintText:
+                    'e.g., Annual leave, sick leave, personal matters', // This remains the hint text inside the field
+                icon: Icons.edit_note,
+                maxLines: 5, // Increased maxLines for more detailed input
+                keyboardType:
+                    TextInputType.multiline, // Set keyboard to multiline
+                fillColor: AppColors.inputFill, // Match previous fillColor
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18, // Adjusted vertical padding for multiline
+                ),
+                customValidator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Reason cannot be empty';
+                  }
+                  return null;
+                },
+                // Add styling to CustomInputField if not already present internally
+                // For example:
+                // border: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(12.0),
+                //   borderSide: BorderSide.none, // Or a subtle color
+                // ),
+                // focusedBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(12.0),
+                //   borderSide: BorderSide(color: AppColors.primary, width: 2.0),
+                // ),
+                // hintStyle: TextStyle(color: AppColors.textDark.withOpacity(0.5)),
+                // labelStyle: TextStyle(color: AppColors.textDark),
+              ),
+            ),
+            const SizedBox(height: 40), // Increased spacing
             // Submit Button using PrimaryButton
             _isLoading
                 ? const Center(
@@ -183,10 +228,41 @@ class _RequestScreenState extends State<RequestScreen> {
                 : PrimaryButton(
                   label: 'Submit Request',
                   onPressed: _submitRequest,
+                  // Ensure PrimaryButton supports elevated style internally
+                  // For example, within PrimaryButton:
+                  // style: ElevatedButton.styleFrom(
+                  //   backgroundColor: AppColors.primary,
+                  //   foregroundColor: Colors.white,
+                  //   shape: RoundedRectangleBorder(
+                  //     borderRadius: BorderRadius.circular(12.0),
+                  //   ),
+                  //   padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  //   elevation: 5.0, // Add elevation
+                  //   shadowColor: AppColors.primary.withOpacity(0.4), // Shadow color
+                  // ),
                 ),
           ],
         ),
       ),
+    );
+  }
+
+  // Helper method to wrap input fields in a consistent container for elegance
+  Widget _buildInputContainer({required Widget child}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white, // A clean white background for inputs
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 8,
+            offset: const Offset(0, 4), // subtle shadow
+          ),
+        ],
+      ),
+      child: ClipRRect(borderRadius: BorderRadius.circular(12.0), child: child),
     );
   }
 }

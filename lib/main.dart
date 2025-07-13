@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:presiva/routes/app_routes.dart';
 import 'package:presiva/screens/attendance/request_screen.dart';
@@ -30,13 +29,13 @@ class MyApp extends StatelessWidget {
         AppRoutes.main: (context) => MainBottomNavigationBar(),
         AppRoutes.request: (context) => RequestScreen(),
         AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
-        AppRoutes.resetPasswordWithOtp: (context) {
+        AppRoutes.resetPassword: (context) {
           final email = ModalRoute.of(context)?.settings.arguments as String?;
           if (email == null) {
             // Handle case where email is not passed, maybe navigate back or show error
             return const Text('Error: Email not provided for password reset.');
           }
-          return ResetPasswordWithOtpScreen(email: email);
+          return ResetPasswordScreen(email: email);
         },
         // AppRoutes.attendanceList: (context) => AttendanceListScreen(),
         // AppRoutes.report: (context) => const PersonReportScreen(),

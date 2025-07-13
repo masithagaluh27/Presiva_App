@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart';
@@ -35,12 +34,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _selectedBatchName =
       'Loading Batch...'; // To display the selected batch
   int? _selectedTrainingId;
-  String? _selectedGender;
+  String? _selectedGender; // Menggunakan String untuk 'L' atau 'P'
 
   @override
   void initState() {
     super.initState();
     _fetchDropdownData();
+    // Inisialisasi _selectedGender ke nilai default, misalnya 'L'
+    _selectedGender = 'L'; // Default ke Laki-laki
   }
 
   Future<void> _fetchDropdownData() async {
@@ -141,6 +142,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
         return;
       }
+      // Tambahkan validasi untuk _selectedGender
+      if (_selectedGender == null || _selectedGender!.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select your gender')),
+        );
+        return;
+      }
       if (_passwordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(
           context,
@@ -207,7 +215,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background, // Menggunakan AppColors.background
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -220,17 +228,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     Text(
                       "Create Account",
-                      style: AppTextStyles.heading.copyWith(
+                      style: AppTextStyles.heading2(
+                        // Menggunakan heading2() sebagai fungsi
                         color: AppColors.primary,
-                        fontSize: 28,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       "Join us to track your attendance effortlessly.",
-                      style: AppTextStyles.normal.copyWith(
-                        color: Colors.grey[600],
-                        fontSize: 16,
+                      style: AppTextStyles.body2(
+                        // Menggunakan body2() sebagai fungsi
+                        color: AppColors.textLight,
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -314,28 +322,74 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Jenis Kelamin Dropdown
-                    CustomDropdownInputField<String>(
-                      labelText: 'Select Gender',
-                      hintText: 'Select Gender',
-                      icon: Icons.people_outline,
-                      value: _selectedGender,
-                      items: const [
-                        DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
-                        DropdownMenuItem(value: 'P', child: Text('Perempuan')),
-                      ],
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedGender = newValue;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please select your gender';
-                        }
-                        return null;
-                      },
+                    // Bagian Jenis Kelamin (Diganti dengan Radio Buttons)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0,
+                        vertical: 8.0,
+                      ),
+                      child: Text(
+                        "Select Gender",
+                        style: AppTextStyles.body2(color: AppColors.textDark),
+                      ),
                     ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Text(
+                              'Laki-laki',
+                              style: AppTextStyles.body2(
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                            value: 'L',
+                            groupValue: _selectedGender,
+                            onChanged: (String? value) {
+                              setState(() {
+                                _selectedGender = value;
+                              });
+                            },
+                            activeColor:
+                                AppColors.primary, // Warna saat terpilih
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Text(
+                              'Perempuan',
+                              style: AppTextStyles.body2(
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                            value: 'P',
+                            groupValue: _selectedGender,
+                            onChanged: (String? value) {
+                              setState(() {
+                                _selectedGender = value;
+                              });
+                            },
+                            activeColor:
+                                AppColors.primary, // Warna saat terpilih
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Jika Anda ingin menampilkan pesan validasi di bawah Radio Buttons, Anda bisa menambahkannya di sini.
+                    // Namun, dengan RadioListTile, pengguna dipaksa memilih salah satu.
+                    if (_selectedGender == null &&
+                        _formKey.currentState?.validate() ==
+                            true) // Contoh validasi jika perlu
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 4.0,
+                        ),
+                        child: Text(
+                          'Please select your gender',
+                          style: AppTextStyles.caption(color: AppColors.error),
+                        ),
+                      ),
                     const SizedBox(height: 16),
 
                     // Display Batch Name (not a dropdown)
@@ -365,8 +419,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               Expanded(
                                 child: Text(
                                   _selectedBatchName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
+                                  style: AppTextStyles.body2(
                                     color: AppColors.textDark,
                                   ),
                                 ),
@@ -422,18 +475,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Already have an account? "),
+                          Text(
+                            "Already have an account? ",
+                            style: AppTextStyles.body2(
+                              color: AppColors.textDark,
+                            ), // Menggunakan AppTextStyles
+                          ),
                           GestureDetector(
                             onTap:
                                 () => Navigator.pushReplacementNamed(
                                   context,
                                   AppRoutes.login,
                                 ),
-                            child: const Text(
+                            child: Text(
                               "Login",
-                              style: TextStyle(
+                              style: AppTextStyles.body2(
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
+                                color:
+                                    AppColors.primary, // Menggunakan AppColors
                               ),
                             ),
                           ),

@@ -1,11 +1,9 @@
 // lib/services/api_service.dart
 import 'dart:convert';
-
-import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/models/app_models.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:presiva/services/api_Services.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {

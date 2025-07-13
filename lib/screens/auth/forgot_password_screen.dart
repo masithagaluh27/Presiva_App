@@ -1,11 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:presiva/constant/app_colors.dart';
-import 'package:presiva/constant/app_text_styles.dart';
+import 'package:presiva/constant/app_text_styles.dart'; // Pastikan ini juga menggunakan AppColors baru jika ada style spesifik
 import 'package:presiva/routes/app_routes.dart';
 import 'package:presiva/services/api_Services.dart';
-import 'package:presiva/widgets/custom_input_field.dart';
-import 'package:presiva/widgets/primary_button.dart';
+import 'package:presiva/widgets/custom_input_field.dart'; // Pastikan widget ini juga konsisten
+import 'package:presiva/widgets/primary_button.dart'; // Pastikan widget ini juga konsisten
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -16,50 +15,57 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final ApiService _apiService = ApiService();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ApiService _apiService = ApiService(); // Instansiasi ApiService
+
   bool _isLoading = false;
 
   Future<void> _requestOtp() async {
-    if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
-      _showSnackBar('Please enter a valid email address.');
-      return;
-    }
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
 
-    setState(() {
-      _isLoading = true;
-    });
+      final String email = _emailController.text.trim();
+      // MEMANGGIL forgotPassword DENGAN EMAIL SESUAI PERMINTAAN ANDA
+      final response = await _apiService.forgotPassword(email: email);
 
-    final String email = _emailController.text.trim();
-    final response = await _apiService.forgotPassword(email: email);
+      setState(() {
+        _isLoading = false;
+      });
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response.statusCode == 200) {
-      _showSnackBar(response.message);
-      if (mounted) {
-        Navigator.pushNamed(
-          context,
-          AppRoutes.resetPasswordWithOtp,
-          arguments: email, // Pass the email to the next screen
-        );
+      if (response.statusCode == 200) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response.message ?? 'OTP berhasil dikirim.'),
+              backgroundColor: AppColors.success, // Warna hijau untuk sukses
+            ),
+          );
+          // Navigasi ke layar Reset Password dengan email yang diinput
+          Navigator.pushReplacementNamed(
+            context,
+            AppRoutes.resetPassword,
+            arguments: email, // Kirim email ke ResetPasswordScreen
+          );
+        }
+      } else {
+        String errorMessage = response.message ?? 'Gagal meminta OTP.';
+        if (response.errors != null) {
+          response.errors!.forEach((key, value) {
+            errorMessage += '\n$key: ${(value as List).join(', ')}';
+          });
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: AppColors.error, // Warna merah untuk error
+            ),
+          );
+        }
       }
-    } else {
-      String errorMessage = response.message;
-      if (response.errors != null) {
-        response.errors!.forEach((key, value) {
-          errorMessage += '\n$key: ${(value as List).join(', ')}';
-        });
-      }
-      _showSnackBar(errorMessage);
     }
-  }
-
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -71,48 +77,66 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Forgot Password'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        title: const Text(
+          "Lupa Password",
+          style: TextStyle(
+            color: AppColors.textDark,
+          ), // Menggunakan textDark untuk judul AppBar
+        ),
+        backgroundColor:
+            AppColors
+                .background, // Background AppBar sama dengan background layar
+        elevation: 0, // Tanpa bayangan
+        iconTheme: const IconThemeData(
+          color: AppColors.textDark,
+        ), // Warna ikon kembali
       ),
+      backgroundColor: AppColors.background, // Menggunakan AppColors.background
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
-            const Text("Reset Your Password", style: AppTextStyles.heading),
-            const SizedBox(height: 10),
-            const Text(
-              "Enter your email address to receive a one-time password (OTP).",
-              style: AppTextStyles.normal,
-            ),
-            const SizedBox(height: 30),
-            CustomInputField(
-              controller: _emailController,
-              hintText: 'Email',
-              labelText: 'Email Address',
-              icon: Icons.email_outlined,
-              keyboardType: TextInputType.emailAddress,
-              customValidator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Email cannot be empty';
-                }
-                if (!value.contains('@')) {
-                  return 'Please enter a valid email address';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 30),
-            _isLoading
-                ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
-                )
-                : PrimaryButton(label: 'Request OTP', onPressed: _requestOtp),
-          ],
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Masukkan email Anda untuk menerima kode verifikasi (OTP) untuk reset password.",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppColors.textLight,
+                ), // Menggunakan textLight untuk teks instruksi
+              ),
+              const SizedBox(height: 30),
+              CustomInputField(
+                controller: _emailController,
+                hintText: 'Email',
+                icon: Icons.email_outlined,
+                customValidator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Email tidak boleh kosong';
+                  }
+                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    return 'Format email tidak valid';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 30),
+              _isLoading
+                  ? const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primary,
+                    ), // Menggunakan AppColors.primary
+                  )
+                  : PrimaryButton(
+                    label: 'Kirim Kode Verifikasi',
+                    onPressed: _requestOtp,
+                    // Asumsi PrimaryButton sudah menggunakan AppColors.primary untuk warnanya
+                    // Jika belum, perlu ditambahkan properti `buttonColor: AppColors.primary` di sini
+                  ),
+            ],
+          ),
         ),
       ),
     );

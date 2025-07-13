@@ -8,97 +8,80 @@ import 'package:presiva/services/api_Services.dart';
 import 'package:presiva/widgets/custom_input_field.dart';
 import 'package:presiva/widgets/primary_button.dart';
 
-class ResetPasswordWithOtpScreen extends StatefulWidget {
-  final String email; // Email passed from ForgotPasswordScreen
+class ResetPasswordScreen extends StatefulWidget {
+  final String email;
 
-  const ResetPasswordWithOtpScreen({super.key, required this.email});
+  const ResetPasswordScreen({super.key, required this.email});
 
   @override
-  State<ResetPasswordWithOtpScreen> createState() =>
-      _ResetPasswordWithOtpScreenState();
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _ResetPasswordWithOtpScreenState
-    extends State<ResetPasswordWithOtpScreen> {
-  final _formKey = GlobalKey<FormState>();
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _otpController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
 
   bool _isLoading = false;
   bool _isNewPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
-  // Timer related variables
-  Timer? _otpTimer;
-  int _remainingSeconds = 600; // 10 minutes in seconds
+  // --- Variabel untuk Timer ---
+  Timer? _timer;
+  final int _startMinutes = 10; // Durasi OTP dalam menit
+  int _currentSeconds = 0; // Detik yang tersisa dari menit saat ini
+  bool _otpExpired = false; // Status OTP kadaluarsa
 
   @override
   void initState() {
     super.initState();
-    _startOtpTimer();
+    // Jika OTP sudah dikirim sebelum masuk layar ini, mulai timer.
+    // Jika layar ini adalah tempat OTP pertama kali dikirim, Anda mungkin ingin
+    // memicu _resendOtp() di sini juga. Tapi dari konteks, sepertinya OTP
+    // sudah dikirim di ForgotPasswordScreen.
+    _startTimer();
   }
 
-  @override
-  void dispose() {
-    _otpTimer?.cancel(); // Cancel the timer when the widget is disposed
-    _otpController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  void _startOtpTimer() {
-    _otpTimer?.cancel(); // Cancel any existing timer
-    _remainingSeconds = 600; // Reset to 10 minutes
-    _otpTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_remainingSeconds > 0) {
+  // --- Fungsi Timer ---
+  void _startTimer() {
+    _otpExpired = false; // Reset status kadaluarsa
+    _currentSeconds = _startMinutes * 60; // Set total detik
+    _timer?.cancel(); // Pastikan timer sebelumnya dibatalkan jika ada
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_currentSeconds <= 0) {
+        timer.cancel();
         setState(() {
-          _remainingSeconds--;
+          _otpExpired = true; // Set OTP kadaluarsa
         });
       } else {
-        _otpTimer?.cancel(); // Stop the timer when it reaches 0
-      }
-    });
-  }
-
-  String _formatTime(int seconds) {
-    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
-    final remainingSeconds = (seconds % 60).toString().padLeft(2, '0');
-    return '$minutes:$remainingSeconds';
-  }
-
-  Future<void> _requestNewOtp() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final response = await _apiService.forgotPassword(email: widget.email);
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response.statusCode == 200) {
-      _showSnackBar(response.message);
-      _startOtpTimer(); // Restart the timer
-    } else {
-      String errorMessage = response.message;
-      if (response.errors != null) {
-        response.errors!.forEach((key, value) {
-          errorMessage += '\n$key: ${(value as List).join(', ')}';
+        setState(() {
+          _currentSeconds--; // Kurangi detik setiap 1 detik
         });
       }
-      _showSnackBar(errorMessage);
-    }
+    });
   }
 
-  Future<void> _resetPassword() async {
+  // Mengubah detik menjadi format MM:SS
+  String _formatDuration(int totalSeconds) {
+    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  // --- FUNGSI UTAMA UNTUK TOMBOL RESET PASSWORD ---
+  Future<void> _resetPasswordProcess() async {
     if (_formKey.currentState!.validate()) {
-      if (_remainingSeconds == 0) {
-        _showSnackBar('OTP has expired. Please request a new one.');
+      if (_otpExpired) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('OTP telah kadaluarsa. Silakan minta OTP baru.'),
+            ),
+          );
+        }
         return;
       }
 
@@ -106,12 +89,14 @@ class _ResetPasswordWithOtpScreenState
         _isLoading = true;
       });
 
+      final String email = widget.email;
       final String otp = _otpController.text.trim();
       final String newPassword = _newPasswordController.text.trim();
       final String confirmPassword = _confirmPasswordController.text.trim();
 
-      final response = await _apiService.resetPassword(
-        email: widget.email,
+      // --- Panggil langsung API resetPassword ---
+      final resetResponse = await _apiService.resetPassword(
+        email: email,
         otp: otp,
         newPassword: newPassword,
         newPasswordConfirmation: confirmPassword,
@@ -121,100 +106,149 @@ class _ResetPasswordWithOtpScreenState
         _isLoading = false;
       });
 
-      if (response.statusCode == 200) {
-        _showSnackBar(response.message);
+      if (resetResponse.statusCode == 200) {
         if (mounted) {
-          Navigator.pushReplacementNamed(context, AppRoutes.login);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                resetResponse.message ?? 'Password reset successfully!',
+              ),
+            ),
+          );
+          Navigator.popUntil(context, ModalRoute.withName(AppRoutes.login));
         }
       } else {
-        String errorMessage = response.message;
-        if (response.errors != null) {
-          response.errors!.forEach((key, value) {
+        // Handle error dari resetPassword API
+        String errorMessage =
+            resetResponse.message ?? 'Failed to reset password.';
+        if (resetResponse.errors != null) {
+          resetResponse.errors!.forEach((key, value) {
             errorMessage += '\n$key: ${(value as List).join(', ')}';
           });
         }
-        _showSnackBar(errorMessage);
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(errorMessage)));
+        }
       }
     }
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+  // --- FUNGSI UNTUK MENGIRIM ULANG OTP ---
+  Future<void> _resendOtp() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Panggil API forgotPassword untuk meminta OTP ulang
+    final response = await _apiService.forgotPassword(email: widget.email);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response.statusCode == 200) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message ?? 'OTP resent successfully!'),
+          ),
+        );
+        _startTimer(); // Mulai ulang timer setelah OTP baru dikirim
+      }
+    } else {
+      String errorMessage = response.message ?? 'Failed to resend OTP.';
+      if (response.errors != null) {
+        response.errors!.forEach((key, value) {
+          errorMessage += '\n$key: ${(value as List).join(', ')}';
+        });
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _otpController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool otpExpired = _remainingSeconds == 0;
-
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Reset Password'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        title: const Text("Reset Password"),
+        backgroundColor: AppColors.background,
+        elevation: 0,
       ),
+      backgroundColor: AppColors.background,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
-              const Text(
-                "Enter OTP and New Password",
-                style: AppTextStyles.heading,
+              Text(
+                "Kode verifikasi telah dikirim ke **${widget.email}**. Masukkan kode dan password baru Anda.",
+                style: const TextStyle(fontSize: 16, color: AppColors.primary),
               ),
               const SizedBox(height: 10),
-              Text(
-                "An OTP has been sent to ${widget.email}. Please enter it below along with your new password.",
-                style: AppTextStyles.normal,
-              ),
-              const SizedBox(height: 30),
-              CustomInputField(
-                controller: TextEditingController(
-                  text: widget.email,
-                ), // Display email, not editable
-                hintText: 'Email',
-                labelText: 'Email Address',
-                icon: Icons.email_outlined,
-                readOnly: true,
+
+              // --- Tampilan Timer ---
+              Center(
+                child:
+                    _otpExpired
+                        ? Text(
+                          'OTP Kadaluarsa. Silakan minta ulang.',
+                          style: TextStyle(
+                            color: AppColors.error,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                        : Text(
+                          'OTP berlaku dalam: ${_formatDuration(_currentSeconds)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                _currentSeconds < 60
+                                    ? AppColors.error
+                                    : AppColors.primary,
+                          ),
+                        ),
               ),
               const SizedBox(height: 20),
+
+              // --- Urutan Input Field Baru ---
               CustomInputField(
                 controller: _otpController,
-                hintText: 'OTP',
-                labelText: 'One-Time Password (OTP)',
-                icon: Icons.vpn_key_outlined,
+                hintText: 'Kode Verifikasi (OTP)',
+                icon: Icons.numbers,
                 keyboardType: TextInputType.number,
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'OTP cannot be empty';
+                    return 'OTP tidak boleh kosong';
+                  }
+                  if (value.length < 6) {
+                    return 'OTP minimal 6 karakter';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 10),
-              // OTP Timer display
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  otpExpired
-                      ? 'OTP Expired'
-                      : 'OTP expires in ${_formatTime(_remainingSeconds)}',
-                  style: TextStyle(
-                    color: otpExpired ? AppColors.error : AppColors.textLight,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
               const SizedBox(height: 20),
+
               CustomInputField(
                 controller: _newPasswordController,
-                hintText: 'New Password',
-                labelText: 'New Password',
+                hintText: 'Password Baru',
                 icon: Icons.lock_outline,
                 isPassword: true,
                 obscureText: !_isNewPasswordVisible,
@@ -225,19 +259,19 @@ class _ResetPasswordWithOtpScreenState
                 },
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'New password cannot be empty';
+                    return 'Password baru tidak boleh kosong';
                   }
                   if (value.length < 8) {
-                    return 'Password must be at least 8 characters long';
+                    return 'Password minimal 8 karakter';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 20),
+
               CustomInputField(
                 controller: _confirmPasswordController,
-                hintText: 'Confirm New Password',
-                labelText: 'Confirm New Password',
+                hintText: 'Konfirmasi Password Baru',
                 icon: Icons.lock_outline,
                 isPassword: true,
                 obscureText: !_isConfirmPasswordVisible,
@@ -248,45 +282,41 @@ class _ResetPasswordWithOtpScreenState
                 },
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Confirm password cannot be empty';
+                    return 'Konfirmasi password tidak boleh kosong';
                   }
                   if (value != _newPasswordController.text) {
-                    return 'Passwords do not match';
+                    return 'Password tidak cocok';
                   }
                   return null;
                 },
               ),
+              const SizedBox(height: 10),
+
+              Center(
+                child: GestureDetector(
+                  onTap: _isLoading || !_otpExpired ? null : _resendOtp,
+                  child: Text(
+                    "Tidak menerima kode? Kirim ulang OTP",
+                    style: TextStyle(
+                      color:
+                          _isLoading || !_otpExpired
+                              ? AppColors.primary
+                              : AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 30),
+
               _isLoading
                   ? const Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   )
                   : PrimaryButton(
                     label: 'Reset Password',
-                    onPressed:
-                        otpExpired
-                            ? () {}
-                            : () => _resetPassword(), // Changed null to () {}
+                    onPressed: _resetPasswordProcess,
                   ),
-              if (otpExpired)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: Center(
-                    child: TextButton(
-                      onPressed:
-                          _isLoading
-                              ? () {}
-                              : () => _requestNewOtp(), // Changed null to () {}
-                      child: const Text(
-                        'Resend OTP',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),

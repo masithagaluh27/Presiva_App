@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart';
-import 'package:presiva/services/api_Services.dart';
+import 'package:presiva/services/api_Services.dart'; // Pastikan path ini benar
 
-import '../routes/app_routes.dart';
+import '../routes/app_routes.dart'; // Pastikan path ini benar
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -68,41 +68,39 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background, // Latar belakang Deep Navy Blue
+      backgroundColor: AppColors.background,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Ikon alarm dengan warna emas/bronze
               const Icon(
-                Icons.app_registration,
+                Icons.access_alarm,
                 size: 90,
-                color: AppColors.gold,
+                color: AppColors.primary,
               ),
               const SizedBox(height: 20),
-              // Teks 'PRESIVA APP' dengan gaya heading dan warna emas/bronze
+              // Menggunakan AppTextStyles.heading1() atau heading2()
               Text(
-                'PRESIVA APP',
-                style: AppTextStyles.heading.copyWith(
-                  color: AppColors.gold, // Terapkan warna emas/bronze di sini
+                'PRESIVA',
+                style: AppTextStyles.heading1(
+                  // Menggunakan heading1() untuk judul utama
+                  color: AppColors.primary, // Memberi warna utama pada judul
                 ),
               ),
               const SizedBox(height: 10),
-              // Teks tagline dengan gaya normal dan warna teks terang (misal: abu-abu muda)
+              // Menggunakan AppTextStyles.body1() atau body2()
               Text(
                 'Welcome to the future of attendance!',
                 textAlign: TextAlign.center,
-                style: AppTextStyles.normal.copyWith(
-                  color:
-                      AppColors
-                          .textLight, // Warna abu-abu muda agar kontras dengan background gelap
+                style: AppTextStyles.body1(
+                  // Menggunakan body1() untuk deskripsi
+                  color: AppColors.textDark, // Memberi warna teks gelap
                 ),
               ),
               const SizedBox(height: 30),
-              // CircularProgressIndicator dengan warna emas/bronze
-              const CircularProgressIndicator(color: AppColors.primaryLight),
+              const CircularProgressIndicator(color: AppColors.primary),
             ],
           ),
         ),

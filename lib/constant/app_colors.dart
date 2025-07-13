@@ -1,45 +1,65 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary brand color (Blue)
-  static const Color primary = Color(0xFF2563EB);
-  // Warna baru yang diminta: EBD6FB
+  static const Color primary = Color(0xFF2C3E50); // Dark Slate Gray / Deep Navy
   static const Color primaryLight = Color(
-    0xFFEBD6FB,
-  ); // Ini akan menggantikan biru di beberapa tempat
-  static const Color gold = Color(0xffA98C4E);
+    0xFF34495E,
+  ); // Slightly lighter primary for subtle variations
+  static const Color secondary = Color(0xFF03DAC6);
+  static const Color accent = Color(
+    0xFF3498DB,
+  ); // A vibrant, clean blue for actionable elements
 
-  // Backgrounds
-  static const Color background = Color(0xFFF9FAFB); // Very light gray
-  static const Color card = Color(0xFFFFFFFF); // White cards/containers
+  // Backgrounds - Lighter, cleaner
+  static const Color background = Color(
+    0xFFF8F9FA,
+  ); // Very light gray, almost white
+  static const Color cardBackground =
+      Colors.white; // Pure white for cards/containers
   static const Color inputFill = Color(
-    0xFFF3F4F6,
-  ); // Slightly darker than background
+    0xFFECEFF1,
+  ); // Soft gray for input fields, clearer contrast
 
-  // Text
-  static const Color textDark = Color(0xFF1F2937); // Almost black
-  static const Color textLight = Color(0xFF9CA3AF); // Muted gray
-  static const Color placeholder = Color(0xFF6B7280); // Placeholder text
+  // Text - Improved readability
+  static const Color textDark = Color(0xFF212529); // Rich black for main text
+  static const Color textLight = Color(
+    0xFF6C757D,
+  ); // Muted gray for secondary text
+  static const Color placeholder = Color(
+    0xFFADB5BD,
+  ); // Lighter gray for placeholders
 
-  // Borders & dividers
-  static const Color border = Color(0xFFE5E7EB); // Soft gray
+  // Borders & dividers - Softer, less intrusive
+  static const Color border = Color(0xFFDEE2E6); // Light gray for borders
 
-  // States
-  static const Color success = Color(0xFF10B981); // Green
-  static const Color error = Color(0xFFEF4444); // Red
-  static const Color warning = Color(0xFFF59E0B); // Amber
+  // States - Clear and distinct
+  static const Color success = Color(
+    0xFF28A745,
+  ); // Standard green for success (e.g., Present)
+  static const Color error = Color(
+    0xFFDC3545,
+  ); // Standard red for critical (e.g., Absents, Check Out button)
+  static const Color warning = Color(
+    0xFFFFC107,
+  ); // Standard amber for warnings (e.g., Late in)
+  static const Color info = Color(0xFF2196F3);
 
-  // Added colors for attendance list design, mapping to your existing states
-  static const Color accentGreen =
-      AppColors.success; // Using existing success color
-  static const Color accentRed = AppColors.error; // Using existing error color
-  static const Color accentOrange =
-      AppColors.warning; // Using existing warning color
+  // Specific light background colors for the summary cards
+  static const Color lightSuccessBackground = Color(
+    0xFFD4EDDA,
+  ); // Softer green for card background
+  static const Color lightDangerBackground = Color(
+    0xFFF8D7DA,
+  ); // Softer red for card background
+  static const Color lightWarningBackground = Color(
+    0xFFFFF3CD,
+  ); // Softer orange for card background
 
-  // Specific light background colors for the cards
-  static const Color lightGreenBackground = Color(0xFFE8F5E9); // Lighter green
-  static const Color lightRedBackground = Color(0xFFFFEBEE); // Lighter red
-  static const Color lightOrangeBackground = Color(
-    0xFFFFF3E0,
-  ); // Lighter orange
+  // Additional useful colors (optional, but good to have)
+  static const Color disabledButton = Color(
+    0xFFCED4DA,
+  ); // Gray for disabled buttons
+  static const Color shadowColor = Color(
+    0x1A000000,
+  ); // Light black for subtle shadows
 }
