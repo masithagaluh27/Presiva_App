@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -29,8 +30,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Timer? _timer;
 
   AbsenceToday? _todayAbsence;
-  AbsenceStats?
-  _absenceStats; // Tetap ada jika Anda masih ingin menampilkan 'Total Hadir' dan 'Total Izin'
+  AbsenceStats? _absenceStats;
 
   Position? _currentPosition;
   bool _permissionGranted = false;
@@ -363,15 +363,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: AppColors.background,
-            title: const Text('Error'),
-            content: Text(message),
+            backgroundColor: AppColors.background(
+              context,
+            ), // <<< Perubahan di sini
+            title: Text(
+              'Error',
+              style: TextStyle(color: AppColors.textDark(context)),
+            ), // <<< Perubahan di sini
+            content: Text(
+              message,
+              style: TextStyle(color: AppColors.textDark(context)),
+            ), // <<< Perubahan di sini
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
+                child: Text(
                   'OK',
-                  style: TextStyle(color: AppColors.primary),
+                  style: TextStyle(
+                    color: AppColors.primary(context),
+                  ), // <<< Perubahan di sini
                 ),
               ),
             ],
@@ -452,13 +462,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: AppColors.cardBackground,
-              onSurface: AppColors.textDark,
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primary(context), // <<< Perubahan di sini
+              onPrimary: AppColors.onPrimary(context), // <<< Perubahan di sini
+              surface: AppColors.cardBackground(
+                context,
+              ), // <<< Perubahan di sini
+              onSurface: AppColors.textDark(context), // <<< Perubahan di sini
             ),
-            dialogBackgroundColor: AppColors.cardBackground,
+            dialogTheme: DialogTheme(
+              // Ubah DialogThemeData menjadi DialogTheme
+              backgroundColor: AppColors.cardBackground(
+                context,
+              ), // <<< Perubahan di sini
+            ),
           ),
           child: child!,
         );
@@ -474,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           content: Text(
             'Filtering data for ${DateFormat('MMMM yyyy').format(pickedMonth)}',
           ),
-          backgroundColor: AppColors.info,
+          backgroundColor: AppColors.info(context), // <<< Perubahan di sini
         ),
       );
     }
@@ -486,10 +503,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final bool hasCheckedOut = _todayAbsence?.jamKeluar != null;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context), // <<< Perubahan di sini
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.primary(context), // <<< Perubahan di sini
         elevation: 0,
         toolbarHeight: 80,
         flexibleSpace: SafeArea(
@@ -501,21 +518,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(Icons.location_on, color: Colors.white, size: 24),
+                Icon(
+                  Icons.location_on,
+                  color: AppColors.textLight(context),
+                  size: 24,
+                ), // <<< Perubahan di sini
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Current Location',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                        style: TextStyle(
+                          color: AppColors.textLight(context),
+                          fontSize: 12,
+                        ), // <<< Perubahan di sini
                       ),
                       Text(
                         _location,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          // Ubah const TextStyle menjadi TextStyle biasa
+                          color: AppColors.onPrimary(
+                            context,
+                          ), // Menggunakan onPrimary untuk teks di atas primary
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -526,9 +553,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.notifications,
-                    color: Colors.white,
+                    color: AppColors.onPrimary(
+                      context,
+                    ), // Menggunakan onPrimary untuk ikon notifikasi
                     size: 24,
                   ),
                   onPressed: () {
@@ -548,9 +577,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             right: 0,
             child: Container(
               height: 120,
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.vertical(
+              decoration: BoxDecoration(
+                // Ubah const BoxDecoration menjadi BoxDecoration biasa
+                color: AppColors.primary(context), // <<< Perubahan di sini
+                borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(30),
                 ),
               ),
@@ -566,7 +596,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     children: [
                       CircleAvatar(
                         radius: 28,
-                        backgroundColor: AppColors.accent.withOpacity(0.2),
+                        backgroundColor: AppColors.accent(
+                          context,
+                        ).withOpacity(0.2), // <<< Perubahan di sini
                         backgroundImage:
                             _currentUser?.profile_photo != null &&
                                     _currentUser!.profile_photo!.isNotEmpty
@@ -577,9 +609,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         child:
                             _currentUser?.profile_photo == null ||
                                     _currentUser!.profile_photo!.isEmpty
-                                ? const Icon(
+                                ? Icon(
                                   Icons.person,
-                                  color: AppColors.accent,
+                                  color: AppColors.accent(
+                                    context,
+                                  ), // <<< Perubahan di sini
                                   size: 30,
                                 )
                                 : null,
@@ -590,17 +624,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         children: [
                           Text(
                             _getGreeting(),
-                            style: const TextStyle(
+                            style: TextStyle(
+                              // Ubah const TextStyle menjadi TextStyle biasa
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.onPrimary(
+                                context,
+                              ), // Menggunakan onPrimary karena di atas primary
                             ),
                           ),
-                          const Text(
+                          Text(
                             'Ready for a productive day?',
                             style: TextStyle(
+                              // Ubah const TextStyle menjadi TextStyle biasa
                               fontSize: 14,
-                              color: Colors.white70,
+                              color: AppColors.textLight(
+                                context,
+                              ), // <<< Perubahan di sini
                             ),
                           ),
                         ],
@@ -609,9 +649,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(height: 20),
-                _buildMainActionCard(hasCheckedIn, hasCheckedOut),
+                _buildMainActionCard(
+                  context,
+                  hasCheckedIn,
+                  hasCheckedOut,
+                ), // <<< Lewatkan context
                 const SizedBox(height: 20),
-                _buildAttendanceSummary(),
+                _buildAttendanceSummary(context), // <<< Lewatkan context
                 const SizedBox(height: 100),
               ],
             ),
@@ -634,17 +678,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         true;
                   }
                 },
-                icon: const Icon(Icons.add_task, color: AppColors.primary),
-                label: const Text(
+                icon: Icon(
+                  Icons.add_task,
+                  color: AppColors.primary(context),
+                ), // <<< Perubahan di sini
+                label: Text(
                   'Submit Request',
-                  style: TextStyle(color: AppColors.primary, fontSize: 18),
+                  style: TextStyle(
+                    color: AppColors.primary(context),
+                    fontSize: 18,
+                  ), // <<< Perubahan di sini
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.background,
-                  foregroundColor: AppColors.primary,
+                  backgroundColor: AppColors.background(
+                    context,
+                  ), // <<< Perubahan di sini
+                  foregroundColor: AppColors.primary(
+                    context,
+                  ), // <<< Perubahan di sini
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   side: BorderSide(
-                    color: AppColors.primary.withOpacity(0.5),
+                    color: AppColors.primary(
+                      context,
+                    ).withOpacity(0.5), // <<< Perubahan di sini
                     width: 1,
                   ),
                   shape: RoundedRectangleBorder(
@@ -659,9 +715,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMainActionCard(bool hasCheckedIn, bool hasCheckedOut) {
+  Widget _buildMainActionCard(
+    BuildContext context,
+    bool hasCheckedIn,
+    bool hasCheckedOut,
+  ) {
+    // Tambahkan context
     return Card(
-      color: AppColors.cardBackground,
+      color: AppColors.cardBackground(context), // <<< Perubahan di sini
       margin: const EdgeInsets.symmetric(horizontal: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 6,
@@ -674,13 +735,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: AppColors.success.withOpacity(0.1),
+                color: AppColors.success(
+                  context,
+                ).withOpacity(0.1), // <<< Perubahan di sini
                 borderRadius: BorderRadius.circular(5),
               ),
-              child: const Text(
+              child: Text(
                 'GENERAL SHIFT',
                 style: TextStyle(
-                  color: AppColors.success,
+                  // Ubah const TextStyle menjadi TextStyle biasa
+                  color: AppColors.success(context), // <<< Perubahan di sini
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                 ),
@@ -693,17 +757,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 Text(
                   _currentTime,
-                  style: const TextStyle(
+                  style: TextStyle(
+                    // Ubah const TextStyle menjadi TextStyle biasa
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
+                    color: AppColors.textDark(context), // <<< Perubahan di sini
                   ),
                 ),
                 Text(
                   _currentDate,
-                  style: const TextStyle(
+                  style: TextStyle(
+                    // Ubah const TextStyle menjadi TextStyle biasa
                     fontSize: 16,
-                    color: AppColors.textLight,
+                    color: AppColors.textLight(
+                      context,
+                    ), // <<< Perubahan di sini
                   ),
                 ),
               ],
@@ -724,9 +792,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   backgroundColor:
                       hasCheckedIn
                           ? (hasCheckedOut
-                              ? AppColors.textLight
-                              : AppColors.error)
-                          : AppColors.primary,
+                              ? AppColors.textLight(
+                                context,
+                              ) // <<< Perubahan di sini
+                              : AppColors.error(
+                                context,
+                              )) // <<< Perubahan di sini
+                          : AppColors.primary(context), // <<< Perubahan di sini
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
@@ -739,7 +811,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           width: 24,
                           height: 24,
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color:
+                                Colors
+                                    .white, // Ini bisa tetap putih atau AppColors.onPrimary(context)
                             strokeWidth: 2,
                           ),
                         )
@@ -747,8 +821,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           hasCheckedIn
                               ? (hasCheckedOut ? 'Checked Out' : 'Check Out')
                               : 'Check In',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            // Ubah const TextStyle menjadi TextStyle biasa
+                            color: AppColors.onPrimary(
+                              context,
+                            ), // Menggunakan onPrimary untuk teks tombol
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -756,12 +833,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(height: 20),
-            const Divider(color: AppColors.textLight),
+            Divider(
+              color: AppColors.textLight(context),
+            ), // <<< Perubahan di sini
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildTimeDetail(
+                  context, // <<< Lewatkan context
                   Icons.watch_later_outlined,
                   _todayAbsence?.jamMasuk?.toLocal().toString().substring(
                         11,
@@ -769,9 +849,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ) ??
                       'N/A',
                   'Check In',
-                  AppColors.primary,
+                  AppColors.primary(context), // <<< Perubahan di sini
                 ),
                 _buildTimeDetail(
+                  context, // <<< Lewatkan context
                   Icons.watch_later_outlined,
                   _todayAbsence?.jamKeluar?.toLocal().toString().substring(
                         11,
@@ -779,13 +860,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ) ??
                       'N/A',
                   'Check Out',
-                  AppColors.error,
+                  AppColors.error(context), // <<< Perubahan di sini
                 ),
                 _buildTimeDetail(
+                  context, // <<< Lewatkan context
                   Icons.watch_later_outlined,
                   _calculateWorkingHours(),
                   'Working HR\'s',
-                  AppColors.warning,
+                  AppColors.warning(context), // <<< Perubahan di sini
                 ),
               ],
             ),
@@ -796,6 +878,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildTimeDetail(
+    BuildContext context, // Tambahkan context di sini
     IconData icon,
     String time,
     String label,
@@ -807,21 +890,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         const SizedBox(height: 5),
         Text(
           time,
-          style: const TextStyle(
+          style: TextStyle(
+            // Ubah const TextStyle menjadi TextStyle biasa
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: AppColors.textDark,
+            color: AppColors.textDark(context), // <<< Perubahan di sini
           ),
         ),
         Text(
           label,
-          style: const TextStyle(fontSize: 12, color: AppColors.textLight),
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.textLight(context),
+          ), // <<< Perubahan di sini
         ),
       ],
     );
   }
 
-  Widget _buildAttendanceSummary() {
+  Widget _buildAttendanceSummary(BuildContext context) {
+    // Tambahkan context
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -830,12 +918,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Attendance for this Month',
                 style: TextStyle(
+                  // Ubah const TextStyle menjadi TextStyle biasa
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textDark,
+                  color: AppColors.textDark(context), // <<< Perubahan di sini
                 ),
               ),
               InkWell(
@@ -849,7 +938,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: AppColors.textLight.withOpacity(0.5),
+                      color: AppColors.textLight(
+                        context,
+                      ).withOpacity(0.5), // <<< Perubahan di sini
                     ),
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -857,16 +948,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     children: [
                       Text(
                         DateFormat('MMM').format(DateTime.now()).toUpperCase(),
-                        style: const TextStyle(
+                        style: TextStyle(
+                          // Ubah const TextStyle menjadi TextStyle biasa
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textDark,
+                          color: AppColors.textDark(
+                            context,
+                          ), // <<< Perubahan di sini
                         ),
                       ),
                       const SizedBox(width: 5),
-                      const Icon(
+                      Icon(
                         Icons.calendar_today,
                         size: 16,
-                        color: AppColors.textDark,
+                        color: AppColors.textDark(
+                          context,
+                        ), // <<< Perubahan di sini
                       ),
                     ],
                   ),
@@ -878,15 +974,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         const SizedBox(height: 15),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: _buildAttendanceStatsCard(),
+          child: _buildAttendanceStatsCard(context), // <<< Lewatkan context
         ),
       ],
     );
   }
 
-  Widget _buildAttendanceStatsCard() {
+  Widget _buildAttendanceStatsCard(BuildContext context) {
+    // Tambahkan context
     return Card(
-      color: AppColors.cardBackground,
+      color: AppColors.cardBackground(context), // <<< Perubahan di sini
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 4,
       child: Padding(
@@ -897,30 +994,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildStatItem(
+                  context, // <<< Lewatkan context
                   'Total Hadir',
-                  _absenceStats?.totalMasuk?.toString() ?? '0',
-                  AppColors.primary,
+                  _absenceStats?.totalMasuk.toString() ?? '0',
+                  AppColors.primary(context), // <<< Perubahan di sini
                 ),
-                // "Total Terlambat" dihapus
                 _buildStatItem(
+                  context, // <<< Lewatkan context
                   'Total Izin',
-                  _absenceStats?.totalIzin?.toString() ?? '0',
-                  AppColors.info,
+                  _absenceStats?.totalIzin.toString() ?? '0',
+                  AppColors.info(context), // <<< Perubahan di sini
                 ),
-                // "Total Sakit" dihapus
               ],
             ),
-            // Jika Anda hanya ingin menampilkan 2 item per baris setelah penghapusan,
-            // Anda bisa menyesuaikan atau menghapus baris kedua di bawah ini
-            // Jika ada lebih dari 2 item yang ingin ditampilkan di baris pertama,
-            // Anda bisa mengatur mainAxisAlignment atau menambahkan Expanded
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, Color color) {
+  Widget _buildStatItem(
+    BuildContext context,
+    String label,
+    String value,
+    Color color,
+  ) {
+    // Tambahkan context
     return Column(
       children: [
         Text(
@@ -934,7 +1033,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(fontSize: 14, color: AppColors.textDark),
+          style: TextStyle(
+            fontSize: 14,
+            color: AppColors.textDark(context),
+          ), // <<< Perubahan di sini
         ),
       ],
     );

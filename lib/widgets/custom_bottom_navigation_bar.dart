@@ -23,7 +23,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
-      selectedItemColor: AppColors.primary, // Color for selected icon/label
+      selectedItemColor: AppColors.primary(context), // Color for selected icon/label
       unselectedItemColor: Colors.grey, // Color for unselected icons/labels
       backgroundColor: Colors.white, // Background color of the navigation bar
       type:

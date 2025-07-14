@@ -42,18 +42,19 @@ class _RequestScreenState extends State<RequestScreen> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: AppColors.textDark, // Body text color
+            colorScheme: ColorScheme.light(
+              // Gunakan ColorScheme.light di sini karena kita menimpa tema date picker agar selalu light
+              primary: AppColors.primary(context), // <--- UBAH DI SINI
+              onPrimary: Colors.white, // Header text color, bisa tetap putih
+              onSurface: AppColors.textDark(context), // <--- UBAH DI SINI
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary, // Button text color
+                foregroundColor: AppColors.primary(
+                  context,
+                ), // <--- UBAH DI SINI
               ),
             ),
-            // You can also customize other aspects here for a more refined look
-            // For example, shape of the date picker dialog
             dialogTheme: DialogTheme(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
@@ -134,8 +135,7 @@ class _RequestScreenState extends State<RequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          AppColors.background, // Use your defined background color
+      backgroundColor: AppColors.background(context), // <--- UBAH DI SINI
       appBar: AppBar(
         title: const Text(
           'New Request',
@@ -143,14 +143,17 @@ class _RequestScreenState extends State<RequestScreen> {
             fontWeight: FontWeight.bold, // Make app bar title bold
           ),
         ),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.primary(context), // <--- UBAH DI SINI
+        foregroundColor:
+            Colors
+                .white, // Jika Anda ingin foreground tetap putih terlepas dari tema, biarkan Colors.white. Jika ingin dinamis, gunakan AppColors.textLight(context) atau sejenisnya.
         elevation: 4.0, // Add a subtle shadow
-        shadowColor: AppColors.primary.withOpacity(0.3), // Shadow color
+        shadowColor: AppColors.primary(
+          context,
+        ).withOpacity(0.3), // <--- UBAH DI SINI
         centerTitle: true, // Center the title
       ),
       body: SingleChildScrollView(
-        // Added SingleChildScrollView
         padding: const EdgeInsets.symmetric(
           horizontal: 24.0,
           vertical: 20.0,
@@ -162,7 +165,9 @@ class _RequestScreenState extends State<RequestScreen> {
               'Fill out the form to submit your leave or absence request.',
               style: TextStyle(
                 fontSize: 16.0,
-                color: AppColors.textDark.withOpacity(0.7),
+                color: AppColors.textDark(
+                  context,
+                ).withOpacity(0.7), // <--- UBAH DI SINI
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -170,34 +175,29 @@ class _RequestScreenState extends State<RequestScreen> {
             const SizedBox(height: 30),
 
             // Date Picker using CustomDateInputField
-            // Wrapped in a Container for a card-like effect
             _buildInputContainer(
               child: CustomDateInputField(
                 labelText: 'Select Date',
                 icon: Icons.calendar_today,
                 selectedDate: _selectedDate,
                 onTap: () => _selectDate(context),
-                hintText: 'Tap to choose a date', // More engaging hint text
+                hintText: 'Tap to choose a date',
               ),
             ),
             const SizedBox(height: 25), // Increased spacing
             // Reason Text Field using CustomInputField
-            // Wrapped in a Container for a card-like effect
             _buildInputContainer(
               child: CustomInputField(
                 controller: _reasonController,
-                labelText:
-                    'Reason for Request', // This becomes the floating label
-                hintText:
-                    'e.g., Annual leave, sick leave, personal matters', // This remains the hint text inside the field
+                labelText: 'Reason for Request',
+                hintText: 'e.g., Annual leave, sick leave, personal matters',
                 icon: Icons.edit_note,
-                maxLines: 5, // Increased maxLines for more detailed input
-                keyboardType:
-                    TextInputType.multiline, // Set keyboard to multiline
-                fillColor: AppColors.inputFill, // Match previous fillColor
+                maxLines: 5,
+                keyboardType: TextInputType.multiline,
+                fillColor: AppColors.inputFill(context), // <--- UBAH DI SINI
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 20,
-                  vertical: 18, // Adjusted vertical padding for multiline
+                  vertical: 18,
                 ),
                 customValidator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -205,41 +205,19 @@ class _RequestScreenState extends State<RequestScreen> {
                   }
                   return null;
                 },
-                // Add styling to CustomInputField if not already present internally
-                // For example:
-                // border: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(12.0),
-                //   borderSide: BorderSide.none, // Or a subtle color
-                // ),
-                // focusedBorder: OutlineInputBorder(
-                //   borderRadius: BorderRadius.circular(12.0),
-                //   borderSide: BorderSide(color: AppColors.primary, width: 2.0),
-                // ),
-                // hintStyle: TextStyle(color: AppColors.textDark.withOpacity(0.5)),
-                // labelStyle: TextStyle(color: AppColors.textDark),
               ),
             ),
             const SizedBox(height: 40), // Increased spacing
             // Submit Button using PrimaryButton
             _isLoading
-                ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+                ? Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary(context),
+                  ), // <--- UBAH DI SINI
                 )
                 : PrimaryButton(
                   label: 'Submit Request',
                   onPressed: _submitRequest,
-                  // Ensure PrimaryButton supports elevated style internally
-                  // For example, within PrimaryButton:
-                  // style: ElevatedButton.styleFrom(
-                  //   backgroundColor: AppColors.primary,
-                  //   foregroundColor: Colors.white,
-                  //   shape: RoundedRectangleBorder(
-                  //     borderRadius: BorderRadius.circular(12.0),
-                  //   ),
-                  //   padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  //   elevation: 5.0, // Add elevation
-                  //   shadowColor: AppColors.primary.withOpacity(0.4), // Shadow color
-                  // ),
                 ),
           ],
         ),
@@ -251,11 +229,17 @@ class _RequestScreenState extends State<RequestScreen> {
   Widget _buildInputContainer({required Widget child}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white, // A clean white background for inputs
+        // Untuk warna background kontainer, jika Anda ingin dinamis, gunakan AppColors.cardBackground(context)
+        // Jika Anda selalu ingin putih terang, biarkan Colors.white.
+        color: AppColors.cardBackground(
+          context,
+        ), // <--- UBAH DI SINI (Opsional, tergantung keinginan)
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: AppColors.shadowColor(
+              context,
+            ).withOpacity(0.1), // <--- UBAH DI SINI
             spreadRadius: 2,
             blurRadius: 8,
             offset: const Offset(0, 4), // subtle shadow

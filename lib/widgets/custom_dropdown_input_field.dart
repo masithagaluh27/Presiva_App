@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:presiva/constant/app_colors.dart';
 
@@ -9,8 +8,8 @@ class CustomDropdownInputField<T> extends StatelessWidget {
   final T? value;
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?>? onChanged;
-  final double? menuMaxHeight; // NEW: Added menuMaxHeight
-  final String? Function(T?)? validator; // NEW: Added validator
+  final double? menuMaxHeight;
+  final String? Function(T?)? validator;
 
   const CustomDropdownInputField({
     super.key,
@@ -20,8 +19,8 @@ class CustomDropdownInputField<T> extends StatelessWidget {
     required this.value,
     required this.items,
     required this.onChanged,
-    this.menuMaxHeight, // Initialize new parameter
-    this.validator, // Initialize new parameter
+    this.menuMaxHeight,
+    this.validator,
   });
 
   @override
@@ -30,47 +29,55 @@ class CustomDropdownInputField<T> extends StatelessWidget {
       value: value,
       hint: Text(
         hintText ?? 'Select ${labelText.toLowerCase()}',
-        style: const TextStyle(color: AppColors.placeholder),
+        style: TextStyle(
+          color: AppColors.placeholder(context),
+        ), // <<< Perubahan di sini
       ),
       items: items,
       onChanged: onChanged,
-      style: const TextStyle(
+      style: TextStyle(
+        // Ubah const TextStyle menjadi TextStyle biasa
         fontSize: 16,
-        color: AppColors.textDark,
-      ), // Consistent text style
+        color: AppColors.textDark(context), // <<< Perubahan di sini
+      ),
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: const TextStyle(
-          color: AppColors.textLight,
-        ), // Consistent label style
+        labelStyle: TextStyle(
+          // Ubah const TextStyle menjadi TextStyle biasa
+          color: AppColors.textLight(context), // <<< Perubahan di sini
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            16,
-          ), // Match CustomInputField's border radius
-          borderSide: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: AppColors.border(context),
+          ), // <<< Perubahan di sini
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(
+            color: AppColors.border(context),
+          ), // <<< Perubahan di sini
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(
+            color: AppColors.primary(context),
+          ), // <<< Perubahan di sini
         ),
         filled: true,
-        fillColor: AppColors.inputFill, // Consistent fill color
+        fillColor: AppColors.inputFill(context), // <<< Perubahan di sini
         prefixIcon: Icon(
           icon,
-          color: AppColors.primary,
-        ), // Consistent icon styling
+          color: AppColors.primary(context), // <<< Perubahan di sini
+        ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
-        ), // Consistent padding
+        ),
       ),
-      menuMaxHeight: menuMaxHeight, // Apply menuMaxHeight here
-      validator: validator, // Apply validator here
-      isExpanded: true, // Keep this to prevent overflow
+      menuMaxHeight: menuMaxHeight,
+      validator: validator,
+      isExpanded: true,
     );
   }
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Keep this import for DateFormat if you use it for displaying dates in UI
+import 'package:intl/intl.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/models/app_models.dart';
 import 'package:presiva/screens/auth/edit_profile_screen.dart';
 import 'package:presiva/services/api_Services.dart';
 
-import '../../routes/app_routes.dart'; // Your AppRoutes
+import '../../routes/app_routes.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ValueNotifier<bool> refreshNotifier;
@@ -17,11 +17,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final ApiService _apiService = ApiService(); // Use ApiService
-  User? _currentUser; // Holds the full user data (from API)
-  bool _isLoading = false; // Add loading state
-
-  bool _notificationEnabled = true; // State for the notification switch
+  final ApiService _apiService = ApiService();
+  User? _currentUser;
+  bool _isLoading = false;
+  bool _notificationEnabled = true;
 
   @override
   void initState() {
@@ -38,61 +37,118 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _handleRefreshSignal() {
     if (widget.refreshNotifier.value) {
-      _loadUserData(); // Re-fetch user data on refresh signal
-      widget.refreshNotifier.value = false; // Reset the notifier
+      _loadUserData();
+      widget.refreshNotifier.value = false;
     }
   }
 
   Future<void> _loadUserData() async {
     setState(() {
-      _isLoading = true; // Set loading to true
+      _isLoading = true;
     });
 
     final ApiResponse<User> response = await _apiService.getProfile();
 
     setState(() {
-      _isLoading = false; // Set loading to false
+      _isLoading = false;
     });
 
     if (response.statusCode == 200 && response.data != null) {
       setState(() {
         _currentUser = response.data;
-        // You might also want to load the notification preference from the user model
-        // if you store it there:
-        // _notificationEnabled = user?.notificationPreference ?? true;
       });
     } else {
       print('Failed to load user profile: ${response.message}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load profile: ${response.message}'),
+            content: Text(
+              'Failed to load profile: ${response.message}',
+              style: TextStyle(color: AppColors.onError(context)),
+            ),
+            backgroundColor: AppColors.error(context),
           ),
         );
       }
       setState(() {
-        _currentUser = null; // Ensure _currentUser is null on error
+        _currentUser = null;
       });
     }
   }
 
   void _logout(BuildContext context) async {
-    await ApiService.clearToken(); // Clear token using ApiService static method
-    if (context.mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
+    final bool? confirmLogout = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text(
+              'Logout Confirmation',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: AppColors.textDark(context),
+              ),
+            ),
+            content: Text(
+              'Are you sure you want to log out?',
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.textLight(context),
+              ),
+            ),
+            backgroundColor: AppColors.cardBackground(context),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: AppColors.primary(context),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error(context),
+                  foregroundColor: AppColors.onError(context),
+                ),
+                child: Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: AppColors.onError(context),
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmLogout == true) {
+      await ApiService.clearToken();
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      }
     }
   }
 
   void _navigateToEditProfile() async {
     if (_currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User data not loaded yet. Please wait.')),
+        SnackBar(
+          content: Text(
+            'User data not loaded yet. Please wait.',
+            style: TextStyle(color: AppColors.onError(context)),
+          ),
+          backgroundColor: AppColors.error(context),
+        ),
       );
       return;
     }
 
-    // Navigate to the EditProfileScreen, passing the current user data.
-    // Await the result to know if data was updated.
     final bool? result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -100,18 +156,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
 
-    // If result is true, it means the profile was successfully updated in EditProfileScreen,
-    // so refresh the data on this ProfileScreen.
     if (result == true) {
-      _loadUserData(); // Refresh profile data
+      _loadUserData();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Provide default values if _currentUser is null (e.g., still loading or no user logged in)
-    final String username =
-        _currentUser?.name ?? 'Guest User'; // Use .name property
+    final String username = _currentUser?.name ?? 'Guest User';
     final String email = _currentUser?.email ?? 'guest@example.com';
     final String jenisKelamin =
         _currentUser?.jenis_kelamin == 'L'
@@ -119,17 +171,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             : _currentUser?.jenis_kelamin == 'P'
             ? 'Perempuan'
             : 'N/A';
-    // Changed: profilePhotoUrl will now hold the URL/path from the API
     final String profilePhotoUrl = _currentUser?.profile_photo ?? '';
-
-    // Use training_title from API for designation
     final String designation = _currentUser?.training_title ?? 'Employee';
 
-    // Format the joinedDate based on batch.start_date from User model
     String formattedJoinedDate = 'N/A';
     if (_currentUser?.batch?.startDate != null) {
       try {
-        // Added null assertion (!) to startDate as DateTime.parse expects a non-nullable String
         final DateTime startDate = DateTime.parse(
           _currentUser!.batch!.startDate!,
         );
@@ -140,230 +187,262 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
 
+    ImageProvider<Object>? profileImageProvider;
+    if (profilePhotoUrl.isNotEmpty) {
+      final String fullImageUrl =
+          profilePhotoUrl.startsWith('http')
+              ? profilePhotoUrl
+              : 'https://appabsensi.mobileprojp.com/public/$profilePhotoUrl';
+      profileImageProvider = NetworkImage(fullImageUrl);
+    }
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        automaticallyImplyLeading: false, // Managed by MainBottomNavigationBar
+        automaticallyImplyLeading: false,
+        title: Text(
+          'Profile',
+          style: TextStyle(
+            color: AppColors.onPrimary(context),
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
+        centerTitle: true,
       ),
-      body: Stack(
-        children: [
-          // Blue background wave/area at the top
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 150, // Height of the blue background
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(30),
+      body:
+          _isLoading
+              ? Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.primary(context),
+                  ),
+                ),
+              )
+              : RefreshIndicator(
+                onRefresh: _loadUserData,
+                color: AppColors.primary(context),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 280, // Disesuaikan tingginya
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppColors.primary(context),
+                              AppColors.primary(context).withOpacity(0.8),
+                            ],
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 80.0,
+                          ), // Menambahkan padding atas
+                          child: Column(
+                            mainAxisAlignment:
+                                MainAxisAlignment.start, // Mengubah alignment
+                            children: [
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: profileImageProvider,
+                                    child:
+                                        profileImageProvider == null
+                                            ? Icon(
+                                              Icons.person,
+                                              size: 60,
+                                              color: AppColors.primary(context),
+                                            )
+                                            : null,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                username,
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.onPrimary(context),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                designation,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColors.onPrimary(
+                                    context,
+                                  ).withOpacity(0.8),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Transform.translate(
+                        offset: const Offset(0, -30),
+                        child: Column(
+                          children: [
+                            _buildContentCard(
+                              email,
+                              _currentUser?.batch_ke,
+                              jenisKelamin,
+                              designation,
+                              formattedJoinedDate,
+                              _currentUser?.profile_photo ?? '',
+                            ),
+                            const SizedBox(height: 20),
+                            _buildActionOptions(),
+                            const SizedBox(height: 40),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+    );
+  }
+
+  Widget _buildContentCard(
+    String email,
+    String? batchKe,
+    String jenisKelamin,
+    String designation,
+    String joinedDate,
+    String profilePhotoPath,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Card(
+        color: AppColors.cardBackground(context),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        elevation: 10,
+        shadowColor: AppColors.primary(context).withOpacity(0.2),
+        child: Padding(
+          padding: const EdgeInsets.all(25.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Personal Details',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textDark(context).withOpacity(0.9),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildDetailRow('Email ID', email, Icons.email_outlined),
+              if (batchKe != null) ...[
+                Divider(color: AppColors.border(context), height: 25),
+                _buildDetailRow(
+                  'Batch',
+                  batchKe,
+                  Icons.calendar_today_outlined,
+                ),
+              ],
+              Divider(color: AppColors.border(context), height: 25),
+              _buildDetailRow('Gender', jenisKelamin, Icons.transgender),
+              Divider(color: AppColors.border(context), height: 25),
+              _buildDetailRow('Designation', designation, Icons.work_outline),
+              Divider(color: AppColors.border(context), height: 25),
+              _buildDetailRow(
+                'Joined Date',
+                joinedDate,
+                Icons.date_range_outlined,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: AppColors.primary(context).withOpacity(0.7),
+            size: 24,
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textLight(context).withOpacity(0.8),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textDark(context),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
-          // Conditional rendering: Show CircularProgressIndicator while _isLoading is true
-          _isLoading
-              ? const Center(
-                child: CircularProgressIndicator(), // Show loading indicator
-              )
-              : ListView(
-                padding: const EdgeInsets.only(top: 20, bottom: 20),
-                children: [
-                  // Profile Header Section (Avatar, Name, Designation, Joined Date)
-                  _buildProfileHeader(
-                    username,
-                    designation,
-                    formattedJoinedDate,
-                    profilePhotoUrl, // Pass URL/path string
-                  ),
-                  const SizedBox(height: 20), // Space between sections
-                  // User Details Card
-                  _buildUserDetailsCard(
-                    email,
-                    _currentUser?.batch_ke, // Pass batch_ke
-                    jenisKelamin, // Pass jenisKelamin
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Settings and Logout Options
-                  _buildActionOptions(),
-                ],
-              ),
         ],
       ),
     );
   }
 
-  Widget _buildProfileHeader(
-    String username,
-    String designation,
-    String joinedDate,
-    String profilePhotoPath, // Changed to profilePhotoPath
-  ) {
-    ImageProvider<Object>? imageProvider;
-
-    // Construct full URL based on whether it's already a full URL or a relative path
-    if (profilePhotoPath.isNotEmpty) {
-      final String fullImageUrl =
-          profilePhotoPath.startsWith('http')
-              ? profilePhotoPath
-              : 'https://appabsensi.mobileprojp.com/public/' +
-                  profilePhotoPath; // Adjusted base path
-      imageProvider = NetworkImage(fullImageUrl);
-    }
-
-    return Column(
-      children: [
-        // Profile Picture
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white, // White border around avatar
-              width: 4,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: CircleAvatar(
-            radius: 55, // Larger radius for a prominent profile picture
-            backgroundColor: AppColors.primary, // Placeholder background
-            backgroundImage: imageProvider, // Use the determined image provider
-            child:
-                imageProvider ==
-                        null // Show icon only if no valid image provider
-                    ? const Icon(
-                      Icons
-                          .person, // Fallback icon if no image URL or local file
-                      size: 50,
-                      color: Colors.white,
-                    )
-                    : null, // No child if an image is loading
-          ),
-        ),
-        const SizedBox(height: 15),
-        // User Name
-        Text(
-          username,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textDark, // Dark text color
-          ),
-        ),
-        const SizedBox(height: 4),
-        // Designation and Joined Date
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              designation,
-              style: const TextStyle(fontSize: 16, color: AppColors.textLight),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                '-', // Separator
-                style: TextStyle(fontSize: 16, color: AppColors.textLight),
-              ),
-            ),
-            Text(
-              'Joined $joinedDate', // Add "Joined " prefix here
-              style: const TextStyle(fontSize: 16, color: AppColors.textLight),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUserDetailsCard(
-    String email,
-    String? batchKe, // Added batchKe parameter
-    String jenisKelamin, // Added jenisKelamin parameter
-  ) {
-    return Card(
-      color: AppColors.background,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildDetailRow('Email ID', email),
-            if (batchKe != null) ...[
-              // Conditionally add batch info
-              const Divider(color: AppColors.border, height: 20),
-              _buildDetailRow('Batch', batchKe),
-            ],
-            const Divider(color: AppColors.border, height: 20), // New Divider
-            _buildDetailRow(
-              'Jenis Kelamin',
-              jenisKelamin,
-            ), // New row for Jenis Kelamin
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            color: AppColors.textLight,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            color: AppColors.textDark,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildActionOptions() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         children: [
-          // Notification Toggle
           Card(
-            color: AppColors.background,
-            margin: EdgeInsets.zero, // No extra margin for this card
+            color: AppColors.cardBackground(context),
+            margin: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            elevation: 4,
+            elevation: 8,
+            shadowColor: AppColors.primary(context).withOpacity(0.1),
             child: ListTile(
-              leading: const Icon(
-                Icons.notifications,
-                color: AppColors.primary,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 5,
               ),
-              title: const Text(
-                'Notification',
-                style: TextStyle(fontSize: 16, color: AppColors.textDark),
+              leading: Icon(
+                Icons.notifications_active_outlined,
+                color: AppColors.primary(context),
+                size: 28,
+              ),
+              title: Text(
+                'Notifications',
+                style: TextStyle(
+                  fontSize: 17,
+                  color: AppColors.textDark(context),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               trailing: Switch.adaptive(
                 value: _notificationEnabled,
@@ -371,60 +450,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   setState(() {
                     _notificationEnabled = newValue;
                   });
-                  // Add logic to save notification preference (e.g., to UserModel or SessionManager)
                 },
-                activeColor: AppColors.primary,
+                activeColor: AppColors.primary(context),
+                inactiveTrackColor: AppColors.border(context),
+                inactiveThumbColor: AppColors.textLight(context),
               ),
               onTap: () {
-                // Toggling the switch directly is often enough, but you can add more logic here.
                 setState(() {
                   _notificationEnabled = !_notificationEnabled;
                 });
               },
             ),
           ),
-          const SizedBox(height: 10), // Space between cards
-          // Settings Option (now navigates to EditProfileScreen)
+          const SizedBox(height: 15),
           Card(
-            color: AppColors.background,
+            color: AppColors.cardBackground(context),
             margin: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            elevation: 4,
+            elevation: 8,
+            shadowColor: AppColors.primary(context).withOpacity(0.1),
             child: ListTile(
-              leading: const Icon(Icons.settings, color: AppColors.primary),
-              title: const Text(
-                'Settings',
-                style: TextStyle(fontSize: 16, color: AppColors.textDark),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 5,
               ),
-              trailing: const Icon(
-                Icons.arrow_forward_ios,
-                size: 18,
-                color: AppColors.textLight,
+              leading: Icon(
+                Icons.edit_outlined,
+                color: AppColors.primary(context),
+                size: 28,
               ),
-              onTap: _navigateToEditProfile, // Call the new navigation method
+              title: Text(
+                'Edit Profile',
+                style: TextStyle(
+                  fontSize: 17,
+                  color: AppColors.textDark(context),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              trailing: Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 20,
+                color: AppColors.textLight(context),
+              ),
+              onTap: _navigateToEditProfile,
             ),
           ),
-          const SizedBox(height: 10), // Space between cards
-          // Logout Option
+          const SizedBox(height: 15),
           Card(
-            color: AppColors.background,
+            color: AppColors.cardBackground(context),
             margin: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            elevation: 4,
+            elevation: 8,
+            shadowColor: AppColors.error(context).withOpacity(0.1),
             child: ListTile(
-              leading: const Icon(Icons.logout, color: AppColors.error),
-              title: const Text(
-                'Logout',
-                style: TextStyle(color: AppColors.error, fontSize: 16),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 5,
               ),
-              trailing: const Icon(
-                Icons.arrow_forward_ios,
-                size: 18,
-                color: AppColors.textLight,
+              leading: Icon(
+                Icons.logout_rounded,
+                color: AppColors.error(context),
+                size: 28,
+              ),
+              title: Text(
+                'Logout',
+                style: TextStyle(
+                  color: AppColors.error(context),
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              trailing: Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 20,
+                color: AppColors.textLight(context),
               ),
               onTap: () => _logout(context),
             ),

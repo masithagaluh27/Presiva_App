@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart';
-import 'package:presiva/models/app_models.dart';
-import 'package:presiva/routes/app_routes.dart';
-import 'package:presiva/services/api_Services.dart';
-import 'package:presiva/widgets/custom_dropdown_input_field.dart';
-import 'package:presiva/widgets/custom_input_field.dart';
-import 'package:presiva/widgets/primary_button.dart';
+import 'package:presiva/models/app_models.dart'; // Pastikan path ini benar
+import 'package:presiva/routes/app_routes.dart'; // Pastikan path ini benar
+import 'package:presiva/services/api_Services.dart'; // Pastikan path ini benar
+import 'package:presiva/widgets/custom_dropdown_input_field.dart'; // Pastikan path ini benar
+import 'package:presiva/widgets/custom_input_field.dart'; // Pastikan path ini benar
+import 'package:presiva/widgets/primary_button.dart'; // Pastikan path ini benar
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -67,7 +67,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           batch_ke: 'N/A',
                           startDate: '',
                           endDate: '',
-                        ), // Corrected Batch constructor
+                        ), // Corrected Batch constructor, assuming you have this model
           );
           _selectedBatchId = batch2.id;
           _selectedBatchName =
@@ -132,27 +132,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (_selectedBatchId == null || _selectedBatchId == -1) {
         // Check for valid batch ID
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Batch not selected or invalid.')),
+          SnackBar(content: Text('Batch not selected or invalid.')),
         );
         return;
       }
       if (_selectedTrainingId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a training')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Please select a training')));
         return;
       }
       // Tambahkan validasi untuk _selectedGender
       if (_selectedGender == null || _selectedGender!.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select your gender')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Please select your gender')));
         return;
       }
       if (_passwordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+        ).showSnackBar(SnackBar(content: Text('Passwords do not match')));
         return;
       }
 
@@ -215,7 +215,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background, // Menggunakan AppColors.background
+      backgroundColor: AppColors.background(
+        context,
+      ), // Menggunakan AppColors dengan context
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -228,17 +230,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     Text(
                       "Create Account",
-                      style: AppTextStyles.heading2(
-                        // Menggunakan heading2() sebagai fungsi
-                        color: AppColors.primary,
+                      style: AppTextStyles.heading2(context).copyWith(
+                        // Menggunakan AppTextStyles dengan context
+                        color: AppColors.primary(
+                          context,
+                        ), // Menggunakan AppColors dengan context
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       "Join us to track your attendance effortlessly.",
-                      style: AppTextStyles.body2(
-                        // Menggunakan body2() sebagai fungsi
-                        color: AppColors.textLight,
+                      style: AppTextStyles.body2(context).copyWith(
+                        // Menggunakan AppTextStyles dengan context
+                        color: AppColors.textLight(
+                          context,
+                        ), // Menggunakan AppColors dengan context
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -330,7 +336,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       child: Text(
                         "Select Gender",
-                        style: AppTextStyles.body2(color: AppColors.textDark),
+                        style: AppTextStyles.body2(context).copyWith(
+                          color: AppColors.textDark(context),
+                        ), // Menggunakan AppTextStyles dengan context
                       ),
                     ),
                     Row(
@@ -340,8 +348,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             title: Text(
                               'Laki-laki',
                               style: AppTextStyles.body2(
-                                color: AppColors.textDark,
-                              ),
+                                context,
+                              ).copyWith(color: AppColors.textDark(context)),
                             ),
                             value: 'L',
                             groupValue: _selectedGender,
@@ -350,8 +358,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _selectedGender = value;
                               });
                             },
-                            activeColor:
-                                AppColors.primary, // Warna saat terpilih
+                            activeColor: AppColors.primary(
+                              context,
+                            ), // Warna saat terpilih
                           ),
                         ),
                         Expanded(
@@ -359,8 +368,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             title: Text(
                               'Perempuan',
                               style: AppTextStyles.body2(
-                                color: AppColors.textDark,
-                              ),
+                                context,
+                              ).copyWith(color: AppColors.textDark(context)),
                             ),
                             value: 'P',
                             groupValue: _selectedGender,
@@ -369,8 +378,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _selectedGender = value;
                               });
                             },
-                            activeColor:
-                                AppColors.primary, // Warna saat terpilih
+                            activeColor: AppColors.primary(
+                              context,
+                            ), // Warna saat terpilih
                           ),
                         ),
                       ],
@@ -387,16 +397,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: Text(
                           'Please select your gender',
-                          style: AppTextStyles.caption(color: AppColors.error),
+                          style: AppTextStyles.body3(
+                            context: context,
+                            color: AppColors.error(context),
+                          ), // Menggunakan AppTextStyles dan AppColors dengan context
                         ),
                       ),
                     const SizedBox(height: 16),
 
                     // Display Batch Name (not a dropdown)
                     _isLoading
-                        ? const Center(
+                        ? Center(
                           child: CircularProgressIndicator(
-                            color: AppColors.primary,
+                            color: AppColors.primary(context),
                           ),
                         )
                         : Container(
@@ -405,22 +418,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             vertical: 18,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.inputFill,
+                            color: AppColors.inputFill(
+                              context,
+                            ), // Menggunakan AppColors dengan context
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.border),
+                            border: Border.all(
+                              color: AppColors.border(context),
+                            ), // Menggunakan AppColors dengan context
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.group_outlined,
-                                color: AppColors.primary,
+                                color: AppColors.primary(
+                                  context,
+                                ), // Menggunakan AppColors dengan context
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   _selectedBatchName,
-                                  style: AppTextStyles.body2(
-                                    color: AppColors.textDark,
+                                  style: AppTextStyles.body2(context).copyWith(
+                                    // Menggunakan AppTextStyles dengan context
+                                    color: AppColors.textDark(
+                                      context,
+                                    ), // Menggunakan AppColors dengan context
                                   ),
                                 ),
                               ),
@@ -460,9 +482,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 32),
 
                     _isLoading
-                        ? const Center(
+                        ? Center(
                           child: CircularProgressIndicator(
-                            color: AppColors.primary,
+                            color: AppColors.primary(
+                              context,
+                            ), // Menggunakan AppColors dengan context
                           ),
                         )
                         : PrimaryButton(
@@ -477,9 +501,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         children: [
                           Text(
                             "Already have an account? ",
-                            style: AppTextStyles.body2(
-                              color: AppColors.textDark,
-                            ), // Menggunakan AppTextStyles
+                            style: AppTextStyles.body2(context).copyWith(
+                              // Menggunakan AppTextStyles dengan context
+                              color: AppColors.textDark(
+                                context,
+                              ), // Menggunakan AppColors dengan context
+                            ),
                           ),
                           GestureDetector(
                             onTap:
@@ -489,10 +516,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                             child: Text(
                               "Login",
-                              style: AppTextStyles.body2(
+                              style: AppTextStyles.body2(context).copyWith(
+                                // Menggunakan AppTextStyles dengan context
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    AppColors.primary, // Menggunakan AppColors
+                                color: AppColors.primary(
+                                  context,
+                                ), // Menggunakan AppColors dengan context
                               ),
                             ),
                           ),

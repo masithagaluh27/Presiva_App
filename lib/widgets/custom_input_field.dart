@@ -1,46 +1,39 @@
-
 import 'package:flutter/material.dart';
 import 'package:presiva/constant/app_colors.dart';
 
 class CustomInputField extends StatelessWidget {
   final TextEditingController controller;
-  final String hintText; // This remains the primary hint text for the field
+  final String hintText;
   final IconData icon;
   final bool isPassword;
   final bool obscureText;
   final VoidCallback? toggleVisibility;
 
-  // NEW: Optional properties for more flexibility
-  final String? labelText; // For a floating label above the input
-  final int? maxLines; // For multi-line text input
-  final TextInputType?
-  keyboardType; // For specifying keyboard type (e.g., multiline, email)
-  final String? Function(String?)?
-  customValidator; // For providing a specific validation function
-  final Color? fillColor; // To override the default fill color
-  final EdgeInsetsGeometry?
-  contentPadding; // To override the default content padding
-  final bool readOnly; // Re-added readOnly property
+  final String? labelText;
+  final int? maxLines;
+  final TextInputType? keyboardType;
+  final String? Function(String?)? customValidator;
+  final Color? fillColor;
+  final EdgeInsetsGeometry? contentPadding;
+  final bool readOnly;
 
   const CustomInputField({
     super.key,
     required this.controller,
-    required this.hintText, // Existing required parameter
+    required this.hintText,
     required this.icon,
     this.isPassword = false,
     this.obscureText = false,
     this.toggleVisibility,
-    // Initialize new optional parameters
     this.labelText,
-    this.maxLines = 1, // Default to single line
+    this.maxLines = 1,
     this.keyboardType,
-    this.customValidator, // Renamed to avoid clash with internal _defaultValidator
+    this.customValidator,
     this.fillColor,
     this.contentPadding,
-    this.readOnly = false, // Default readOnly to false
+    this.readOnly = false,
   });
 
-  // Auto-validator based on field type. This will be used if customValidator is not provided.
   String? _defaultValidator(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter your ${hintText.toLowerCase()}';
@@ -74,25 +67,37 @@ class CustomInputField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
-      maxLines: maxLines, // Apply maxLines
-      keyboardType: keyboardType, // Apply keyboardType
-      readOnly: readOnly, // Apply the readOnly property here
-      validator:
-          customValidator ??
-          _defaultValidator, // Use custom validator if provided, else default
-      style: const TextStyle(fontSize: 16),
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      readOnly: readOnly,
+      validator: customValidator ?? _defaultValidator,
+      style: TextStyle(
+        fontSize: 16,
+        color: AppColors.textDark(context),
+      ), // <<< Tambahkan warna teks dinamis
       decoration: InputDecoration(
-        labelText:
-            labelText, // NEW: Use labelText if provided (for floating label)
-        hintText:
-            hintText, // EXISTING: Continues to be used as hintText (inner placeholder)
-        prefixIcon: Icon(icon, color: AppColors.primary),
+        labelText: labelText,
+        hintText: hintText,
+        // labelStyle dan hintStyle juga bisa menggunakan warna dinamis jika diperlukan
+        labelStyle: TextStyle(
+          color: AppColors.textLight(context),
+        ), // <<< Tambahkan warna label dinamis
+        hintStyle: TextStyle(
+          color: AppColors.placeholder(context),
+        ), // <<< Tambahkan warna hint dinamis
+
+        prefixIcon: Icon(
+          icon,
+          color: AppColors.primary(context),
+        ), // <<< Perubahan di sini
         suffixIcon:
             isPassword
                 ? IconButton(
                   icon: Icon(
                     obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.grey,
+                    color: AppColors.textLight(
+                      context,
+                    ), // <<< Perubahan di sini, menggunakan warna dinamis
                   ),
                   onPressed: toggleVisibility,
                 )
@@ -103,18 +108,26 @@ class CustomInputField extends StatelessWidget {
         filled: true,
         fillColor:
             fillColor ??
-            Colors.grey.shade100, // Use custom fill color or default
+            AppColors.inputFill(
+              context,
+            ), // <<< Perubahan di sini, menggunakan warna dinamis
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(
+            color: AppColors.border(context),
+          ), // <<< Perubahan di sini
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(
+            color: AppColors.border(context),
+          ), // <<< Perubahan di sini
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(
+            color: AppColors.primary(context),
+          ), // <<< Perubahan di sini
         ),
       ),
     );

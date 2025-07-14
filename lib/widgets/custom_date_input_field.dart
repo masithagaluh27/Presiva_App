@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:presiva/constant/app_colors.dart';
@@ -26,38 +25,44 @@ class CustomDateInputField extends StatelessWidget {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: labelText,
-          labelStyle: const TextStyle(
-            color: AppColors.textLight,
-          ), // Consistent label style
+          labelStyle: TextStyle(
+            // Ubah const TextStyle menjadi TextStyle biasa karena color-nya dinamis
+            color: AppColors.textLight(context), // <<< Perubahan di sini
+          ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(
-              16,
-            ), // Match CustomInputField's border radius
-            borderSide: const BorderSide(color: AppColors.border),
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(
+              color: AppColors.border(context),
+            ), // <<< Perubahan di sini
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.border),
+            borderSide: BorderSide(
+              color: AppColors.border(context),
+            ), // <<< Perubahan di sini
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.primary),
+            borderSide: BorderSide(
+              color: AppColors.primary(context),
+            ), // <<< Perubahan di sini
           ),
           filled: true,
-          fillColor: AppColors.inputFill, // Consistent fill color
+          fillColor: AppColors.inputFill(context), // <<< Perubahan di sini
           prefixIcon: Icon(
             icon,
-            color: AppColors.primary,
-          ), // Consistent icon styling
+            color: AppColors.primary(context), // <<< Perubahan di sini
+          ),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 18,
-          ), // Consistent padding
+          ),
         ),
-        baseStyle: const TextStyle(
+        baseStyle: TextStyle(
+          // Ubah const TextStyle menjadi TextStyle biasa karena color-nya dinamis
           fontSize: 16,
-          color: AppColors.textDark,
-        ), // Consistent text style
+          color: AppColors.textDark(context), // <<< Perubahan di sini
+        ),
         child: Text(
           selectedDate == null
               ? hintText ?? 'Select ${labelText.toLowerCase()}'
@@ -65,8 +70,8 @@ class CustomDateInputField extends StatelessWidget {
           style: TextStyle(
             color:
                 selectedDate == null
-                    ? AppColors.placeholder
-                    : AppColors.textDark, // Consistent placeholder/text color
+                    ? AppColors.placeholder(context) // <<< Perubahan di sini
+                    : AppColors.textDark(context), // <<< Perubahan di sini
             fontSize: 16,
           ),
         ),

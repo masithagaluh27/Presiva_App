@@ -4,7 +4,7 @@ import 'dart:io'; // For File operations
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart'; // Import for image picking
-import 'package:presiva/constant/app_colors.dart';
+import 'package:presiva/constant/app_colors.dart'; // Your dynamic AppColors
 import 'package:presiva/models/app_models.dart';
 import 'package:presiva/services/api_Services.dart';
 
@@ -76,7 +76,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       bool profileDetailsChanged = false;
       bool profilePhotoChanged = false;
 
-      // 1. Check if name or gender has changed and update
+      // 1. Check if name has changed and update
       final bool nameChanged = newName != widget.currentUser.name;
 
       if (nameChanged) {
@@ -100,7 +100,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   content: Text(
                     'Gagal memperbarui detail profil: $errorMessage', // Pesan error bahasa Indonesia
                   ),
-                  backgroundColor: AppColors.error, // Warna error untuk error
+                  backgroundColor: AppColors.error(
+                    context,
+                  ), // <--- UBAH DI SINI
                 ),
               );
             }
@@ -116,8 +118,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 content: Text(
                   'Terjadi kesalahan saat memperbarui detail: $e',
                 ), // Pesan error bahasa Indonesia
-                backgroundColor: AppColors.error,
-              ), // Warna error untuk error
+                backgroundColor: AppColors.error(context), // <--- UBAH DI SINI
+              ),
             );
           }
           setState(() {
@@ -155,7 +157,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   content: Text(
                     'Gagal memperbarui foto profil: $errorMessage', // Pesan error bahasa Indonesia
                   ),
-                  backgroundColor: AppColors.error, // Warna error untuk error
+                  backgroundColor: AppColors.error(
+                    context,
+                  ), // <--- UBAH DI SINI
                 ),
               );
             }
@@ -171,8 +175,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 content: Text(
                   'Terjadi kesalahan saat memperbarui foto: $e',
                 ), // Pesan error bahasa Indonesia
-                backgroundColor: AppColors.error,
-              ), // Warna error untuk error
+                backgroundColor: AppColors.error(context), // <--- UBAH DI SINI
+              ),
             );
           }
           setState(() {
@@ -186,23 +190,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       if (profileDetailsChanged || profilePhotoChanged) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
+          SnackBar(
+            // SnackBar tidak bisa const lagi karena backgroundColor dinamis
+            content: const Text(
               "Profil berhasil diperbarui!",
             ), // Pesan sukses bahasa Indonesia
-            backgroundColor: AppColors.success,
-          ), // Warna success untuk sukses
+            backgroundColor: AppColors.success(context), // <--- UBAH DI SINI
+          ),
         );
         Navigator.pop(context, true); // Pop with true to signal refresh
       } else {
         // If no changes were made to either name/gender or photo
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
+          SnackBar(
+            // SnackBar tidak bisa const lagi karena backgroundColor dinamis
+            content: const Text(
               "Tidak ada perubahan untuk disimpan.",
             ), // Pesan info bahasa Indonesia
-            backgroundColor: AppColors.info,
-          ), // Warna info untuk tidak ada perubahan
+            backgroundColor: AppColors.info(context), // <--- UBAH DI SINI
+          ),
         );
       }
 
@@ -232,16 +238,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background, // Menggunakan AppColors.background
+      backgroundColor: AppColors.background(context), // <--- UBAH DI SINI
       appBar: AppBar(
-        title: const Text(
+        title: Text(
+          // Hapus 'const' karena Text memerlukan nilai dinamis jika stylenya dinamis
           'Edit Profil', // Judul AppBar bahasa Indonesia
           style: TextStyle(
-            color: AppColors.textDark,
+            color: AppColors.textDark(context), // <--- UBAH DI SINI
           ), // Warna teks judul AppBar
         ),
-        backgroundColor: AppColors.background, // Warna latar belakang AppBar
-        foregroundColor: AppColors.textDark, // Warna ikon dan teks di AppBar
+        backgroundColor: AppColors.background(context), // <--- UBAH DI SINI
+        foregroundColor: AppColors.textDark(
+          context,
+        ), // <--- UBAH DI SINI (Warna ikon dan teks di AppBar)
         elevation: 0, // Tanpa bayangan
       ),
       body: SingleChildScrollView(
@@ -258,18 +267,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       onTap: _pickImage,
                       child: CircleAvatar(
                         radius: 60,
-                        backgroundColor:
-                            AppColors
-                                .cardBackground, // Background avatar saat tidak ada gambar
+                        backgroundColor: AppColors.cardBackground(
+                          context,
+                        ), // <--- UBAH DI SINI (Background avatar saat tidak ada gambar)
                         backgroundImage:
                             currentImageProvider, // Use the determined image provider
                         child:
                             currentImageProvider == null
-                                ? const Icon(
+                                ? Icon(
+                                  // Hapus 'const' karena Icon memerlukan nilai dinamis jika warnanya dinamis
                                   Icons.person,
                                   size: 60,
-                                  color:
-                                      AppColors.textLight, // Warna ikon default
+                                  color: AppColors.textLight(
+                                    context,
+                                  ), // <--- UBAH DI SINI (Warna ikon default)
                                 )
                                 : null,
                       ),
@@ -283,8 +294,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     _initialProfilePhotoUrl!.isNotEmpty)
                             ? 'Ganti Foto' // Teks tombol bahasa Indonesia
                             : 'Unggah Foto', // Teks tombol bahasa Indonesia
-                        style: const TextStyle(
-                          color: AppColors.primary,
+                        style: TextStyle(
+                          // Hapus 'const' karena TextStyle memerlukan nilai dinamis jika warnanya dinamis
+                          color: AppColors.primary(
+                            context,
+                          ), // <--- UBAH DI SINI
                         ), // Warna teks tombol
                       ),
                     ),
@@ -300,6 +314,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 hintText: 'Nama', // Hint text bahasa Indonesia
                 labelText: 'Nama', // Label text bahasa Indonesia
                 icon: Icons.person,
+                // Pastikan CustomInputField Anda juga bisa menerima fillColor yang dinamis
+                fillColor: AppColors.inputFill(
+                  context,
+                ), // <--- TAMBAH / UBAH DI SINI
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Nama tidak boleh kosong'; // Validasi bahasa Indonesia
@@ -311,15 +329,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               // Save Button using PrimaryButton
               _isLoading
-                  ? const Center(
+                  ? Center(
+                    // Hapus 'const' karena CircularProgressIndicator memerlukan nilai dinamis jika warnanya dinamis
                     child: CircularProgressIndicator(
-                      color: AppColors.primary,
+                      color: AppColors.primary(context), // <--- UBAH DI SINI
                     ), // Warna loading indicator
                   )
                   : PrimaryButton(
                     label: 'Simpan Profil', // Label tombol bahasa Indonesia
                     onPressed: _saveProfile,
-                    // Asumsi PrimaryButton sudah menggunakan AppColors.primary untuk warnanya
+                    // Asumsi PrimaryButton sudah menggunakan AppColors.primary untuk warnanya secara internal
+                    // Jika tidak, Anda perlu meneruskan warna primary ke PrimaryButton
+                    // Contoh: buttonColor: AppColors.primary(context), jika PrimaryButton punya properti itu.
                   ),
             ],
           ),

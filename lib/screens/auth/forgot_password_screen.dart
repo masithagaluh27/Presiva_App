@@ -38,8 +38,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              // Hapus 'const'
               content: Text(response.message ?? 'OTP berhasil dikirim.'),
-              backgroundColor: AppColors.success, // Warna hijau untuk sukses
+              backgroundColor: AppColors.success(context), // <--- UBAH DI SINI
             ),
           );
           // Navigasi ke layar Reset Password dengan email yang diinput
@@ -59,8 +60,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              // Hapus 'const'
               content: Text(errorMessage),
-              backgroundColor: AppColors.error, // Warna merah untuk error
+              backgroundColor: AppColors.error(context), // <--- UBAH DI SINI
             ),
           );
         }
@@ -78,21 +80,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
+          // Hapus 'const'
           "Lupa Password",
           style: TextStyle(
-            color: AppColors.textDark,
+            // Hapus 'const'
+            color: AppColors.textDark(context), // <--- UBAH DI SINI
           ), // Menggunakan textDark untuk judul AppBar
         ),
-        backgroundColor:
-            AppColors
-                .background, // Background AppBar sama dengan background layar
+        backgroundColor: AppColors.background(context), // <--- UBAH DI SINI
         elevation: 0, // Tanpa bayangan
-        iconTheme: const IconThemeData(
-          color: AppColors.textDark,
+        iconTheme: IconThemeData(
+          // Hapus 'const'
+          color: AppColors.textDark(context), // <--- UBAH DI SINI
         ), // Warna ikon kembali
       ),
-      backgroundColor: AppColors.background, // Menggunakan AppColors.background
+      backgroundColor: AppColors.background(context), // <--- UBAH DI SINI
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
         child: Form(
@@ -100,11 +103,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
+                // Hapus 'const'
                 "Masukkan email Anda untuk menerima kode verifikasi (OTP) untuk reset password.",
                 style: TextStyle(
+                  // Hapus 'const'
                   fontSize: 16,
-                  color: AppColors.textLight,
+                  color: AppColors.textLight(context), // <--- UBAH DI SINI
                 ), // Menggunakan textLight untuk teks instruksi
               ),
               const SizedBox(height: 30),
@@ -112,6 +117,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 controller: _emailController,
                 hintText: 'Email',
                 icon: Icons.email_outlined,
+                // Tambahkan fillColor untuk konsistensi dengan AppColors Anda
+                fillColor: AppColors.inputFill(context), // <--- TAMBAH DI SINI
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Email tidak boleh kosong';
@@ -124,16 +131,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 30),
               _isLoading
-                  ? const Center(
+                  ? Center(
+                    // Hapus 'const'
                     child: CircularProgressIndicator(
-                      color: AppColors.primary,
+                      color: AppColors.primary(context), // <--- UBAH DI SINI
                     ), // Menggunakan AppColors.primary
                   )
                   : PrimaryButton(
                     label: 'Kirim Kode Verifikasi',
                     onPressed: _requestOtp,
-                    // Asumsi PrimaryButton sudah menggunakan AppColors.primary untuk warnanya
-                    // Jika belum, perlu ditambahkan properti `buttonColor: AppColors.primary` di sini
+                    // Jika PrimaryButton tidak secara otomatis mengambil tema,
+                    // Anda mungkin perlu menambahkan properti seperti:
+                    // buttonColor: AppColors.primary(context),
+                    // textColor: AppColors.textLight(context),
                   ),
             ],
           ),

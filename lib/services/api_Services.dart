@@ -1,9 +1,8 @@
 // lib/services/api_service.dart
 import 'dart:convert';
-import 'package:presiva/models/app_models.dart';
 
 import 'package:http/http.dart' as http;
-
+import 'package:presiva/models/app_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
@@ -339,13 +338,53 @@ class ApiService {
       );
 
       final Map<String, dynamic> responseBody = jsonDecode(response.body);
+      // --- START DEBUGGING ADDITION ---
+      print('DEBUG: Raw response body for /absen/today: $responseBody');
+      if (responseBody['data'] != null) {
+        print(
+          'DEBUG: Type of responseBody[\'data\'] for /absen/today: ${responseBody['data'].runtimeType}',
+        );
+        if (responseBody['data'] is List) {
+          print(
+            'DEBUG: responseBody[\'data\'] is a List. First item: ${(responseBody['data'] as List).isNotEmpty ? (responseBody['data'] as List).first : 'List is empty'}',
+          );
+        }
+      } else {
+        print('DEBUG: responseBody[\'data\'] for /absen/today is NULL.');
+      }
+      // --- END DEBUGGING ADDITION ---
 
       if (response.statusCode == 200) {
-        return ApiResponse(
-          message: responseBody['message'],
-          data: AbsenceToday.fromJson(responseBody['data']),
-          statusCode: response.statusCode,
-        );
+        // --- CONDITIONAL PARSING BASED ON NULLABILITY / TYPE ---
+        final dynamic data = responseBody['data'];
+        if (data == null) {
+          return ApiResponse(
+            message: responseBody['message'],
+            data: null, // Return null data if API returns null
+            statusCode: response.statusCode,
+          );
+        } else if (data is List && data.isNotEmpty) {
+          // If 'data' is a list and not empty, assume we want the first item
+          return ApiResponse(
+            message: responseBody['message'],
+            data: AbsenceToday.fromJson(data.first),
+            statusCode: response.statusCode,
+          );
+        } else if (data is Map<String, dynamic>) {
+          // If 'data' is a map, parse it directly
+          return ApiResponse(
+            message: responseBody['message'],
+            data: AbsenceToday.fromJson(data),
+            statusCode: response.statusCode,
+          );
+        } else {
+          // Handle unexpected data type
+          return ApiResponse.fromError(
+            'Unexpected data format for today\'s absence: ${data.runtimeType}',
+            statusCode: response.statusCode,
+          );
+        }
+        // --- END CONDITIONAL PARSING ---
       } else {
         return ApiResponse.fromError(
           responseBody['message'] ?? 'Failed to get today\'s absence data',
@@ -354,6 +393,7 @@ class ApiService {
         );
       }
     } catch (e) {
+      print('DEBUG: Error in getAbsenceToday: $e');
       return ApiResponse.fromError('An error occurred: $e');
     }
   }

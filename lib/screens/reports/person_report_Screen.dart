@@ -1,10 +1,12 @@
 import 'dart:async';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:presiva/constant/app_colors.dart';
-import 'package:presiva/models/app_models.dart'; // Pastikan path ini benar
-import 'package:presiva/services/api_Services.dart'; // Pastikan path ini benar
+import 'package:presiva/constant/app_text_styles.dart'; // Import AppTextStyles
+import 'package:presiva/models/app_models.dart';
+import 'package:presiva/services/api_Services.dart';
 
 class PersonReportScreen extends StatefulWidget {
   final ValueNotifier<bool> refreshNotifier;
@@ -252,12 +254,18 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
     ];
   }
 
-  Widget _buildStatListItem(String title, dynamic value, Color color) {
+  // Menerima BuildContext untuk mengakses AppColors dan AppTextStyles
+  Widget _buildStatListItem(
+    BuildContext context,
+    String title,
+    dynamic value,
+    Color color,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground, // Assuming you have this color defined
+        color: AppColors.cardBackground(context), // Menggunakan BuildContext
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -273,32 +281,21 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textDark, // Assuming you have this color defined
-            ),
-          ),
-          Text(
-            value.toString(),
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: color,
+              fontSize: 16.0, // Perkirakan ukuran font untuk 'medium'
+              fontWeight:
+                  FontWeight.w500, // Perkirakan ketebalan font untuk 'medium'
+              color: AppColors.textDark(context),
             ),
           ),
+          Text(value.toString(), style: AppTextStyles.body1(context)),
         ],
       ),
     );
   }
 
   // Function to get titles for the bottom axis
-  Widget getTitles(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: AppColors.textDark,
-      fontWeight: FontWeight.bold,
-      fontSize: 14,
-    );
+  Widget getTitles(BuildContext context, double value, TitleMeta meta) {
     String text;
     switch (value.toInt()) {
       case 0:
@@ -318,7 +315,15 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
     return SideTitleWidget(
       axisSide: meta.axisSide,
       space: 16,
-      child: Text(text, style: style),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize:
+              14.0, // Perkirakan ukuran font untuk 'bold' (umumnya 14 atau 16)
+          fontWeight: FontWeight.bold, // Menjadikan teks tebal
+          color: AppColors.textDark(context),
+        ),
+      ),
     );
   }
 
@@ -332,8 +337,12 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: AppColors.primary,
-            colorScheme: const ColorScheme.light(primary: AppColors.primary),
+            primaryColor: AppColors.primary(
+              context,
+            ), // Menggunakan BuildContext
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primary(context),
+            ), // Menggunakan BuildContext
             buttonTheme: const ButtonThemeData(
               textTheme: ButtonTextTheme.primary,
             ),
@@ -354,7 +363,9 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(
+        context,
+      ), // Menggunakan BuildContext
       body: FutureBuilder<void>(
         future: _reportDataFuture,
         builder: (context, snapshot) {
@@ -375,9 +386,14 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                 right: 0,
                 height: MediaQuery.of(context).size.height * 0.3,
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.secondary],
+                      colors: [
+                        AppColors.primary(context), // Menggunakan BuildContext
+                        AppColors.secondary(
+                          context,
+                        ), // Menggunakan BuildContext
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -391,8 +407,8 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                   children: [
                     SizedBox(height: MediaQuery.of(context).padding.top + 20),
                     // Welcome section
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 24.0,
                         vertical: 8.0,
                       ),
@@ -402,16 +418,29 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                           Text(
                             'Welcome',
                             style: TextStyle(
-                              fontSize: 32,
+                              fontSize: 32.0,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color:
+                                  Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? Colors.black
+                                      : Colors.white,
+                              fontFamily:
+                                  'Montserrat', // Ganti dengan font family Anda jika ada
                             ),
                           ),
                           Text(
                             'Test this monthly report',
                             style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white70,
+                              fontSize:
+                                  16.0, // Perkirakan ukuran font yang sesuai dengan 'medium'
+                              fontWeight:
+                                  FontWeight
+                                      .w500, // Perkirakan ketebalan font untuk 'medium'
+                              color:
+                                  Colors
+                                      .white70, // Gunakan warna yang Anda inginkan secara langsung
+                              // fontFamily: 'Montserrat', // Opsional: Tambahkan font family jika Anda menggunakannya secara konsisten
                             ),
                           ),
                         ],
@@ -443,12 +472,15 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Text(
+                                      Text(
                                         'Monthly Overview',
                                         style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textDark,
+                                          fontSize:
+                                              20.0, // Perkirakan ukuran font untuk judul (sesuai dengan 'title' sebelumnya)
+                                          fontWeight:
+                                              FontWeight
+                                                  .bold, // Perkirakan ketebalan font untuk judul
+                                          color: AppColors.textDark(context),
                                         ),
                                       ),
                                       GestureDetector(
@@ -472,16 +504,23 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                                 DateFormat('MMM yyyy')
                                                     .format(_selectedMonth)
                                                     .toUpperCase(),
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.textDark,
+                                                style: TextStyle(
+                                                  fontSize: 14.0,
+                                                  fontWeight:
+                                                      FontWeight
+                                                          .bold, // Sesuai dengan 'AppTextStyles.bold'
+                                                  color: AppColors.textDark(
+                                                    context,
+                                                  ),
                                                 ),
                                               ),
                                               const SizedBox(width: 5),
-                                              const Icon(
+                                              Icon(
                                                 Icons.calendar_today,
                                                 size: 16,
-                                                color: AppColors.textDark,
+                                                color: AppColors.textDark(
+                                                  context,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -492,6 +531,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                   const SizedBox(height: 20),
                                   // Stats list - now calls the defined method
                                   _buildStatListItem(
+                                    context, // Meneruskan BuildContext
                                     'Total Working Days',
                                     _totalWorkingDaysInMonth.toString().padLeft(
                                       2,
@@ -500,26 +540,33 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                     Colors.blueGrey,
                                   ),
                                   _buildStatListItem(
+                                    context, // Meneruskan BuildContext
                                     'Total Present Days',
                                     _presentCount.toString().padLeft(2, '0'),
                                     Colors.green,
                                   ),
                                   _buildStatListItem(
+                                    context, // Meneruskan BuildContext
                                     'Total Absent Days',
                                     _absentCount.toString().padLeft(2, '0'),
                                     Colors.red,
                                   ),
                                   _buildStatListItem(
+                                    context, // Meneruskan BuildContext
                                     'Total Late Entries',
                                     _lateInCount.toString().padLeft(2, '0'),
                                     Colors.orange,
                                   ),
                                   _buildStatListItem(
+                                    context, // Meneruskan BuildContext
                                     'Total Working Hours',
                                     _totalWorkingHours,
-                                    AppColors.primary,
+                                    AppColors.primary(
+                                      context,
+                                    ), // Menggunakan BuildContext
                                   ),
                                   _buildStatListItem(
+                                    context, // Meneruskan BuildContext
                                     'Overall Attendance %',
                                     '${(_presentCount / (_totalWorkingDaysInMonth == 0 ? 1 : _totalWorkingDaysInMonth) * 100).toStringAsFixed(0)}%',
                                     Colors.teal,
@@ -535,7 +582,9 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: AppColors.background,
+                                color: AppColors.background(
+                                  context,
+                                ), // Menggunakan BuildContext
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
@@ -546,9 +595,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                   ),
                                 ],
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.home_work_outlined,
-                                color: AppColors.primary,
+                                color: AppColors.primary(
+                                  context,
+                                ), // Menggunakan BuildContext
                                 size: 30,
                               ),
                             ),
@@ -563,12 +614,12 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Attendance Overview (Bar Chart)',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 20.0,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textDark,
+                              color: AppColors.textDark(context),
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -587,12 +638,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                       alignment: BarChartAlignment.spaceAround,
                                       maxY: _maxYValue,
                                       barTouchData: BarTouchData(
-                                        // BARTOUCHTOOLDATA
-                                        // tooltipStyle and tooltipRoundedRadius are removed
                                         touchTooltipData: BarTouchTooltipData(
-                                          // CORRECTED: tooltipBgColor is a direct property of BarTouchTooltipData
-                                          // tooltipBgColor: Colors.blueGrey,
-                                          // getTooltipItem's signature and logic adjusted
                                           getTooltipItem: (
                                             BarChartGroupData group,
                                             int groupIndex,
@@ -614,11 +660,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                                 category = '';
                                             }
                                             return BarTooltipItem(
-                                              '$category\n', // Added category for clarity
-                                              const TextStyle(
-                                                color: Colors.white,
+                                              '$category\n',
+                                              TextStyle(
+                                                fontSize: 18.0,
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 16,
+                                                color: Colors.white,
                                               ),
                                               children: <TextSpan>[
                                                 TextSpan(
@@ -626,10 +672,10 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                                       rod.toY
                                                           .toInt()
                                                           .toString(),
-                                                  style: const TextStyle(
-                                                    color: Colors.yellow,
-                                                    fontSize: 15,
+                                                  style: TextStyle(
+                                                    fontSize: 16.0,
                                                     fontWeight: FontWeight.w500,
+                                                    color: Colors.yellow,
                                                   ),
                                                 ),
                                               ],
@@ -643,7 +689,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                           sideTitles: SideTitles(
                                             showTitles: true,
                                             getTitlesWidget:
-                                                getTitles, // This uses the 'getTitles' function defined above
+                                                (value, meta) => getTitles(
+                                                  context,
+                                                  value,
+                                                  meta,
+                                                ), // Meneruskan BuildContext
                                             reservedSize: 38,
                                           ),
                                         ),
@@ -651,21 +701,20 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                           sideTitles: SideTitles(
                                             showTitles: true,
                                             reservedSize: 40,
-                                            // CORRECTED: getTitlesWidget signature with TitleMeta and meta.axisSide
                                             getTitlesWidget: (value, meta) {
                                               if (value % 1 == 0) {
                                                 return SideTitleWidget(
-                                                  // Use SideTitleWidget for correct alignment
                                                   axisSide: meta.axisSide,
-                                                  space:
-                                                      4, // Adjust spacing as needed
+                                                  space: 4,
                                                   child: Text(
                                                     value.toInt().toString(),
-                                                    style: const TextStyle(
-                                                      color: AppColors.textDark,
+                                                    style: TextStyle(
+                                                      fontSize: 16.0,
                                                       fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14,
+                                                          FontWeight.w500,
+                                                      color: AppColors.textDark(
+                                                        context,
+                                                      ),
                                                     ),
                                                   ),
                                                 );
@@ -700,14 +749,20 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                               ),
                             )
                           else
-                            const Padding(
-                              padding: EdgeInsets.all(16.0),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
                               child: Center(
                                 child: Text(
                                   'No attendance data available for the selected month to display chart.',
                                   style: TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                    color: AppColors.textLight,
+                                    fontSize: 14.0,
+                                    fontStyle:
+                                        FontStyle
+                                            .italic, // Memberikan gaya italic
+                                    fontWeight:
+                                        FontWeight
+                                            .normal, // Biasanya pesan info tidak terlalu tebal
+                                    color: AppColors.textLight(context),
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -726,24 +781,20 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                           vertical: 15,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: AppColors.primary(
+                            context,
+                          ), // Menggunakan BuildContext
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: AppColors.primary(
+                                context,
+                              ).withOpacity(0.3),
                               spreadRadius: 2,
                               blurRadius: 5,
                               offset: const Offset(0, 3),
                             ),
                           ],
-                        ),
-                        child: const Text(
-                          'View Details',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
                         ),
                       ),
                     ),
