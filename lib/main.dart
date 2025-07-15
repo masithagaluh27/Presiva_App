@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:presiva/routes/app_routes.dart';
 import 'package:presiva/screens/attendance/request_screen.dart';
 import 'package:presiva/screens/auth/forgot_password_screen.dart';
@@ -8,8 +9,12 @@ import 'package:presiva/screens/auth/reset_password_with_otp.dart';
 import 'package:presiva/screens/main_botom_navigation_bar.dart';
 import 'package:presiva/screens/splash_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('id', null);
+
+  runApp(MyApp()); // Ganti dengan widget root aplikasi Anda
 }
 
 class MyApp extends StatelessWidget {
@@ -37,9 +42,6 @@ class MyApp extends StatelessWidget {
           }
           return ResetPasswordScreen(email: email);
         },
-        // AppRoutes.attendanceList: (context) => AttendanceListScreen(),
-        // AppRoutes.report: (context) => const PersonReportScreen(),
-        // AppRoutes.profile: (context) => const ProfileScreen(),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

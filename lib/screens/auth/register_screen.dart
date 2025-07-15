@@ -44,6 +44,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _selectedGender = 'L'; // Default ke Laki-laki
   }
 
+  // Helper function to show snackbars with specific colors
+  void _showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+            isError
+                ? AppColors.error(context)
+                : AppColors.success(
+                  context,
+                ), // Use AppColors for snackbar background
+        behavior: SnackBarBehavior.floating, // Makes it float above content
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   Future<void> _fetchDropdownData() async {
     setState(() {
       _isLoading = true;
@@ -76,9 +93,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         if (mounted) {
           final String message = batchResponse.message;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to load batches: $message')),
-          );
+          _showSnackBar('Failed to load batches: $message', isError: true);
         }
         setState(() {
           _selectedBatchName = 'Error Loading Batch';
@@ -86,10 +101,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('An error occurred while fetching batches: $e'),
-          ),
+        _showSnackBar(
+          'An error occurred while fetching batches: $e',
+          isError: true,
         );
       }
       setState(() {
@@ -107,17 +121,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         if (mounted) {
           final String message = trainingResponse.message;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to load trainings: $message')),
-          );
+          _showSnackBar('Failed to load trainings: $message', isError: true);
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('An error occurred while fetching trainings: $e'),
-          ),
+        _showSnackBar(
+          'An error occurred while fetching trainings: $e',
+          isError: true,
         );
       }
     }
@@ -131,28 +142,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       if (_selectedBatchId == null || _selectedBatchId == -1) {
         // Check for valid batch ID
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Batch not selected or invalid.')),
-        );
+        _showSnackBar('Batch not selected or invalid.', isError: true);
         return;
       }
       if (_selectedTrainingId == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Please select a training')));
+        _showSnackBar('Please select a training', isError: true);
         return;
       }
       // Tambahkan validasi untuk _selectedGender
       if (_selectedGender == null || _selectedGender!.isEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Please select your gender')));
+        _showSnackBar('Please select your gender', isError: true);
         return;
       }
       if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Passwords do not match')));
+        _showSnackBar('Passwords do not match', isError: true);
         return;
       }
 
@@ -181,9 +184,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (response.statusCode == 200 && response.data != null) {
         // Registration successful
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(response.message)));
+          _showSnackBar(response.message, isError: false); // Success snackbar
           Navigator.pushReplacementNamed(context, AppRoutes.login);
         }
       } else {
@@ -195,9 +196,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           });
         }
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(errorMessage)));
+          _showSnackBar(errorMessage, isError: true); // Error snackbar
         }
       }
     }
@@ -231,7 +230,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Text(
                       "Create Account",
                       style: AppTextStyles.heading2(context).copyWith(
-                        // Menggunakan AppTextStyles dengan context
                         color: AppColors.primary(
                           context,
                         ), // Menggunakan AppColors dengan context
@@ -241,7 +239,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Text(
                       "Join us to track your attendance effortlessly.",
                       style: AppTextStyles.body2(context).copyWith(
-                        // Menggunakan AppTextStyles dengan context
                         color: AppColors.textLight(
                           context,
                         ), // Menggunakan AppColors dengan context
@@ -502,7 +499,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Text(
                             "Already have an account? ",
                             style: AppTextStyles.body2(context).copyWith(
-                              // Menggunakan AppTextStyles dengan context
                               color: AppColors.textDark(
                                 context,
                               ), // Menggunakan AppColors dengan context
@@ -517,7 +513,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             child: Text(
                               "Login",
                               style: AppTextStyles.body2(context).copyWith(
-                                // Menggunakan AppTextStyles dengan context
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primary(
                                   context,

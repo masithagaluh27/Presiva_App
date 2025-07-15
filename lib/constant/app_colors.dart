@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Import untuk mengakses Brightness dari context
-import 'package:provider/provider.dart'; // Atau cukup import 'package:flutter/material.dart'; jika Theme.of(context).brightness sudah cukup.
-
 class AppColors {
   // Ini adalah definisi warna dasar untuk Light Mode
   // Anda bisa menjaga ini sebagai referensi, tetapi yang akan digunakan di getter adalah nilai dinamis.
@@ -56,6 +53,11 @@ class AppColors {
   static const Color _lightOnError =
       Colors.white; // Warna teks/ikon di atas error
 
+  // New divider color for light mode
+  static const Color _lightDivider = Color(
+    0xFFE0E0E0,
+  ); // A subtle light gray for dividers
+
   // Ini adalah definisi warna dasar untuk Dark Mode
   static const Color _darkPrimary = Color(
     0xFF1A2633,
@@ -94,20 +96,24 @@ class AppColors {
   static const Color _darkError = Color(0xFFEF5350);
   static const Color _darkWarning = Color(0xFFFFD54F);
   static const Color _darkInfo = Color(0xFF64B5F6);
-static const Color _white70 = Color(0xB3FFFFFF);
+  static const Color _white70 = Color(0xB3FFFFFF);
   static const Color _darkSuccessBackground = Color(0xFF2A422D);
   static const Color _darkDangerBackground = Color(0xFF4C2A2D);
   static const Color _darkWarningBackground = Color(0xFF4C422A);
 
   static const Color _darkDisabledButton = Color(0xFF424242);
   static const Color _darkShadowColor = Color(0x33FFFFFF);
-  
 
   // Tambahan untuk onPrimary dan onError di Dark Mode
   static const Color _darkOnPrimary =
       Colors.white; // Warna teks/ikon di atas primary
   static const Color _darkOnError =
       Colors.white; // Warna teks/ikon di atas error
+
+  // New divider color for dark mode
+  static const Color _darkDivider = Color(
+    0xFF424242,
+  ); // A darker gray for dividers in dark mode
 
   // Getters publik yang menggunakan nama asli dan mengembalikan warna berdasarkan tema
   static Color primary(BuildContext context) =>
@@ -205,4 +211,10 @@ static const Color _white70 = Color(0xB3FFFFFF);
       Theme.of(context).brightness == Brightness.light
           ? _lightOnError
           : _darkOnError;
+
+  // New getter for divider color
+  static Color divider(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+          ? _lightDivider
+          : _darkDivider;
 }

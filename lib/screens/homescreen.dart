@@ -10,7 +10,6 @@ import 'package:presiva/screens/attendance/request_screen.dart';
 import 'package:presiva/screens/main_botom_navigation_bar.dart';
 import 'package:presiva/services/api_Services.dart';
 
-// Enum LocationType dihilangkan karena tidak lagi digunakan
 
 class HomeScreen extends StatefulWidget {
   final ValueNotifier<bool> refreshNotifier;
@@ -120,7 +119,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final now = DateTime.now();
     setState(() {
       // Memastikan jam update setiap detik dengan format HH:mm:ss
-      _currentDate = DateFormat('EEEE, dd MMMM yyyy').format(now);
+      _currentDate = DateFormat(
+        'EEEE, dd MMMM yyyy',
+        'id_ID',
+      ).format(now); // Added locale
       _currentTime = DateFormat('HH:mm:ss').format(now);
     });
   }
@@ -197,15 +199,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
+        // localeIdentifier: 'id_ID', // Uncomment if needed and supported for better accuracy
       );
-      Placemark place = placemarks[0];
-      setState(() {
-        _location = "${place.street}, ${place.subLocality}, ${place.locality}";
-      });
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        setState(() {
+          // Prioritize street, subLocality (kecamatan), locality (kota), administrativeArea (provinsi)
+          _location = [
+                place.street,
+                place.subLocality,
+                place.locality,
+                place.administrativeArea,
+              ]
+              .where((element) => element != null && element.isNotEmpty)
+              .join(', ');
+          if (_location.isEmpty) {
+            _location = 'Unknown address'; // Fallback if no parts are found
+          }
+        });
+      } else {
+        setState(() {
+          _location =
+              'Address not found'; // Explicitly set if placemarks is empty
+        });
+      }
     } catch (e) {
       print('Error getting address from coordinates: $e');
       setState(() {
-        _location = 'Address not found';
+        _location = 'Address not found'; // Handle error case
       });
     }
   }
@@ -363,25 +384,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: AppColors.background(
-              context,
-            ), // <<< Perubahan di sini
+            backgroundColor: AppColors.background(context),
             title: Text(
               'Error',
               style: TextStyle(color: AppColors.textDark(context)),
-            ), // <<< Perubahan di sini
+            ),
             content: Text(
               message,
               style: TextStyle(color: AppColors.textDark(context)),
-            ), // <<< Perubahan di sini
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text(
                   'OK',
-                  style: TextStyle(
-                    color: AppColors.primary(context),
-                  ), // <<< Perubahan di sini
+                  style: TextStyle(color: AppColors.primary(context)),
                 ),
               ),
             ],
@@ -391,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   String _calculateWorkingHours() {
     if (_todayAbsence == null || _todayAbsence!.jamMasuk == null) {
-      return '00:00:00';
+      return '00:00:00'; // Return 0 if not checked in
     }
 
     final DateTime checkInDateTime = _todayAbsence!.jamMasuk!;
@@ -403,10 +420,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       endDateTime = DateTime.now();
     }
 
+    // Ensure the duration is not negative. If for some reason checkOut is before checkIn,
+    // or if only checkIn exists and it's in the future (unlikely but for robustness),
+    // we should return 0 or handle it as an invalid state.
+    if (endDateTime.isBefore(checkInDateTime)) {
+      return '00:00:00'; // Or consider showing an error/N/A
+    }
+
     final Duration duration = endDateTime.difference(checkInDateTime);
-    final int hours = duration.inHours;
-    final int minutes = duration.inMinutes.remainder(60);
-    final int seconds = duration.inSeconds.remainder(60);
+
+    // Ensure non-negative duration parts
+    final int hours = duration.inHours.abs();
+    final int minutes = duration.inMinutes.remainder(60).abs();
+    final int seconds = duration.inSeconds.remainder(60).abs();
 
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
@@ -435,9 +461,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // Penentuan panggilan berdasarkan gender dari _currentUser
     if (_currentUser?.jenis_kelamin != null) {
       final userGender = _currentUser!.jenis_kelamin!.toLowerCase();
-      if (userGender == 'L' || userGender == 'laki-laki') {
+      if (userGender == 'l' || userGender == 'laki-laki') {
         honorific = 'gantengku';
-      } else if (userGender == 'P' || userGender == 'perempuan') {
+      } else if (userGender == 'p' || userGender == 'perempuan') {
         honorific = 'cantikku';
       }
     }
@@ -463,18 +489,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: AppColors.primary(context), // <<< Perubahan di sini
-              onPrimary: AppColors.onPrimary(context), // <<< Perubahan di sini
-              surface: AppColors.cardBackground(
-                context,
-              ), // <<< Perubahan di sini
-              onSurface: AppColors.textDark(context), // <<< Perubahan di sini
+              primary: AppColors.primary(context),
+              onPrimary: AppColors.onPrimary(context),
+              surface: AppColors.cardBackground(context),
+              onSurface: AppColors.textDark(context),
             ),
             dialogTheme: DialogTheme(
-              // Ubah DialogThemeData menjadi DialogTheme
-              backgroundColor: AppColors.cardBackground(
-                context,
-              ), // <<< Perubahan di sini
+              backgroundColor: AppColors.cardBackground(context),
             ),
           ),
           child: child!,
@@ -491,9 +512,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           content: Text(
             'Filtering data for ${DateFormat('MMMM yyyy').format(pickedMonth)}',
           ),
-          backgroundColor: AppColors.info(context), // <<< Perubahan di sini
+          backgroundColor: AppColors.info(context),
         ),
       );
+      // TODO: Implement actual data filtering based on the selected month
     }
   }
 
@@ -503,10 +525,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final bool hasCheckedOut = _todayAbsence?.jamKeluar != null;
 
     return Scaffold(
-      backgroundColor: AppColors.background(context), // <<< Perubahan di sini
+      backgroundColor: AppColors.background(context),
+      extendBodyBehindAppBar: true, // Allow body to extend behind AppBar
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: AppColors.primary(context), // <<< Perubahan di sini
+        backgroundColor: Colors.transparent, // Make AppBar transparent
         elevation: 0,
         toolbarHeight: 80,
         flexibleSpace: SafeArea(
@@ -520,9 +543,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 Icon(
                   Icons.location_on,
-                  color: AppColors.textLight(context),
+                  color: AppColors.onPrimary(
+                    context,
+                  ), // Use onPrimary for contrast
                   size: 24,
-                ), // <<< Perubahan di sini
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -534,15 +559,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         style: TextStyle(
                           color: AppColors.textLight(context),
                           fontSize: 12,
-                        ), // <<< Perubahan di sini
+                        ),
                       ),
                       Text(
                         _location,
                         style: TextStyle(
-                          // Ubah const TextStyle menjadi TextStyle biasa
-                          color: AppColors.onPrimary(
-                            context,
-                          ), // Menggunakan onPrimary untuk teks di atas primary
+                          color: AppColors.onPrimary(context),
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -555,9 +577,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 IconButton(
                   icon: Icon(
                     Icons.notifications,
-                    color: AppColors.onPrimary(
-                      context,
-                    ), // Menggunakan onPrimary untuk ikon notifikasi
+                    color: AppColors.onPrimary(context),
                     size: 24,
                   ),
                   onPressed: () {
@@ -569,148 +589,136 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
       ),
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 120,
-              decoration: BoxDecoration(
-                // Ubah const BoxDecoration menjadi BoxDecoration biasa
-                color: AppColors.primary(context), // <<< Perubahan di sini
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(30),
-                ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primary(context),
+              AppColors.primary(context).withOpacity(0.8),
+              AppColors.background(context),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: const [0.0, 0.2, 1.0], // Adjust gradient stops
+          ),
+        ),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.only(
+                top: 100,
+              ), // Adjusted padding to account for transparent AppBar
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 32, // Slightly larger avatar
+                          backgroundColor: AppColors.accent(
+                            context,
+                          ).withOpacity(0.2),
+                          backgroundImage:
+                              _currentUser?.profile_photo != null &&
+                                      _currentUser!.profile_photo!.isNotEmpty
+                                  ? NetworkImage(
+                                    'https://appabsensi.mobileprojp.com/public/${_currentUser!.profile_photo!}',
+                                  )
+                                  : null,
+                          child:
+                              _currentUser?.profile_photo == null ||
+                                      _currentUser!.profile_photo!.isEmpty
+                                  ? Icon(
+                                    Icons.person,
+                                    color: AppColors.accent(context),
+                                    size: 35,
+                                  )
+                                  : null,
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _getGreeting(),
+                                style: TextStyle(
+                                  fontSize: 24, // Larger greeting text
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.onPrimary(context),
+                                ),
+                              ),
+                              Text(
+                                'Ready for a productive day?',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColors.textLight(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 30), // More spacing
+                  _buildMainActionCard(context, hasCheckedIn, hasCheckedOut),
+                  const SizedBox(height: 30), // More spacing
+                  _buildAttendanceSummary(context),
+                  const SizedBox(height: 100), // Added bottom space
+                ],
               ),
             ),
-          ),
-          SingleChildScrollView(
-            padding: const EdgeInsets.only(top: 5),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: AppColors.accent(
-                          context,
-                        ).withOpacity(0.2), // <<< Perubahan di sini
-                        backgroundImage:
-                            _currentUser?.profile_photo != null &&
-                                    _currentUser!.profile_photo!.isNotEmpty
-                                ? NetworkImage(
-                                  'https://appabsensi.mobileprojp.com/public/${_currentUser!.profile_photo!}',
-                                )
-                                : null,
-                        child:
-                            _currentUser?.profile_photo == null ||
-                                    _currentUser!.profile_photo!.isEmpty
-                                ? Icon(
-                                  Icons.person,
-                                  color: AppColors.accent(
-                                    context,
-                                  ), // <<< Perubahan di sini
-                                  size: 30,
-                                )
-                                : null,
-                      ),
-                      const SizedBox(width: 15),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _getGreeting(),
-                            style: TextStyle(
-                              // Ubah const TextStyle menjadi TextStyle biasa
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.onPrimary(
-                                context,
-                              ), // Menggunakan onPrimary karena di atas primary
-                            ),
-                          ),
-                          Text(
-                            'Ready for a productive day?',
-                            style: TextStyle(
-                              // Ubah const TextStyle menjadi TextStyle biasa
-                              fontSize: 14,
-                              color: AppColors.textLight(
-                                context,
-                              ), // <<< Perubahan di sini
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                _buildMainActionCard(
-                  context,
-                  hasCheckedIn,
-                  hasCheckedOut,
-                ), // <<< Lewatkan context
-                const SizedBox(height: 20),
-                _buildAttendanceSummary(context), // <<< Lewatkan context
-                const SizedBox(height: 100),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 10,
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const RequestScreen()),
-                  );
-                  if (result == true) {
-                    _fetchAttendanceData();
-                    MainBottomNavigationBar.refreshAttendanceNotifier.value =
-                        true;
-                  }
-                },
-                icon: Icon(
-                  Icons.add_task,
-                  color: AppColors.primary(context),
-                ), // <<< Perubahan di sini
-                label: Text(
-                  'Submit Request',
-                  style: TextStyle(
-                    color: AppColors.primary(context),
-                    fontSize: 18,
-                  ), // <<< Perubahan di sini
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.background(
-                    context,
-                  ), // <<< Perubahan di sini
-                  foregroundColor: AppColors.primary(
-                    context,
-                  ), // <<< Perubahan di sini
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  side: BorderSide(
-                    color: AppColors.primary(
+            Positioned(
+              bottom: 10,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    final result = await Navigator.push(
                       context,
-                    ).withOpacity(0.5), // <<< Perubahan di sini
-                    width: 1,
+                      MaterialPageRoute(builder: (_) => const RequestScreen()),
+                    );
+                    if (result == true) {
+                      _fetchAttendanceData();
+                      MainBottomNavigationBar.refreshAttendanceNotifier.value =
+                          true;
+                    }
+                  },
+                  icon: Icon(Icons.add_task, color: AppColors.primary(context)),
+                  label: Text(
+                    'Submit Request',
+                    style: TextStyle(
+                      color: AppColors.primary(context),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold, // Make text bolder
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.onPrimary(
+                      context,
+                    ), // Changed to onPrimary for contrast
+                    foregroundColor: AppColors.primary(context),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                    ), // Slightly larger padding
+                    side: BorderSide(
+                      color: AppColors.primary(context).withOpacity(0.5),
+                      width: 1,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 8, // Added elevation
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -720,211 +728,217 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     bool hasCheckedIn,
     bool hasCheckedOut,
   ) {
-    // Tambahkan context
-    return Card(
-      color: AppColors.cardBackground(context), // <<< Perubahan di sini
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 6,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Label GENERAL SHIFT dipindahkan ke paling atas
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: AppColors.success(
-                  context,
-                ).withOpacity(0.1), // <<< Perubahan di sini
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                'GENERAL SHIFT',
-                style: TextStyle(
-                  // Ubah const TextStyle menjadi TextStyle biasa
-                  color: AppColors.success(context), // <<< Perubahan di sini
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Informasi tanggal dan jam
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  _currentTime,
-                  style: TextStyle(
-                    // Ubah const TextStyle menjadi TextStyle biasa
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textDark(context), // <<< Perubahan di sini
+    return SlideTransition(
+      position: _slideAnimation,
+      child: Card(
+        color: AppColors.cardBackground(context),
+        margin: const EdgeInsets.symmetric(
+          horizontal: 20,
+        ), // Increased horizontal margin
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ), // More rounded corners
+        elevation: 10, // Increased elevation for a floating effect
+        shadowColor: AppColors.primary(
+          context,
+        ).withOpacity(0.2), // Subtle shadow color
+        child: Padding(
+          padding: const EdgeInsets.all(25.0), // Increased padding
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ScaleTransition(
+                    scale: _pulseAnimation,
+                    child: Text(
+                      _currentTime,
+                      style: TextStyle(
+                        fontSize: 52, // Larger time font
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textDark(context),
+                        letterSpacing: 1.5, // Added letter spacing
+                      ),
+                    ),
                   ),
-                ),
-                Text(
-                  _currentDate,
-                  style: TextStyle(
-                    // Ubah const TextStyle menjadi TextStyle biasa
-                    fontSize: 16,
-                    color: AppColors.textLight(
-                      context,
-                    ), // <<< Perubahan di sini
+                  const SizedBox(height: 5),
+                  Text(
+                    _currentDate,
+                    style: TextStyle(
+                      fontSize: 18, // Larger date font
+                      color: AppColors.textLight(context),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
+                ],
+              ),
+              const SizedBox(height: 40), // More spacing
 
-            // Tombol Check In dan Check Out (lonjong dan memanjang)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed:
-                    _isCheckingInOrOut
-                        ? null
-                        : (hasCheckedIn
-                            ? (hasCheckedOut ? null : _handleCheckOut)
-                            : _handleCheckIn),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      hasCheckedIn
-                          ? (hasCheckedOut
-                              ? AppColors.textLight(
-                                context,
-                              ) // <<< Perubahan di sini
-                              : AppColors.error(
-                                context,
-                              )) // <<< Perubahan di sini
-                          : AppColors.primary(context), // <<< Perubahan di sini
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed:
+                      _isCheckingInOrOut
+                          ? null
+                          : (hasCheckedIn
+                              ? (hasCheckedOut ? null : _handleCheckOut)
+                              : _handleCheckIn),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        hasCheckedIn
+                            ? (hasCheckedOut
+                                ? AppColors.textLight(context).withOpacity(
+                                  0.5,
+                                ) // Less prominent when both checked in/out
+                                : AppColors.error(context))
+                            : AppColors.primary(context),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                    ), // Larger button padding
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 8, // Elevated button
+                    shadowColor:
+                        hasCheckedIn
+                            ? AppColors.error(context).withOpacity(0.3)
+                            : AppColors.primary(context).withOpacity(0.3),
                   ),
-                  elevation: 5,
+                  child:
+                      _isCheckingInOrOut
+                          ? const SizedBox(
+                            width: 28, // Larger loading indicator
+                            height: 28,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3, // Thicker stroke
+                            ),
+                          )
+                          : Text(
+                            hasCheckedIn
+                                ? (hasCheckedOut ? 'Checked Out' : 'Check Out')
+                                : 'Check In',
+                            style: TextStyle(
+                              color: AppColors.onPrimary(context),
+                              fontSize: 22, // Larger button text
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                 ),
-                child:
-                    _isCheckingInOrOut
-                        ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color:
-                                Colors
-                                    .white, // Ini bisa tetap putih atau AppColors.onPrimary(context)
-                            strokeWidth: 2,
-                          ),
-                        )
-                        : Text(
-                          hasCheckedIn
-                              ? (hasCheckedOut ? 'Checked Out' : 'Check Out')
-                              : 'Check In',
-                          style: TextStyle(
-                            // Ubah const TextStyle menjadi TextStyle biasa
-                            color: AppColors.onPrimary(
-                              context,
-                            ), // Menggunakan onPrimary untuk teks tombol
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Divider(
-              color: AppColors.textLight(context),
-            ), // <<< Perubahan di sini
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildTimeDetail(
-                  context, // <<< Lewatkan context
-                  Icons.watch_later_outlined,
-                  _todayAbsence?.jamMasuk?.toLocal().toString().substring(
-                        11,
-                        19,
-                      ) ??
-                      'N/A',
-                  'Check In',
-                  AppColors.primary(context), // <<< Perubahan di sini
-                ),
-                _buildTimeDetail(
-                  context, // <<< Lewatkan context
-                  Icons.watch_later_outlined,
-                  _todayAbsence?.jamKeluar?.toLocal().toString().substring(
-                        11,
-                        19,
-                      ) ??
-                      'N/A',
-                  'Check Out',
-                  AppColors.error(context), // <<< Perubahan di sini
-                ),
-                _buildTimeDetail(
-                  context, // <<< Lewatkan context
-                  Icons.watch_later_outlined,
-                  _calculateWorkingHours(),
-                  'Working HR\'s',
-                  AppColors.warning(context), // <<< Perubahan di sini
-                ),
-              ],
-            ),
-          ],
+              const SizedBox(height: 25), // More spacing
+              Divider(
+                color: AppColors.textLight(context).withOpacity(0.4),
+                thickness: 1,
+              ), // Thicker and softer divider
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildTimeDetail(
+                    context,
+                    Icons.login, // Changed icon for Check In
+                    _todayAbsence?.jamMasuk?.toLocal().toString().substring(
+                          11,
+                          19,
+                        ) ??
+                        '', // Empty string for N/A value
+                    'Check In',
+                    AppColors.primary(context),
+                    _todayAbsence?.jamMasuk == null
+                        ? AppColors.textLight(context).withOpacity(0.7)
+                        : AppColors.textDark(context), // Conditional text color
+                  ),
+                  _buildTimeDetail(
+                    context,
+                    Icons.logout, // Changed icon for Check Out
+                    _todayAbsence?.jamKeluar?.toLocal().toString().substring(
+                          11,
+                          19,
+                        ) ??
+                        '', // Empty string for N/A value
+                    'Check Out',
+                    AppColors.error(context),
+                    _todayAbsence?.jamKeluar == null
+                        ? AppColors.textLight(context).withOpacity(0.7)
+                        : AppColors.textDark(context), // Conditional text color
+                  ),
+                  _buildTimeDetail(
+                    context,
+                    Icons.timer, // Changed icon for Working HR's
+                    _calculateWorkingHours(),
+                    'Working Hours', // Changed label for clarity
+                    AppColors.warning(context),
+                    _todayAbsence?.jamMasuk == null
+                        ? AppColors.textLight(context).withOpacity(0.7)
+                        : AppColors.textDark(context), // Conditional text color
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  // Updated _buildTimeDetail to handle "N/A" display and differentiate styles
   Widget _buildTimeDetail(
-    BuildContext context, // Tambahkan context di sini
+    BuildContext context,
     IconData icon,
-    String time,
+    String timeValue, // Renamed to timeValue to avoid confusion
     String label,
-    Color color,
+    Color iconColor, // Renamed to iconColor
+    Color textColor, // New parameter for text color
   ) {
+    bool isNA =
+        timeValue.isEmpty ||
+        timeValue == 'N/A' ||
+        timeValue == '00:00:00'; // Check if value is effectively N/A or zero
     return Column(
       children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 5),
+        Icon(icon, color: iconColor, size: 30), // Slightly larger icons
+        const SizedBox(height: 8), // More spacing
         Text(
-          time,
+          isNA ? 'N/A' : timeValue, // Display "N/A" if value is empty/zero
           style: TextStyle(
-            // Ubah const TextStyle menjadi TextStyle biasa
-            fontSize: 16,
+            fontSize: 17, // Slightly larger font
             fontWeight: FontWeight.bold,
-            color: AppColors.textDark(context), // <<< Perubahan di sini
+            color:
+                isNA
+                    ? AppColors.textLight(context).withOpacity(0.7)
+                    : textColor, // Use light color for N/A
           ),
         ),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 13,
             color: AppColors.textLight(context),
-          ), // <<< Perubahan di sini
+          ), // Slightly larger label
         ),
       ],
     );
   }
 
   Widget _buildAttendanceSummary(BuildContext context) {
-    // Tambahkan context
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20.0,
+          ), // Increased padding
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Attendance for this Month',
                 style: TextStyle(
-                  // Ubah const TextStyle menjadi TextStyle biasa
-                  fontSize: 18,
+                  fontSize: 20, // Larger title
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textDark(context), // <<< Perubahan di sini
+                  color: AppColors.textDark(context),
                 ),
               ),
               InkWell(
@@ -933,36 +947,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                    horizontal: 14, // Adjusted padding
+                    vertical: 8, // Adjusted padding
                   ),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: AppColors.textLight(
-                        context,
-                      ).withOpacity(0.5), // <<< Perubahan di sini
+                      color: AppColors.textLight(context).withOpacity(0.5),
                     ),
                     borderRadius: BorderRadius.circular(30),
+                    color: AppColors.cardBackground(
+                      context,
+                    ), // Added background color to filter button
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.shadowColor(context).withOpacity(0.1),
+                        blurRadius: 5,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
                       Text(
                         DateFormat('MMM').format(DateTime.now()).toUpperCase(),
                         style: TextStyle(
-                          // Ubah const TextStyle menjadi TextStyle biasa
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textDark(
-                            context,
-                          ), // <<< Perubahan di sini
+                          color: AppColors.textDark(context),
                         ),
                       ),
-                      const SizedBox(width: 5),
                       Icon(
-                        Icons.calendar_today,
-                        size: 16,
-                        color: AppColors.textDark(
-                          context,
-                        ), // <<< Perubahan di sini
+                        Icons.arrow_drop_down,
+                        color: AppColors.textDark(context),
                       ),
                     ],
                   ),
@@ -971,72 +986,82 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ],
           ),
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 15), // More spacing
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: _buildAttendanceStatsCard(context), // <<< Lewatkan context
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20.0,
+          ), // Increased padding
+          child: Card(
+            color: AppColors.cardBackground(context),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20), // More rounded corners
+            ),
+            elevation: 8, // Increased elevation
+            shadowColor: AppColors.shadowColor(
+              context,
+            ).withOpacity(0.15), // Subtle shadow
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 25.0, // Increased padding
+                vertical: 20.0, // Increased padding
+              ),
+              child: Column(
+                children: [
+                  _buildStatRow(
+                    context,
+                    'Present',
+                    _absenceStats?.totalMasuk.toString() ??
+                        '0', // Default to '0'
+                  ),
+                  const Divider(
+                    height: 25,
+                    thickness: 0.8,
+                  ), // Divider between stats
+                  _buildStatRow(
+                    context,
+                    'Absent',
+                    _absenceStats?.totalAbsen.toString() ??
+                        '0', // Default to '0'
+                  ),
+                  const Divider(
+                    height: 25,
+                    thickness: 0.8,
+                  ), // Divider between stats
+                  _buildStatRow(
+                    context,
+                    'Permission',
+                    _absenceStats?.totalIzin.toString() ??
+                        '0', // Default to '0'
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildAttendanceStatsCard(BuildContext context) {
-    // Tambahkan context
-    return Card(
-      color: AppColors.cardBackground(context), // <<< Perubahan di sini
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(
-                  context, // <<< Lewatkan context
-                  'Total Hadir',
-                  _absenceStats?.totalMasuk.toString() ?? '0',
-                  AppColors.primary(context), // <<< Perubahan di sini
-                ),
-                _buildStatItem(
-                  context, // <<< Lewatkan context
-                  'Total Izin',
-                  _absenceStats?.totalIzin.toString() ?? '0',
-                  AppColors.info(context), // <<< Perubahan di sini
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatItem(
-    BuildContext context,
-    String label,
-    String value,
-    Color color,
-  ) {
-    // Tambahkan context
-    return Column(
+  // Helper for attendance stats rows
+  Widget _buildStatRow(BuildContext context, String title, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16,
+            color: AppColors.textDark(context),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         Text(
           value,
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 16,
+            color: AppColors.primary(context),
             fontWeight: FontWeight.bold,
-            color: color,
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppColors.textDark(context),
-          ), // <<< Perubahan di sini
         ),
       ],
     );

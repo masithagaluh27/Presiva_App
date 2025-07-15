@@ -87,7 +87,10 @@ class _SplashScreenState extends State<SplashScreen>
               // Teks 'PRESIVA'
               Text(
                 'PRESIVA',
-                style: TextStyle(color: Color(0xFF42A5F5)), // Warna biru terang
+                style: TextStyle(
+                  color: Color(0xFF42A5F5),
+                  fontSize: 30,
+                ), // Warna biru terang
               ),
 
               const SizedBox(height: 10), // Spasi vertikal
@@ -97,6 +100,7 @@ class _SplashScreenState extends State<SplashScreen>
                 textAlign: TextAlign.center, // Teks rata tengah
                 style: TextStyle(
                   color: Color(0xFF424242),
+                  fontSize: 18,
                 ), // Warna abu-abu gelap
               ),
 
