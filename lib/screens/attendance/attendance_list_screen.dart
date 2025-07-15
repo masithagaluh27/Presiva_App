@@ -772,13 +772,14 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            Icon(Icons.no_accounts),
                             // You can keep this image or replace it with an icon as well
-                            Image.asset(
-                              'assets/images/shaun.jpeg', // Make sure this asset exists
-                              height: 150,
-                              width: 150,
-                              fit: BoxFit.contain,
-                            ),
+                            // Image.asset(
+                            //   'assets/images/presivabg.png', // Make sure this asset exists
+                            //   height: 150,
+                            //   width: 150,
+                            //   fit: BoxFit.contain,
+                            // ),
                             const SizedBox(height: 20),
                             Text(
                               'No attendance records found for this month.',

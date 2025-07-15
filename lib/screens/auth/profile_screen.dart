@@ -4,7 +4,6 @@ import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/models/app_models.dart';
 import 'package:presiva/screens/auth/edit_profile_screen.dart';
 import 'package:presiva/services/api_Services.dart';
-
 import '../../routes/app_routes.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -43,20 +42,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     final ApiResponse<User> response = await _apiService.getProfile();
 
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() => _isLoading = false);
 
     if (response.statusCode == 200 && response.data != null) {
-      setState(() {
-        _currentUser = response.data;
-      });
+      setState(() => _currentUser = response.data);
     } else {
       print('Failed to load user profile: ${response.message}');
       if (mounted) {
@@ -70,9 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         );
       }
-      setState(() {
-        _currentUser = null;
-      });
+      setState(() => _currentUser = null);
     }
   }
 
@@ -97,7 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             backgroundColor: AppColors.cardBackground(context),
-            actions: <Widget>[
+            actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
                 child: Text(
@@ -183,7 +174,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         formattedJoinedDate = DateFormat('MMM dd, yyyy').format(startDate);
       } catch (e) {
         print('Error parsing batch start date: $e');
-        formattedJoinedDate = 'N/A';
       }
     }
 
@@ -229,69 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
                     children: [
-                      Container(
-                        width: double.infinity,
-                        height: 280, // Disesuaikan tingginya
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.primary(context),
-                              AppColors.primary(context).withOpacity(0.8),
-                            ],
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            top: 80.0,
-                          ), // Menambahkan padding atas
-                          child: Column(
-                            mainAxisAlignment:
-                                MainAxisAlignment.start, // Mengubah alignment
-                            children: [
-                              Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 50,
-                                    backgroundColor: Colors.white,
-                                    backgroundImage: profileImageProvider,
-                                    child:
-                                        profileImageProvider == null
-                                            ? Icon(
-                                              Icons.person,
-                                              size: 60,
-                                              color: AppColors.primary(context),
-                                            )
-                                            : null,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                username,
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.onPrimary(context),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                designation,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppColors.onPrimary(
-                                    context,
-                                  ).withOpacity(0.8),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      _buildHeader(profileImageProvider, username, designation),
                       Transform.translate(
                         offset: const Offset(0, -30),
                         child: Column(
@@ -302,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               jenisKelamin,
                               designation,
                               formattedJoinedDate,
-                              _currentUser?.profile_photo ?? '',
+                              profilePhotoUrl,
                             ),
                             const SizedBox(height: 20),
                             _buildActionOptions(),
@@ -314,6 +242,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
+    );
+  }
+
+  Widget _buildHeader(ImageProvider<Object>? image, String name, String role) {
+    return Container(
+      width: double.infinity,
+      height: 280,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.primary(context),
+            AppColors.primary(context).withOpacity(0.8),
+          ],
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 80.0),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.white,
+              backgroundImage: image,
+              child:
+                  image == null
+                      ? Icon(
+                        Icons.person,
+                        size: 60,
+                        color: AppColors.primary(context),
+                      )
+                      : null,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              name,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.onPrimary(context),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              role,
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.onPrimary(context).withOpacity(0.8),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -418,6 +401,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         children: [
+          // Optional Notification Switch (can uncomment if used)
+          // Card(
+          //   color: AppColors.cardBackground(context),
+          //   margin: EdgeInsets.zero,
+          //   shape: RoundedRectangleBorder(
+          //     borderRadius: BorderRadius.circular(15),
+          //   ),
+          //   child: ListTile(
+          //     leading: Icon(Icons.notifications_active_outlined, color: AppColors.primary(context)),
+          //     title: Text('Notifications', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+          //     trailing: Switch.adaptive(
+          //       value: _notificationEnabled,
+          //       onChanged: (val) => setState(() => _notificationEnabled = val),
+          //       activeColor: AppColors.primary(context),
+          //     ),
+          //   ),
+          // ),
           Card(
             color: AppColors.cardBackground(context),
             margin: EdgeInsets.zero,
@@ -427,67 +427,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             elevation: 8,
             shadowColor: AppColors.primary(context).withOpacity(0.1),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 5,
-              ),
-              leading: Icon(
-                Icons.notifications_active_outlined,
-                color: AppColors.primary(context),
-                size: 28,
-              ),
-              title: Text(
-                'Notifications',
-                style: TextStyle(
-                  fontSize: 17,
-                  color: AppColors.textDark(context),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              trailing: Switch.adaptive(
-                value: _notificationEnabled,
-                onChanged: (bool newValue) {
-                  setState(() {
-                    _notificationEnabled = newValue;
-                  });
-                },
-                activeColor: AppColors.primary(context),
-                inactiveTrackColor: AppColors.border(context),
-                inactiveThumbColor: AppColors.textLight(context),
-              ),
-              onTap: () {
-                setState(() {
-                  _notificationEnabled = !_notificationEnabled;
-                });
-              },
-            ),
-          ),
-          const SizedBox(height: 15),
-          Card(
-            color: AppColors.cardBackground(context),
-            margin: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            elevation: 8,
-            shadowColor: AppColors.primary(context).withOpacity(0.1),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 5,
-              ),
               leading: Icon(
                 Icons.edit_outlined,
                 color: AppColors.primary(context),
-                size: 28,
               ),
               title: Text(
                 'Edit Profile',
-                style: TextStyle(
-                  fontSize: 17,
-                  color: AppColors.textDark(context),
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
               ),
               trailing: Icon(
                 Icons.arrow_forward_ios_rounded,
@@ -507,14 +453,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             elevation: 8,
             shadowColor: AppColors.error(context).withOpacity(0.1),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 5,
-              ),
               leading: Icon(
                 Icons.logout_rounded,
                 color: AppColors.error(context),
-                size: 28,
               ),
               title: Text(
                 'Logout',

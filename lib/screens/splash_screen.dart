@@ -1,9 +1,9 @@
-import 'dart:async'; // Digunakan untuk Future.delayed dan Timer (meskipun timer tidak di sini, tetap dipertahankan jika ada kebutuhan di masa depan)
+import 'dart:async';
 
-import 'package:flutter/material.dart'; // Import utama untuk widget Flutter
-import 'package:presiva/services/api_Services.dart'; // Import untuk API service
+import 'package:flutter/material.dart';
+import 'package:presiva/services/api_Services.dart';
 
-import '../routes/app_routes.dart'; // Import untuk definisi rute aplikasi
+import '../routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,46 +21,32 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Inisialisasi AnimationController untuk durasi 1.5 detik
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
-      vsync: this, // Menggunakan SingleTickerProviderStateMixin
+      vsync: this,
     );
 
-    // Inisialisasi CurvedAnimation untuk efek fade in/out yang halus
     _fadeAnimation = CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeInOut, // Kurva yang masuk dan keluar secara perlahan
+      curve: Curves.easeInOut,
     );
 
-    // Memulai animasi fade in
     _animationController.forward();
-
-    // Memulai urutan splash screen (delay, inisialisasi API, navigasi)
     _startSplashSequence();
   }
 
   Future<void> _startSplashSequence() async {
-    // Menunggu 3 detik sebelum melanjutkan
-    await Future.delayed(const Duration(seconds: 3));
-    // Inisialisasi layanan API
+    await Future.delayed(const Duration(seconds: 2));
     await ApiService.init();
-
-    // Mengecek apakah pengguna sudah login (token tersedia)
     final isLoggedIn = ApiService.getToken() != null;
-    // Menentukan rute berikutnya berdasarkan status login
     final nextRoute = isLoggedIn ? AppRoutes.main : AppRoutes.login;
 
-    // Memastikan widget masih terpasang sebelum melakukan navigasi
     if (!mounted) return;
-
-    // Navigasi ke rute berikutnya, menggantikan rute splash screen
     Navigator.of(context).pushReplacementNamed(nextRoute);
   }
 
   @override
   void dispose() {
-    // Membuang controller animasi saat widget dibuang
     _animationController.dispose();
     super.dispose();
   }
@@ -68,47 +54,63 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Background putih bersih untuk splash screen
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F5), // Light grey background
       body: Center(
         child: FadeTransition(
-          opacity:
-              _fadeAnimation, // Animasi fade diterapkan pada seluruh konten
+          opacity: _fadeAnimation,
           child: Column(
-            mainAxisSize: MainAxisSize.min, // Membuat kolom sekecil mungkin
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Gambar logo Presiva
-              Image.asset(
-                'assets/images/shaun.jpeg', // Pastikan path ini benar
-                width: 120, // Lebar gambar
-                height: 120, // Tinggi gambar
+              // Logo
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/images/presivabg.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-              const SizedBox(height: 20), // Spasi vertikal
-              // Teks 'PRESIVA'
-              Text(
-                'PRESIVA',
+              const SizedBox(height: 24),
+
+              // App Name
+              // const Text(
+              //   'PRESIVA',
+              //   style: TextStyle(
+              //     fontSize: 34,
+              //     fontWeight: FontWeight.w700,
+              //     letterSpacing: 1.5,
+              //     color: Color(0xFF333333),
+              //   ),
+              // ),
+              // const SizedBox(height: 10),
+
+              // Tagline
+              const Text(
+                'Smart Attendance System',
                 style: TextStyle(
-                  color: Color(0xFF42A5F5),
-                  fontSize: 30,
-                ), // Warna biru terang
+                  fontSize: 16,
+                  color: Color(0xFF666666),
+                  fontStyle: FontStyle.italic,
+                ),
               ),
 
-              const SizedBox(height: 10), // Spasi vertikal
-              // Teks slogan/deskripsi
-              Text(
-                'Welcome to the future of attendance!',
-                textAlign: TextAlign.center, // Teks rata tengah
-                style: TextStyle(
-                  color: Color(0xFF424242),
-                  fontSize: 18,
-                ), // Warna abu-abu gelap
-              ),
-
-              const SizedBox(height: 30), // Spasi vertikal
-
-              CircularProgressIndicator(
-                // Warna indikator loading sama dengan warna utama logo
-                color: const Color(0xFF42A5F5), // Warna biru terang
+              const SizedBox(height: 30),
+              const CircularProgressIndicator(
+                color: Color(0xFF9E9E9E),
+                strokeWidth: 3,
               ),
             ],
           ),

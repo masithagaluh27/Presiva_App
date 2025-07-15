@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'PRESIVA',
       initialRoute: AppRoutes.initial,
       routes: {
         AppRoutes.initial: (context) => const SplashScreen(),

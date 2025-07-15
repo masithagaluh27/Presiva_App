@@ -4,13 +4,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:presiva/constant/app_colors.dart';
-import 'package:presiva/constant/app_text_styles.dart'; // Import AppTextStyles
-import 'package:presiva/models/app_models.dart';
-import 'package:presiva/services/api_Services.dart';
+import 'package:presiva/constant/app_text_styles.dart';
+import 'package:presiva/models/app_models.dart'; // Pastikan path model Anda benar
+import 'package:presiva/services/api_Services.dart'; // Pastikan path service Anda benar
 
 class PersonReportScreen extends StatefulWidget {
-  final ValueNotifier<bool> refreshNotifier;
-
+  final ValueNotifier<bool> refreshNotifier; // Gunakan tipe yang spesifik
   const PersonReportScreen({super.key, required this.refreshNotifier});
 
   @override
@@ -28,10 +27,13 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
   );
 
   int _presentCount = 0;
-  int _absentCount = 0;
-  int _lateInCount = 0;
+  int _absentCount = 0; // Untuk total 'Absen' (alpha / tanpa izin)
+  int _permitCount = 0; // Untuk total 'Izin' (dengan izin)
+  int _lateInCount = 0; // Dihitung lokal
+
   int _totalWorkingDaysInMonth = 0;
-  String _totalWorkingHours = '0hr';
+  String _totalWorkingHours = '0hr 0min';
+  double _overallAttendancePercentage = 0.0;
 
   List<BarChartGroupData> _barChartGroupData = [];
   double _maxYValue = 10.0;
@@ -65,10 +67,13 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
     setState(() {
       _presentCount = 0;
       _absentCount = 0;
+      _permitCount = 0;
       _lateInCount = 0;
       _totalWorkingDaysInMonth = 0;
-      _totalWorkingHours = '0hr';
+      _totalWorkingHours = '0hr 0min';
+      _overallAttendancePercentage = 0.0;
       _barChartGroupData = [];
+      _maxYValue = 10.0;
     });
 
     try {
@@ -78,13 +83,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         final AbsenceStats stats = statsResponse.data!;
         setState(() {
           _presentCount = stats.totalMasuk;
-          _absentCount = stats.totalIzin;
-          _lateInCount = stats.totalAbsen;
+          _permitCount = stats.totalIzin;
+          _absentCount = stats.totalAbsen;
         });
       } else {
         print('Failed to get absence stats: ${statsResponse.message}');
-        _updateSummaryCounts(0, 0, 0, 0, '0hr');
-        _updateBarChartData(0, 0, 0);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -92,7 +95,6 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
             ),
           );
         }
-        return;
       }
 
       final String startDate = DateFormat('yyyy-MM-01').format(_selectedMonth);
@@ -104,9 +106,10 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
           .getAbsenceHistory(startDate: startDate, endDate: endDate);
 
       Duration totalWorkingDuration = Duration.zero;
-      int actualPresentCount = 0;
-      int actualAbsentCount = 0;
-      int actualLateCount = 0;
+      int actualPresentCountFromHistory = 0;
+      int actualAbsentCountFromHistory = 0;
+      int actualPermitCountFromHistory = 0;
+      int actualLateCountFromHistory = 0;
 
       int daysInMonth =
           DateTime(_selectedMonth.year, _selectedMonth.month + 1, 0).day;
@@ -118,19 +121,18 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
             print('Skipping absence entry due to null attendanceDate.');
             continue;
           }
+
           final DateTime entryDate = absence.attendanceDate!;
 
           if (absence.status?.toLowerCase() == 'masuk') {
-            actualPresentCount++;
+            actualPresentCountFromHistory++;
             if (absence.checkIn != null && absence.checkOut != null) {
               final checkInTime = absence.checkIn!;
               final checkOutTime = absence.checkOut!;
-
               if (checkOutTime.isAfter(checkInTime)) {
                 totalWorkingDuration += checkOutTime.difference(checkInTime);
               }
             }
-
             if (absence.checkIn != null) {
               final officeStart = DateTime(
                 entryDate.year,
@@ -141,11 +143,13 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                 0,
               );
               if (absence.checkIn!.isAfter(officeStart)) {
-                actualLateCount++;
+                actualLateCountFromHistory++;
               }
             }
           } else if (absence.status?.toLowerCase() == 'izin') {
-            actualAbsentCount++;
+            actualPermitCountFromHistory++;
+          } else if (absence.status?.toLowerCase() == 'absen') {
+            actualAbsentCountFromHistory++;
           }
         }
       } else {
@@ -168,16 +172,29 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       String formattedTotalWorkingHours =
           '${totalHours}hr ${remainingMinutes}min';
 
+      double calculatedAttendancePercentage = 0.0;
+      if (_totalWorkingDaysInMonth > 0) {
+        calculatedAttendancePercentage =
+            (actualPresentCountFromHistory / _totalWorkingDaysInMonth) * 100;
+      }
+
       setState(() {
-        _presentCount = actualPresentCount;
-        _absentCount = actualAbsentCount;
-        _lateInCount = actualLateCount;
+        _presentCount = actualPresentCountFromHistory;
+        _absentCount = actualAbsentCountFromHistory;
+        _permitCount = actualPermitCountFromHistory;
+        _lateInCount = actualLateCountFromHistory;
         _totalWorkingHours = formattedTotalWorkingHours;
-        _updateBarChartData(_presentCount, _absentCount, _lateInCount);
+        _overallAttendancePercentage = calculatedAttendancePercentage;
+
+        _updateBarChartData(
+          _presentCount,
+          _absentCount + _permitCount, // Gabungkan Absen dan Izin untuk chart
+          _lateInCount,
+        );
       });
     } catch (e) {
       print('Error fetching and calculating monthly reports: $e');
-      _updateSummaryCounts(0, 0, 0, 0, '0hr');
+      _updateSummaryCounts(0, 0, 0, 0, 0, '0hr 0min', 0.0);
       _updateBarChartData(0, 0, 0);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -190,23 +207,27 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
   void _updateSummaryCounts(
     int present,
     int absent,
+    int permit,
     int late,
     int totalWorkingDays,
     String totalHrs,
+    double attendancePercentage,
   ) {
     setState(() {
       _presentCount = present;
       _absentCount = absent;
+      _permitCount = permit;
       _lateInCount = late;
       _totalWorkingDaysInMonth = totalWorkingDays;
       _totalWorkingHours = totalHrs;
+      _overallAttendancePercentage = attendancePercentage;
     });
   }
 
-  void _updateBarChartData(int present, int absent, int late) {
+  void _updateBarChartData(int present, int absentAndPermit, int late) {
     _maxYValue = [
       present.toDouble(),
-      absent.toDouble(),
+      absentAndPermit.toDouble(),
       late.toDouble(),
       5.0,
     ].reduce((a, b) => a > b ? a : b);
@@ -220,7 +241,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         barRods: [
           BarChartRodData(
             toY: present.toDouble(),
-            color: Colors.green,
+            color: AppColors.success(context),
             width: 25,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -231,8 +252,8 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         x: 1,
         barRods: [
           BarChartRodData(
-            toY: absent.toDouble(),
-            color: Colors.red,
+            toY: absentAndPermit.toDouble(),
+            color: AppColors.error(context),
             width: 25,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -244,7 +265,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         barRods: [
           BarChartRodData(
             toY: late.toDouble(),
-            color: Colors.orange,
+            color: AppColors.warning(context),
             width: 25,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -254,47 +275,50 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
     ];
   }
 
-  // Menerima BuildContext untuk mengakses AppColors dan AppTextStyles
   Widget _buildStatListItem(
     BuildContext context,
     String title,
     dynamic value,
     Color color,
   ) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground(context), // Menggunakan BuildContext
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16.0, // Perkirakan ukuran font untuk 'medium'
-              fontWeight:
-                  FontWeight.w500, // Perkirakan ketebalan font untuk 'medium'
-              color: AppColors.textDark(context),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground(context),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowColor(context),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 2),
             ),
-          ),
-          Text(value.toString(), style: AppTextStyles.body1(context)),
-        ],
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: AppTextStyles.body2(context).copyWith(
+                fontWeight: FontWeight.w500,
+                color: AppColors.textDark(context),
+              ),
+            ),
+            Text(
+              value.toString(),
+              style: AppTextStyles.heading4(context).copyWith(
+                color: color,
+              ), // Menggunakan heading4 untuk nilai, dengan warna opsional
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // Function to get titles for the bottom axis
   Widget getTitles(BuildContext context, double value, TitleMeta meta) {
     String text;
     switch (value.toInt()) {
@@ -302,7 +326,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         text = 'MASUK';
         break;
       case 1:
-        text = 'IZIN';
+        text = 'ABSEN/IZIN';
         break;
       case 2:
         text = 'TERLAMBAT';
@@ -311,16 +335,13 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         text = '';
         break;
     }
-    // Use SideTitleWidget correctly with axisSide from TitleMeta
     return SideTitleWidget(
       axisSide: meta.axisSide,
       space: 16,
       child: Text(
         text,
-        style: TextStyle(
-          fontSize:
-              14.0, // Perkirakan ukuran font untuk 'bold' (umumnya 14 atau 16)
-          fontWeight: FontWeight.bold, // Menjadikan teks tebal
+        style: AppTextStyles.body2(context).copyWith(
+          fontWeight: FontWeight.bold,
           color: AppColors.textDark(context),
         ),
       ),
@@ -336,22 +357,39 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       initialDatePickerMode: DatePickerMode.year,
       builder: (BuildContext context, Widget? child) {
         return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: AppColors.primary(
-              context,
-            ), // Menggunakan BuildContext
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary(context),
-            ), // Menggunakan BuildContext
-            buttonTheme: const ButtonThemeData(
-              textTheme: ButtonTextTheme.primary,
+          data: Theme.of(context).copyWith(
+            colorScheme:
+                Theme.of(context).brightness == Brightness.light
+                    ? ColorScheme.light(
+                      primary: AppColors.primary(context),
+                      onPrimary: AppColors.onPrimary(context),
+                      surface: AppColors.background(context),
+                      onSurface: AppColors.textDark(context),
+                    )
+                    : ColorScheme.dark(
+                      primary: AppColors.primary(context),
+                      onPrimary: AppColors.onPrimary(context),
+                      surface: AppColors.background(context),
+                      onSurface: AppColors.textDark(context),
+                    ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary(context),
+              ),
+            ),
+            appBarTheme: AppBarTheme(
+              backgroundColor: AppColors.primary(context),
+              foregroundColor: AppColors.onPrimary(context),
+              elevation: 0,
+            ),
+            dialogTheme: DialogThemeData(
+              backgroundColor: AppColors.cardBackground(context),
             ),
           ),
           child: child!,
         );
       },
     );
-
     if (picked != null && picked != _selectedMonth) {
       setState(() {
         _selectedMonth = DateTime(picked.year, picked.month, 1);
@@ -363,36 +401,44 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background(
-        context,
-      ), // Menggunakan BuildContext
+      backgroundColor: AppColors.background(context),
       body: FutureBuilder<void>(
         future: _reportDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primary(context),
+              ),
+            );
           }
-
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Error loading data: ${snapshot.error}',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.body2(
+                    context,
+                  ).copyWith(color: AppColors.error(context)),
+                ),
+              ),
+            );
           }
-
           return Stack(
             children: [
-              // Background gradient
               Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
-                height: MediaQuery.of(context).size.height * 0.3,
+                height: MediaQuery.of(context).size.height * 0.25,
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.primary(context), // Menggunakan BuildContext
-                        AppColors.secondary(
-                          context,
-                        ), // Menggunakan BuildContext
+                        AppColors.primary(context),
+                        AppColors.secondary(context).withOpacity(0.8),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -400,13 +446,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                   ),
                 ),
               ),
-              // Content
               SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(height: MediaQuery.of(context).padding.top + 20),
-                    // Welcome section
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24.0,
@@ -416,38 +460,23 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome',
-                            style: TextStyle(
-                              fontSize: 32.0,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.black
-                                      : Colors.white,
-                              fontFamily:
-                                  'Montserrat', // Ganti dengan font family Anda jika ada
-                            ),
+                            'Monthly Report',
+                            style: AppTextStyles.heading1(
+                              context,
+                            ).copyWith(color: AppColors.onPrimary(context)),
                           ),
                           Text(
-                            'Test this monthly report',
-                            style: TextStyle(
-                              fontSize:
-                                  16.0, // Perkirakan ukuran font yang sesuai dengan 'medium'
-                              fontWeight:
-                                  FontWeight
-                                      .w500, // Perkirakan ketebalan font untuk 'medium'
-                              color:
-                                  Colors
-                                      .white70, // Gunakan warna yang Anda inginkan secara langsung
-                              // fontFamily: 'Montserrat', // Opsional: Tambahkan font family jika Anda menggunakannya secara konsisten
+                            'Review your attendance overview below.',
+                            style: AppTextStyles.body1(context).copyWith(
+                              color: AppColors.onPrimary(
+                                context,
+                              ).withOpacity(0.8),
                             ),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Monthly Overview Card
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Stack(
@@ -458,7 +487,10 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            elevation: 4,
+                            elevation: 8,
+                            shadowColor: AppColors.primary(
+                              context,
+                            ).withOpacity(0.2),
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(
                                 16.0,
@@ -474,14 +506,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                     children: [
                                       Text(
                                         'Monthly Overview',
-                                        style: TextStyle(
-                                          fontSize:
-                                              20.0, // Perkirakan ukuran font untuk judul (sesuai dengan 'title' sebelumnya)
-                                          fontWeight:
-                                              FontWeight
-                                                  .bold, // Perkirakan ketebalan font untuk judul
-                                          color: AppColors.textDark(context),
-                                        ),
+                                        style: AppTextStyles.heading2(context),
                                       ),
                                       GestureDetector(
                                         onTap: () => _selectMonth(context),
@@ -491,8 +516,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                             vertical: 6,
                                           ),
                                           decoration: BoxDecoration(
+                                            color: AppColors.background(
+                                              context,
+                                            ),
                                             border: Border.all(
-                                              color: Colors.grey.shade300,
+                                              color: AppColors.border(context),
                                             ),
                                             borderRadius: BorderRadius.circular(
                                               30,
@@ -504,20 +532,16 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                                 DateFormat('MMM yyyy')
                                                     .format(_selectedMonth)
                                                     .toUpperCase(),
-                                                style: TextStyle(
-                                                  fontSize: 14.0,
-                                                  fontWeight:
-                                                      FontWeight
-                                                          .bold, // Sesuai dengan 'AppTextStyles.bold'
-                                                  color: AppColors.textDark(
-                                                    context,
-                                                  ),
+                                                style: AppTextStyles.body2(
+                                                  context,
+                                                ).copyWith(
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
                                               const SizedBox(width: 5),
                                               Icon(
-                                                Icons.calendar_today,
-                                                size: 16,
+                                                Icons.calendar_month,
+                                                size: 18,
                                                 color: AppColors.textDark(
                                                   context,
                                                 ),
@@ -529,66 +553,66 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                     ],
                                   ),
                                   const SizedBox(height: 20),
-                                  // Stats list - now calls the defined method
                                   _buildStatListItem(
-                                    context, // Meneruskan BuildContext
+                                    context,
                                     'Total Working Days',
-                                    _totalWorkingDaysInMonth.toString().padLeft(
-                                      2,
-                                      '0',
-                                    ),
-                                    Colors.blueGrey,
+                                    _totalWorkingDaysInMonth.toString(),
+                                    AppColors.info(context),
                                   ),
                                   _buildStatListItem(
-                                    context, // Meneruskan BuildContext
+                                    context,
                                     'Total Present Days',
-                                    _presentCount.toString().padLeft(2, '0'),
-                                    Colors.green,
+                                    _presentCount.toString(),
+                                    AppColors.success(context),
                                   ),
                                   _buildStatListItem(
-                                    context, // Meneruskan BuildContext
+                                    context,
                                     'Total Absent Days',
-                                    _absentCount.toString().padLeft(2, '0'),
-                                    Colors.red,
+                                    _absentCount.toString(),
+                                    AppColors.error(context),
                                   ),
                                   _buildStatListItem(
-                                    context, // Meneruskan BuildContext
+                                    context,
+                                    'Total Izin Days',
+                                    _permitCount.toString(),
+                                    AppColors.warning(context),
+                                  ),
+                                  _buildStatListItem(
+                                    context,
                                     'Total Late Entries',
-                                    _lateInCount.toString().padLeft(2, '0'),
-                                    Colors.orange,
+                                    _lateInCount.toString(),
+                                    Colors
+                                        .orange, // Menggunakan Colors.orange karena AppColors.orange tidak ada
                                   ),
                                   _buildStatListItem(
-                                    context, // Meneruskan BuildContext
+                                    context,
                                     'Total Working Hours',
                                     _totalWorkingHours,
-                                    AppColors.primary(
-                                      context,
-                                    ), // Menggunakan BuildContext
+                                    AppColors.primary(context),
                                   ),
                                   _buildStatListItem(
-                                    context, // Meneruskan BuildContext
+                                    context,
                                     'Overall Attendance %',
-                                    '${(_presentCount / (_totalWorkingDaysInMonth == 0 ? 1 : _totalWorkingDaysInMonth) * 100).toStringAsFixed(0)}%',
-                                    Colors.teal,
+                                    '${_overallAttendancePercentage.toStringAsFixed(0)}%',
+                                    _overallAttendancePercentage >= 80
+                                        ? AppColors.success(context)
+                                        : AppColors.error(context),
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                          // Icon
                           Positioned(
                             top: 0,
                             left: MediaQuery.of(context).size.width / 2 - 25,
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: AppColors.background(
-                                  context,
-                                ), // Menggunakan BuildContext
+                                color: AppColors.background(context),
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
+                                    color: AppColors.shadowColor(context),
                                     spreadRadius: 2,
                                     blurRadius: 5,
                                     offset: const Offset(0, 3),
@@ -596,10 +620,8 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                 ],
                               ),
                               child: Icon(
-                                Icons.home_work_outlined,
-                                color: AppColors.primary(
-                                  context,
-                                ), // Menggunakan BuildContext
+                                Icons.insert_chart_outlined,
+                                color: AppColors.primary(context),
                                 size: 30,
                               ),
                             ),
@@ -608,196 +630,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Bar Chart Section
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Attendance Overview (Bar Chart)',
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textDark(context),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          if (_presentCount + _absentCount + _lateInCount > 0)
-                            AspectRatio(
-                              aspectRatio: 1.5,
-                              child: Card(
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: BarChart(
-                                    BarChartData(
-                                      alignment: BarChartAlignment.spaceAround,
-                                      maxY: _maxYValue,
-                                      barTouchData: BarTouchData(
-                                        touchTooltipData: BarTouchTooltipData(
-                                          getTooltipItem: (
-                                            BarChartGroupData group,
-                                            int groupIndex,
-                                            BarChartRodData rod,
-                                            int rodIndex,
-                                          ) {
-                                            String category;
-                                            switch (group.x) {
-                                              case 0:
-                                                category = 'Present';
-                                                break;
-                                              case 1:
-                                                category = 'Absent';
-                                                break;
-                                              case 2:
-                                                category = 'Late';
-                                                break;
-                                              default:
-                                                category = '';
-                                            }
-                                            return BarTooltipItem(
-                                              '$category\n',
-                                              TextStyle(
-                                                fontSize: 18.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                              children: <TextSpan>[
-                                                TextSpan(
-                                                  text:
-                                                      rod.toY
-                                                          .toInt()
-                                                          .toString(),
-                                                  style: TextStyle(
-                                                    fontSize: 16.0,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.yellow,
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      titlesData: FlTitlesData(
-                                        show: true,
-                                        bottomTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: true,
-                                            getTitlesWidget:
-                                                (value, meta) => getTitles(
-                                                  context,
-                                                  value,
-                                                  meta,
-                                                ), // Meneruskan BuildContext
-                                            reservedSize: 38,
-                                          ),
-                                        ),
-                                        leftTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: true,
-                                            reservedSize: 40,
-                                            getTitlesWidget: (value, meta) {
-                                              if (value % 1 == 0) {
-                                                return SideTitleWidget(
-                                                  axisSide: meta.axisSide,
-                                                  space: 4,
-                                                  child: Text(
-                                                    value.toInt().toString(),
-                                                    style: TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: AppColors.textDark(
-                                                        context,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                              return const SizedBox.shrink();
-                                            },
-                                          ),
-                                        ),
-                                        topTitles: const AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: false,
-                                          ),
-                                        ),
-                                        rightTitles: const AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: false,
-                                          ),
-                                        ),
-                                      ),
-                                      borderData: FlBorderData(
-                                        show: true,
-                                        border: Border.all(
-                                          color: const Color(0xff37434d),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      barGroups: _barChartGroupData,
-                                      gridData: const FlGridData(show: true),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                          else
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Center(
-                                child: Text(
-                                  'No attendance data available for the selected month to display chart.',
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontStyle:
-                                        FontStyle
-                                            .italic, // Memberikan gaya italic
-                                    fontWeight:
-                                        FontWeight
-                                            .normal, // Biasanya pesan info tidak terlalu tebal
-                                    color: AppColors.textLight(context),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // View Details Button
-                    Center(
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 20),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 15,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary(
-                            context,
-                          ), // Menggunakan BuildContext
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary(
-                                context,
-                              ).withOpacity(0.3),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+
+                    const SizedBox(
+                      height: 20,
+                    ), // Memberikan sedikit ruang di bagian bawah setelah chart
+                    // Tombol "View Attendance History" telah dihapus dari sini.
                   ],
                 ),
               ),
