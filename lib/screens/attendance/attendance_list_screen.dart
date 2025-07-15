@@ -101,14 +101,12 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
           data: Theme.of(context).copyWith(
             // Gunakan tema aplikasi saat ini
             colorScheme: ColorScheme.light(
-              primary: AppColors.primary(context),
+              primary: AppColors.primary,
               onPrimary: Colors.white,
-              onSurface: AppColors.textDark(context),
+              onSurface: AppColors.textDark,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary(context),
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ),
           child: child!,
@@ -159,36 +157,37 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
         absence.status?.toLowerCase() == 'cuti';
 
     if (isRequestType) {
-      barColor = AppColors.warning(context);
-      statusPillBackgroundColor = AppColors.warning(context);
+      barColor = AppColors.warning;
+      statusPillBackgroundColor = AppColors.warning;
       statusPillTextColor = Colors.white;
-      cardBackgroundColor = AppColors.lightWarningBackground(context);
-      timeTextColor = AppColors.textDark(context);
+      cardBackgroundColor = AppColors.warningBackground;
+      timeTextColor = AppColors.textDark;
       statusIcon = Icons.info_outline; // Icon for "Izin" / "Cuti"
     } else {
       if (absence.status?.toLowerCase() == 'late') {
-        barColor = AppColors.error(context);
-        statusPillBackgroundColor = AppColors.error(context);
+        barColor = AppColors.error;
+        statusPillBackgroundColor = AppColors.error;
         statusPillTextColor = Colors.white;
-        cardBackgroundColor = AppColors.lightDangerBackground(context);
-        timeTextColor = AppColors.error(context);
+        cardBackgroundColor = AppColors.dangerBackground;
+        timeTextColor = AppColors.error;
         statusIcon = Icons.hourglass_empty; // Icon for "Late"
       } else {
-        barColor = AppColors.success(context);
-        statusPillBackgroundColor = AppColors.success(context);
+        barColor = AppColors.success;
+        statusPillBackgroundColor = AppColors.success;
         statusPillTextColor = Colors.white;
-        cardBackgroundColor = AppColors.lightSuccessBackground(context);
-        timeTextColor = AppColors.success(context);
+        cardBackgroundColor = AppColors.successBackground;
+        timeTextColor = AppColors.success;
         statusIcon = Icons.check_circle_outline; // Icon for "Masuk" / "Hadir"
       }
     }
 
     final DateTime? displayDate = absence.attendanceDate;
+    // Format date to Indonesian
     final String formattedDate =
         displayDate != null
-            ? DateFormat('EEEE, MMM d, yyyy').format(
+            ? DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(
               displayDate,
-            ) // Full day name
+            ) // Full day name, day, full month name, year
             : 'N/A';
 
     return Card(
@@ -225,7 +224,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
-                            color: AppColors.textDark(context),
+                            color: AppColors.textDark,
                           ),
                         ),
                         // Status Pill
@@ -313,9 +312,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             Icon(
                               Icons
                                   .description_outlined, // Modern description icon
-                              color: AppColors.textLight(
-                                context,
-                              ).withOpacity(0.7),
+                              color: AppColors.textLight.withOpacity(0.7),
                               size: 20,
                             ),
                             const SizedBox(width: 8),
@@ -323,7 +320,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                               child: Text(
                                 'Reason: ${absence.alasanIzin?.isNotEmpty == true ? absence.alasanIzin : 'N/A'}',
                                 style: TextStyle(
-                                  color: AppColors.textLight(context),
+                                  color: AppColors.textLight,
                                   fontSize: 14,
                                   height: 1.4,
                                 ),
@@ -342,7 +339,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
               child: IconButton(
                 icon: Icon(
                   Icons.cancel_outlined, // A clear cancel icon
-                  color: AppColors.textLight(context).withOpacity(0.6),
+                  color: AppColors.textLight.withOpacity(0.6),
                   size: 24,
                 ),
                 onPressed: () async {
@@ -353,7 +350,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                         content: const Text(
                           'Only "Izin" or "Cuti" entries can be deleted.',
                         ),
-                        backgroundColor: AppColors.error(context),
+                        backgroundColor: AppColors.error,
                       ),
                     );
                     return;
@@ -363,28 +360,26 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                     context: context,
                     builder:
                         (context) => AlertDialog(
-                          backgroundColor: AppColors.cardBackground(context),
+                          backgroundColor: AppColors.cardBackground,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
                           title: Text(
                             'Cancel Entry',
                             style: TextStyle(
-                              color: AppColors.textDark(context),
+                              color: AppColors.textDark,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           content: Text(
                             'Are you sure you want to cancel this entry? This action cannot be undone.',
-                            style: TextStyle(
-                              color: AppColors.textLight(context),
-                            ),
+                            style: TextStyle(color: AppColors.textLight),
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(context).pop(false),
                               style: TextButton.styleFrom(
-                                foregroundColor: AppColors.primary(context),
+                                foregroundColor: AppColors.primary,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                   vertical: 10,
@@ -395,7 +390,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             ElevatedButton(
                               onPressed: () => Navigator.of(context).pop(true),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.error(context),
+                                backgroundColor: AppColors.error,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -419,7 +414,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             content: const Text(
                               'Cannot delete: Invalid Absence ID.',
                             ),
-                            backgroundColor: AppColors.error(context),
+                            backgroundColor: AppColors.error,
                           ),
                         );
                         return;
@@ -432,12 +427,10 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(deleteResponse.message),
-                            backgroundColor: AppColors.success(context),
+                            backgroundColor: AppColors.success,
                           ),
                         );
                         await _refreshList();
-                        // uncomment baris di bawah jika MainBottomNavigationBar.refreshHomeNotifier diperlukan
-                        // MainBottomNavigationBar.refreshHomeNotifier.value = true;
                       } else {
                         String errorMessage = deleteResponse.message;
                         if (deleteResponse.errors != null) {
@@ -452,7 +445,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                               content: Text(
                                 'Failed to cancel entry: $errorMessage',
                               ),
-                              backgroundColor: AppColors.error(context),
+                              backgroundColor: AppColors.error,
                             ),
                           );
                         }
@@ -464,7 +457,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             content: Text(
                               'An error occurred during cancellation: $e',
                             ),
-                            backgroundColor: AppColors.error(context),
+                            backgroundColor: AppColors.error,
                           ),
                         );
                       }
@@ -490,11 +483,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          color: AppColors.textLight(context).withOpacity(0.7),
-          size: 20,
-        ),
+        Icon(icon, color: AppColors.textLight.withOpacity(0.7), size: 20),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -513,7 +502,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                 Text(
                   address,
                   style: TextStyle(
-                    color: AppColors.textLight(context).withOpacity(0.8),
+                    color: AppColors.textLight.withOpacity(0.8),
                     fontSize: 13,
                   ),
                   maxLines: 2,
@@ -533,11 +522,11 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: AppColors.background(context),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          'Attendance Details',
+          'Detail Kehadiran', // Translated to Indonesian
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -550,10 +539,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                AppColors.primary(context),
-                AppColors.secondary(context),
-              ],
+              colors: [AppColors.primary, AppColors.secondary],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -572,15 +558,15 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
               vertical: 12.0,
             ),
             decoration: BoxDecoration(
-              color: AppColors.cardBackground(
-                context,
-              ), // Use card background for this section
+              color:
+                  AppColors
+                      .cardBackground, // Use card background for this section
               borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(25),
               ), // More rounded
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shadowColor(context),
+                  color: AppColors.shadowColor,
                   blurRadius: 10, // Increased blur
                   offset: const Offset(0, 5), // More prominent shadow
                 ),
@@ -590,11 +576,11 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Monthly Overview',
+                  'Monthly Overview', // Translated to Indonesian
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textDark(context),
+                    color: AppColors.textDark,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -610,14 +596,12 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primary(context).withOpacity(0.1),
+                            color: AppColors.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(
                               10,
                             ), // Slightly less rounded for a sleek button
                             border: Border.all(
-                              color: AppColors.primary(
-                                context,
-                              ).withOpacity(0.3),
+                              color: AppColors.primary.withOpacity(0.3),
                             ), // Subtle border
                           ),
                           child: Row(
@@ -626,16 +610,17 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                               Icon(
                                 Icons.calendar_today_outlined,
                                 size: 18,
-                                color: AppColors.primary(context),
+                                color: AppColors.primary,
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 DateFormat(
                                   'MMMM yyyy',
+                                  'id_ID', // Specify Indonesian locale
                                 ).format(_selectedMonth), // Full month name
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.primary(context),
+                                  color: AppColors.primary,
                                   fontSize: 15,
                                 ),
                               ),
@@ -647,10 +632,10 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                     const SizedBox(width: 10),
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.primary(context).withOpacity(0.1),
+                        color: AppColors.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: AppColors.primary(context).withOpacity(0.3),
+                          color: AppColors.primary.withOpacity(0.3),
                         ),
                       ),
                       child: Row(
@@ -660,7 +645,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                               Icons
                                   .chevron_left_rounded, // More modern arrow icon
                               size: 24,
-                              color: AppColors.primary(context),
+                              color: AppColors.primary,
                             ),
                             onPressed: () {
                               setState(() {
@@ -678,7 +663,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                               Icons
                                   .chevron_right_rounded, // More modern arrow icon
                               size: 24,
-                              color: AppColors.primary(context),
+                              color: AppColors.primary,
                             ),
                             onPressed: () {
                               setState(() {
@@ -703,14 +688,14 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
           Expanded(
             child: RefreshIndicator(
               onRefresh: _refreshList,
-              color: AppColors.primary(context),
+              color: AppColors.primary,
               child: FutureBuilder<List<Absence>>(
                 future: _attendanceFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
                       child: CircularProgressIndicator(
-                        color: AppColors.primary(context),
+                        color: AppColors.primary,
                         strokeWidth: 4,
                       ),
                     );
@@ -726,15 +711,15 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             Icon(
                               Icons
                                   .cloud_off_outlined, // More modern error icon
-                              color: AppColors.error(context),
+                              color: AppColors.error,
                               size: 60,
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'Oops! Something went wrong: ${snapshot.error}',
+                              'Oops! Terjadi kesalahan: ${snapshot.error}', // Translated
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: AppColors.textLight(context),
+                                color: AppColors.textLight,
                                 fontSize: 16,
                               ),
                             ),
@@ -744,9 +729,9 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                               icon: const Icon(
                                 Icons.refresh_rounded,
                               ), // Modern refresh icon
-                              label: const Text('Try Again'),
+                              label: const Text('Coba Lagi'), // Translated
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary(context),
+                                backgroundColor: AppColors.primary,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -775,17 +760,17 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             Icon(Icons.no_accounts),
                             // You can keep this image or replace it with an icon as well
                             // Image.asset(
-                            //   'assets/images/presivabg.png', // Make sure this asset exists
-                            //   height: 150,
-                            //   width: 150,
-                            //   fit: BoxFit.contain,
+                            //   'assets/images/presivabg.png', // Make sure this asset exists
+                            //   height: 150,
+                            //   width: 150,
+                            //   fit: BoxFit.contain,
                             // ),
                             const SizedBox(height: 20),
                             Text(
-                              'No attendance records found for this month.',
+                              'Tidak ada catatan kehadiran yang ditemukan untuk bulan ini.', // Translated
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: AppColors.textLight(context),
+                                color: AppColors.textLight,
                                 fontSize: 16,
                                 fontStyle: FontStyle.italic,
                               ),

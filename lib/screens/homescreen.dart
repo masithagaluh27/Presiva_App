@@ -9,6 +9,7 @@ import 'package:presiva/models/app_models.dart';
 import 'package:presiva/screens/attendance/request_screen.dart';
 import 'package:presiva/screens/main_botom_navigation_bar.dart';
 import 'package:presiva/services/api_Services.dart';
+import 'package:auto_size_text/auto_size_text.dart'; // Import AutoSizeText
 
 class HomeScreen extends StatefulWidget {
   final ValueNotifier<bool> refreshNotifier;
@@ -105,21 +106,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         _currentUser = response.data;
       });
     } else {
-      // Don't invoke 'print' in production code. Use a logging framework.
       print('Failed to load user profile: ${response.message}');
       setState(() {
         _currentUser = null;
       });
-      if (mounted) {
-        // _showErrorDialog('Failed to load user profile: ${response.message}'); // Komen ini jika tidak ingin menampilkan dialog error pada kegagalan load profil
-      }
+      // if (mounted) {
+      //   _showErrorDialog('Failed to load user profile: ${response.message}');
+      // }
     }
   }
 
   void _updateDateTime() {
     final now = DateTime.now();
     setState(() {
-      // Menyesuaikan format tanggal dan waktu untuk tampilan yang lebih rapi
       _currentDate = DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(now);
       _currentTime = DateFormat('HH:mm:ss').format(now);
     });
@@ -201,12 +200,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
         setState(() {
-          // Membuat alamat lebih ringkas dan relevan
           _location = [
-                place.thoroughfare, // Nama jalan/gang
-                place.subLocality, // Kelurahan/desa
-                place.locality, // Kota/Kabupaten
-                place.administrativeArea, // Provinsi
+                place.thoroughfare,
+                place.subLocality,
+                place.locality,
+                place.administrativeArea,
               ]
               .where((element) => element != null && element.isNotEmpty)
               .join(', ');
@@ -241,9 +239,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       setState(() {
         _todayAbsence = null;
       });
-      if (mounted) {
-        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to get attendance data: ${todayAbsenceResponse.message}')));
-      }
+      // if (mounted) {
+      //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to get attendance data: ${todayAbsenceResponse.message}')));
+      // }
     }
   }
 
@@ -371,22 +369,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       context: context,
       builder:
           (context) => AlertDialog(
-            backgroundColor: AppColors.background(context),
-            title: Text(
-              'Error',
-              style: TextStyle(color: AppColors.textDark(context)),
-            ),
-            content: Text(
-              message,
-              style: TextStyle(color: AppColors.textDark(context)),
-            ),
+            backgroundColor: AppColors.background,
+            title: Text('Error', style: TextStyle(color: AppColors.textDark)),
+            content: Text(message, style: TextStyle(color: AppColors.textDark)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'OK',
-                  style: TextStyle(color: AppColors.primary(context)),
-                ),
+                child: Text('OK', style: TextStyle(color: AppColors.primary)),
               ),
             ],
           ),
@@ -456,39 +445,45 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final bool hasCheckedIn = _todayAbsence?.jamMasuk != null;
     final bool hasCheckedOut = _todayAbsence?.jamKeluar != null;
 
+    // Tinggi tombol ElevatedButton default sekitar 56 (padding vertical 16 + tinggi teks).
+    // Padding horizontal default adalah 16 di setiap sisi.
+    // Jarak dari bawah layar 16.
+    // Jarak tambahan yang diinginkan antara card check-in dan tombol. Misal 20-30.
+    // Total: Tinggi tombol (56) + padding bottom (16) + jarak ekstra (20) = ~92.
+    // Untuk memastikan ada ruang yang cukup, kita tambahkan sedikit buffer.
+    const double bottomButtonAreaHeight = 92.0;
+
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent, // Background Scaffold transparan
+      extendBodyBehindAppBar: true, // Biarkan body meluas di belakang AppBar
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent, // AppBar transparan
         elevation: 0,
-        toolbarHeight: 80,
+        toolbarHeight: 200, // Tinggi AppBar standar
         flexibleSpace: Container(
+          // Tambahkan BorderRadius pada Container ini
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                AppColors.primary(context),
-                AppColors.primary(context).withOpacity(0.5),
-              ],
+              colors: [AppColors.primary, AppColors.primary.withOpacity(0.5)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
+            // Border radius hanya di bagian bawah agar tidak mengganggu layout atas
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ), // Contoh radius
           ),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
-                vertical: 8.0,
+                vertical: 4.0,
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.location_on,
-                    color: AppColors.onPrimary(context),
-                    size: 24,
-                  ),
+                  Icon(Icons.location_on, color: AppColors.onPrimary, size: 24),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -498,24 +493,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         Text(
                           'Current Location',
                           style: TextStyle(
-                            color: AppColors.onPrimary(
-                              context,
-                            ).withOpacity(0.8), // Slightly dimmed white
+                            color: AppColors.onPrimary.withOpacity(0.8),
                             fontSize: 12,
                           ),
                         ),
-                        Text(
+                        // Menggunakan AutoSizeText untuk alamat dengan elipsis
+                        AutoSizeText(
                           _location,
+                          maxLines: 2, // Hanya satu baris, akan di-ellipsis
+                          minFontSize:
+                              12, // Minimal font size lebih besar, jika tidak muat akan ellipsis
+                          maxFontSize: 14,
+                          overflow:
+                              TextOverflow.ellipsis, // Pastikan elipsis aktif
                           style: TextStyle(
-                            color: AppColors.onPrimary(
-                              context,
-                            ), // White for location text
+                            color: AppColors.onPrimary,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
-                          overflow:
-                              TextOverflow.ellipsis, // Tetap gunakan ellipsis
-                          maxLines: 2, // Mengizinkan 2 baris untuk alamat
                         ),
                       ],
                     ),
@@ -527,12 +522,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
       ),
       body: Container(
+        // Ini adalah Container utama body yang akan memiliki gradient
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.primary(context),
-              AppColors.primary(context).withOpacity(0.8),
-              AppColors.background(context),
+              AppColors.primary,
+              AppColors.primary.withOpacity(0.8),
+              AppColors.background, // Warna akhir gradient adalah abu-abu
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -541,12 +537,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         child: Stack(
           children: [
+            // SingleChildScrollView mencakup seluruh area yang perlu digulir
+            // Padding bawah ditambahkan untuk memberi ruang pada tombol "Submit Request"
             SingleChildScrollView(
-              padding: const EdgeInsets.only(
-                top: 100, // Memberi ruang untuk AppBar
+              padding: EdgeInsets.only(
+                top: 80, // Padding atas untuk konten agar tidak tertutup AppBar
+                bottom: bottomButtonAreaHeight, // Ruang untuk tombol di bawah
               ),
               child: Column(
                 children: [
+                  // Jarak antara AppBar (Lokasi) dan Profile/Greeting
+                  const SizedBox(height: 35),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Row(
@@ -554,9 +555,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       children: [
                         CircleAvatar(
                           radius: 32,
-                          backgroundColor: AppColors.accent(
-                            context,
-                          ).withOpacity(0.2),
+                          backgroundColor: AppColors.accent.withOpacity(0.2),
                           backgroundImage:
                               _currentUser?.profile_photo != null &&
                                       _currentUser!.profile_photo!.isNotEmpty
@@ -569,12 +568,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       _currentUser!.profile_photo!.isEmpty
                                   ? Icon(
                                     Icons.person,
-                                    color: AppColors.accent(context),
+                                    color: AppColors.accent,
                                     size: 35,
                                   )
                                   : null,
                         ),
-                        const SizedBox(width: 15),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -582,18 +581,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               Text(
                                 _getGreeting(),
                                 style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.onPrimary(context),
+                                  color: AppColors.onPrimary,
                                 ),
                               ),
                               Text(
                                 'Ready for a productive day?',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: AppColors.textDark(
-                                    context,
-                                  ), // Ini harusnya AppColors.textLight(context) jika di gradient atas
+                                  color: AppColors.textDark,
                                 ),
                               ),
                             ],
@@ -602,20 +599,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 50),
                   _buildMainActionCard(context, hasCheckedIn, hasCheckedOut),
-                  const SizedBox(
-                    height: 100,
-                  ), // Memberi ruang di bawah kartu utama
+                  // SizedBox tambahan tidak lagi diperlukan di sini karena padding bawah SingleChildScrollView sudah diatur.
                 ],
               ),
             ),
+            // Tombol "Submit Request" mengambang di bagian paling bawah
             Positioned(
-              bottom: 10,
+              bottom: 0, // Tempelkan ke paling bawah Stack
               left: 0,
               right: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
+              child: Container(
+                // Hapus warna solid dari Container ini
+                // Biarkan gradient dari body utama yang terlihat di belakangnya
+                // Anda bisa tetap memberikan padding di sini
+                padding: const EdgeInsets.all(
+                  16.0,
+                ), // Padding di sini untuk jarak dari tepi layar
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     final result = await Navigator.push(
@@ -628,24 +629,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           true;
                     }
                   },
-                  icon: Icon(Icons.add_task, color: AppColors.primary(context)),
+                  icon: Icon(Icons.add_task, color: AppColors.primary),
                   label: Text(
                     'Submit Request',
                     style: TextStyle(
-                      color: AppColors.primary(context),
+                      color: AppColors.primary,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.onPrimary(context),
-                    foregroundColor: AppColors.primary(context),
+                    backgroundColor: AppColors.onPrimary,
+                    foregroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    // Hapus atau ubah border agar tidak ada warna di bawah submit request
-                    // side: BorderSide(
-                    //   color: AppColors.primary(context).withOpacity(0.5),
-                    //   width: 1,
-                    // ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -668,11 +664,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return SlideTransition(
       position: _slideAnimation,
       child: Card(
-        color: AppColors.cardBackground(context),
+        color: AppColors.cardBackground,
         margin: const EdgeInsets.symmetric(horizontal: 20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         elevation: 10,
-        shadowColor: AppColors.primary(context).withOpacity(0.2),
+        shadowColor: AppColors.primary.withOpacity(0.2),
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Column(
@@ -688,7 +684,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       style: TextStyle(
                         fontSize: 52,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textDark(context),
+                        color: AppColors.textDark,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -698,14 +694,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     _currentDate,
                     style: TextStyle(
                       fontSize: 18,
-                      color: AppColors.textLight(context),
+                      color: AppColors.textLight,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 40),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -719,9 +714,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     backgroundColor:
                         hasCheckedIn
                             ? (hasCheckedOut
-                                ? AppColors.textLight(context).withOpacity(0.5)
-                                : AppColors.error(context))
-                            : AppColors.primary(context),
+                                ? AppColors.textLight.withOpacity(0.5)
+                                : AppColors.error)
+                            : AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -729,8 +724,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     elevation: 8,
                     shadowColor:
                         hasCheckedIn
-                            ? AppColors.error(context).withOpacity(0.3)
-                            : AppColors.primary(context).withOpacity(0.3),
+                            ? AppColors.error.withOpacity(0.3)
+                            : AppColors.primary.withOpacity(0.3),
                   ),
                   child:
                       _isCheckingInOrOut
@@ -749,7 +744,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     : 'Check Out')
                                 : 'Check In',
                             style: TextStyle(
-                              color: AppColors.onPrimary(context),
+                              color: AppColors.onPrimary,
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
@@ -758,7 +753,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 25),
               Divider(
-                color: AppColors.textLight(context).withOpacity(0.4),
+                color: AppColors.textLight.withOpacity(0.4),
                 thickness: 1,
               ),
               const SizedBox(height: 15),
@@ -766,7 +761,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildTimeDetail(
-                    context,
                     Icons.login,
                     _todayAbsence?.jamMasuk != null
                         ? DateFormat(
@@ -774,13 +768,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ).format(_todayAbsence!.jamMasuk!.toLocal())
                         : '',
                     'Check In',
-                    AppColors.primary(context),
+                    AppColors.primary,
                     _todayAbsence?.jamMasuk == null
-                        ? AppColors.textLight(context).withOpacity(0.7)
-                        : AppColors.textDark(context),
+                        ? AppColors.textLight.withOpacity(0.7)
+                        : AppColors.textDark,
                   ),
                   _buildTimeDetail(
-                    context,
                     Icons.logout,
                     _todayAbsence?.jamKeluar != null
                         ? DateFormat(
@@ -788,20 +781,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ).format(_todayAbsence!.jamKeluar!.toLocal())
                         : '',
                     'Check Out',
-                    AppColors.error(context),
+                    AppColors.error,
                     _todayAbsence?.jamKeluar == null
-                        ? AppColors.textLight(context).withOpacity(0.7)
-                        : AppColors.textDark(context),
+                        ? AppColors.textLight.withOpacity(0.7)
+                        : AppColors.textDark,
                   ),
                   _buildTimeDetail(
-                    context,
                     Icons.timer,
                     _calculateWorkingHours(),
                     'Working Hours',
-                    AppColors.warning(context),
+                    AppColors.warning,
                     _todayAbsence?.jamMasuk == null
-                        ? AppColors.textLight(context).withOpacity(0.7)
-                        : AppColors.textDark(context),
+                        ? AppColors.textLight.withOpacity(0.7)
+                        : AppColors.textDark,
                   ),
                 ],
               ),
@@ -813,7 +805,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildTimeDetail(
-    BuildContext context,
     IconData icon,
     String timeValue,
     String label,
@@ -827,20 +818,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         Icon(icon, color: iconColor, size: 30),
         const SizedBox(height: 8),
         Text(
-          isNA ? 'N/A' : timeValue,
+          isNA ? '---' : timeValue,
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.bold,
-            color:
-                isNA
-                    ? AppColors.textLight(context).withOpacity(0.7)
-                    : textColor,
+            color: isNA ? AppColors.textLight.withOpacity(0.7) : textColor,
           ),
         ),
-        Text(
-          label,
-          style: TextStyle(fontSize: 13, color: AppColors.textLight(context)),
-        ),
+        Text(label, style: TextStyle(fontSize: 13, color: AppColors.textLight)),
       ],
     );
   }

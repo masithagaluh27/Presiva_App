@@ -187,26 +187,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       appBar: AppBar(
         title: Text(
           "Reset Password",
-          style: AppTextStyles.heading1(context).copyWith(
-            // Menggunakan AppTextStyles dengan context
-            color: AppColors.textDark(
-              context,
-            ), // Menggunakan AppColors dengan context
+          style: AppTextStyles.heading1.copyWith(
+            // Menggunakan AppTextStyles.heading1
+            color: AppColors.textDark, // Hapus `(context)`
           ),
         ),
-        backgroundColor: AppColors.background(
-          context,
-        ), // Menggunakan AppColors dengan context
+        backgroundColor: AppColors.background, // Hapus `(context)`
         elevation: 0,
         iconTheme: IconThemeData(
-          color: AppColors.textDark(
-            context,
-          ), // Menggunakan AppColors dengan context
+          color: AppColors.textDark, // Hapus `(context)`
         ),
       ),
-      backgroundColor: AppColors.background(
-        context,
-      ), // Menggunakan AppColors dengan context
+      backgroundColor: AppColors.background, // Hapus `(context)`
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
         child: Form(
@@ -216,11 +208,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             children: [
               Text(
                 "Kode verifikasi telah dikirim ke **${widget.email}**. Masukkan kode dan password baru Anda.",
-                style: AppTextStyles.body2(context).copyWith(
-                  // Menggunakan AppTextStyles dengan context
-                  color: AppColors.textDark(
-                    context,
-                  ), // Menggunakan AppColors dengan context, bukan AppColors.primary
+                style: AppTextStyles.body2.copyWith(
+                  // Menggunakan AppTextStyles.body2
+                  color: AppColors.textDark, // Hapus `(context)`
                 ),
               ),
               const SizedBox(height: 10),
@@ -231,29 +221,24 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     _otpExpired
                         ? Text(
                           'OTP Kadaluarsa. Silakan minta ulang.',
-                          style: AppTextStyles.body2(context).copyWith(
-                            // Menggunakan AppTextStyles dengan context
-                            color: AppColors.error(
-                              context,
-                            ), // Menggunakan AppColors dengan context
+                          style: AppTextStyles.body2.copyWith(
+                            // Menggunakan AppTextStyles.body2
+                            color: AppColors.error, // Hapus `(context)`
                             fontWeight: FontWeight.bold,
                           ),
                         )
                         : Text(
                           'OTP berlaku dalam: ${_formatDuration(_currentSeconds)}',
-                          style: AppTextStyles.body2(context).copyWith(
-                            // Menggunakan AppTextStyles dengan context
+                          style: AppTextStyles.body2.copyWith(
+                            // Menggunakan AppTextStyles.body2
                             fontSize:
                                 16, // Optional: You might have a specific style for this
                             fontWeight: FontWeight.bold,
                             color:
                                 _currentSeconds < 60
-                                    ? AppColors.error(
-                                      context,
-                                    ) // Menggunakan AppColors dengan context
-                                    : AppColors.primary(
-                                      context,
-                                    ), // Menggunakan AppColors dengan context
+                                    ? AppColors
+                                        .error // Hapus `(context)`
+                                    : AppColors.primary, // Hapus `(context)`
                           ),
                         ),
               ),
@@ -328,16 +313,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   onTap: _isLoading || !_otpExpired ? null : _resendOtp,
                   child: Text(
                     "Tidak menerima kode? Kirim ulang OTP",
-                    style: AppTextStyles.body2(context).copyWith(
-                      // Menggunakan AppTextStyles dengan context
+                    style: AppTextStyles.body2.copyWith(
+                      // Menggunakan AppTextStyles.body2
                       color:
                           _isLoading || !_otpExpired
-                              ? AppColors.textLight(
-                                context,
-                              ) // Jika loading/belum expired, buat sedikit pudar
-                              : AppColors.primary(
-                                context,
-                              ), // Jika expired dan siap kirim ulang, gunakan warna primary
+                              ? AppColors
+                                  .textLight // Jika loading/belum expired, buat sedikit pudar
+                              : AppColors
+                                  .primary, // Jika expired dan siap kirim ulang, gunakan warna primary
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -348,8 +331,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               _isLoading
                   ? Center(
                     child: CircularProgressIndicator(
-                      color: AppColors.primary(context),
-                    ), // Menggunakan AppColors dengan context
+                      color: AppColors.primary, // Hapus `(context)`
+                    ),
                   )
                   : PrimaryButton(
                     label: 'Reset Password',

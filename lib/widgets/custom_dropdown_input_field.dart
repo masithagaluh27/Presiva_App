@@ -29,47 +29,29 @@ class CustomDropdownInputField<T> extends StatelessWidget {
       value: value,
       hint: Text(
         hintText ?? 'Select ${labelText.toLowerCase()}',
-        style: TextStyle(
-          color: AppColors.placeholder(context),
-        ), // <<< Perubahan di sini
+        style: TextStyle(color: AppColors.placeholder),
       ),
       items: items,
       onChanged: onChanged,
-      style: TextStyle(
-        // Ubah const TextStyle menjadi TextStyle biasa
-        fontSize: 16,
-        color: AppColors.textDark(context), // <<< Perubahan di sini
-      ),
+      style: TextStyle(fontSize: 16, color: AppColors.textDark),
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: TextStyle(
-          // Ubah const TextStyle menjadi TextStyle biasa
-          color: AppColors.textLight(context), // <<< Perubahan di sini
-        ),
+        labelStyle: TextStyle(color: AppColors.textLight),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: AppColors.border(context),
-          ), // <<< Perubahan di sini
+          borderSide: BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: AppColors.border(context),
-          ), // <<< Perubahan di sini
+          borderSide: BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: AppColors.primary(context),
-          ), // <<< Perubahan di sini
+          borderSide: BorderSide(color: AppColors.primary),
         ),
         filled: true,
-        fillColor: AppColors.inputFill(context), // <<< Perubahan di sini
-        prefixIcon: Icon(
-          icon,
-          color: AppColors.primary(context), // <<< Perubahan di sini
-        ),
+        fillColor: AppColors.inputFill,
+        prefixIcon: Icon(icon, color: AppColors.primary),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,

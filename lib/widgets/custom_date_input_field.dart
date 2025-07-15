@@ -7,7 +7,7 @@ class CustomDateInputField extends StatelessWidget {
   final IconData icon;
   final DateTime? selectedDate;
   final VoidCallback onTap;
-  final String? hintText; // Optional hint text for when no date is chosen
+  final String? hintText;
 
   const CustomDateInputField({
     super.key,
@@ -26,43 +26,29 @@ class CustomDateInputField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: labelText,
           labelStyle: TextStyle(
-            // Ubah const TextStyle menjadi TextStyle biasa karena color-nya dinamis
-            color: AppColors.textLight(context), // <<< Perubahan di sini
+            color: AppColors.textLight, // <<< Perubahan di sini
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: AppColors.border(context),
-            ), // <<< Perubahan di sini
+            borderSide: BorderSide(color: AppColors.border),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: AppColors.border(context),
-            ), // <<< Perubahan di sini
+            borderSide: BorderSide(color: AppColors.border),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: AppColors.primary(context),
-            ), // <<< Perubahan di sini
+            borderSide: BorderSide(color: AppColors.primary),
           ),
           filled: true,
-          fillColor: AppColors.inputFill(context), // <<< Perubahan di sini
-          prefixIcon: Icon(
-            icon,
-            color: AppColors.primary(context), // <<< Perubahan di sini
-          ),
+          fillColor: AppColors.inputFill,
+          prefixIcon: Icon(icon, color: AppColors.primary),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 18,
           ),
         ),
-        baseStyle: TextStyle(
-          // Ubah const TextStyle menjadi TextStyle biasa karena color-nya dinamis
-          fontSize: 16,
-          color: AppColors.textDark(context), // <<< Perubahan di sini
-        ),
+        baseStyle: TextStyle(fontSize: 16, color: AppColors.textDark),
         child: Text(
           selectedDate == null
               ? hintText ?? 'Select ${labelText.toLowerCase()}'
@@ -70,8 +56,8 @@ class CustomDateInputField extends StatelessWidget {
           style: TextStyle(
             color:
                 selectedDate == null
-                    ? AppColors.placeholder(context) // <<< Perubahan di sini
-                    : AppColors.textDark(context), // <<< Perubahan di sini
+                    ? AppColors.placeholder
+                    : AppColors.textDark,
             fontSize: 16,
           ),
         ),

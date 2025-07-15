@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For date formatting
-import 'package:presiva/constant/app_colors.dart'; // Assuming this defines your color palette
+import 'package:intl/intl.dart';
+import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/models/app_models.dart';
 import 'package:presiva/services/api_Services.dart';
 
-import '../../widgets/custom_date_input_field.dart'; // Your CustomDateInputField
-import '../../widgets/custom_input_field.dart'; // Your CustomInputField
-import '../../widgets/primary_button.dart'; // Your PrimaryButton
+import '../../widgets/custom_date_input_field.dart';
+import '../../widgets/custom_input_field.dart';
+import '../../widgets/primary_button.dart';
 
 class RequestScreen extends StatefulWidget {
   const RequestScreen({super.key});
@@ -16,11 +16,11 @@ class RequestScreen extends StatefulWidget {
 }
 
 class _RequestScreenState extends State<RequestScreen> {
-  final ApiService _apiService = ApiService(); // Use ApiService
+  final ApiService _apiService = ApiService();
   DateTime? _selectedDate;
   final TextEditingController _reasonController = TextEditingController();
 
-  bool _isLoading = false; // Add loading state
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -43,17 +43,12 @@ class _RequestScreenState extends State<RequestScreen> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              // Gunakan ColorScheme.light di sini karena kita menimpa tema date picker agar selalu light
-              primary: AppColors.primary(context), // <--- UBAH DI SINI
-              onPrimary: Colors.white, // Header text color, bisa tetap putih
-              onSurface: AppColors.textDark(context), // <--- UBAH DI SINI
+              primary: AppColors.primary,
+              onPrimary: Colors.white,
+              onSurface: AppColors.textDark,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary(
-                  context,
-                ), // <--- UBAH DI SINI
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
             dialogTheme: DialogTheme(
               shape: RoundedRectangleBorder(
@@ -73,7 +68,6 @@ class _RequestScreenState extends State<RequestScreen> {
   }
 
   Future<void> _submitRequest() async {
-    // Basic validation
     if (_selectedDate == null) {
       _showSnackBar('Please select a date.');
       return;
@@ -84,25 +78,23 @@ class _RequestScreenState extends State<RequestScreen> {
     }
 
     setState(() {
-      _isLoading = true; // Set loading to true
+      _isLoading = true;
     });
 
     try {
-      // Format the selected date to yyyy-MM-dd as required by the /izin API
       final String formattedDate = DateFormat(
         'yyyy-MM-dd',
       ).format(_selectedDate!);
 
-      // Call the dedicated submitIzinRequest method from ApiService
       final ApiResponse<Absence> response = await _apiService.submitIzinRequest(
-        date: formattedDate, // Pass the formatted date as 'date'
-        alasanIzin: _reasonController.text.trim(), // Only send the reason text
+        date: formattedDate,
+        alasanIzin: _reasonController.text.trim(),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (mounted) {
           _showSnackBar('Request submitted successfully!');
-          Navigator.pop(context, true); // Pop with true to indicate success
+          Navigator.pop(context, true);
         }
       } else {
         String errorMessage = response.message;
@@ -121,7 +113,7 @@ class _RequestScreenState extends State<RequestScreen> {
       }
     } finally {
       setState(() {
-        _isLoading = false; // Set loading to false
+        _isLoading = false;
       });
     }
   }
@@ -135,29 +127,20 @@ class _RequestScreenState extends State<RequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background(context), // <--- UBAH DI SINI
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'New Request',
-          style: TextStyle(
-            fontWeight: FontWeight.bold, // Make app bar title bold
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: AppColors.primary(context), // <--- UBAH DI SINI
-        foregroundColor:
-            Colors
-                .white, // Jika Anda ingin foreground tetap putih terlepas dari tema, biarkan Colors.white. Jika ingin dinamis, gunakan AppColors.textLight(context) atau sejenisnya.
-        elevation: 4.0, // Add a subtle shadow
-        shadowColor: AppColors.primary(
-          context,
-        ).withOpacity(0.3), // <--- UBAH DI SINI
-        centerTitle: true, // Center the title
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 4.0,
+        shadowColor: AppColors.primary.withOpacity(0.3),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 24.0,
-          vertical: 20.0,
-        ), // Increased padding
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -165,16 +148,13 @@ class _RequestScreenState extends State<RequestScreen> {
               'Fill out the form to submit your leave or absence request.',
               style: TextStyle(
                 fontSize: 16.0,
-                color: AppColors.textDark(
-                  context,
-                ).withOpacity(0.7), // <--- UBAH DI SINI
+                color: AppColors.textDark.withOpacity(0.7),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
 
-            // Date Picker using CustomDateInputField
             _buildInputContainer(
               child: CustomDateInputField(
                 labelText: 'Select Date',
@@ -184,8 +164,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 hintText: 'Tap to choose a date',
               ),
             ),
-            const SizedBox(height: 25), // Increased spacing
-            // Reason Text Field using CustomInputField
+            const SizedBox(height: 25),
             _buildInputContainer(
               child: CustomInputField(
                 controller: _reasonController,
@@ -194,7 +173,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 icon: Icons.edit_note,
                 maxLines: 5,
                 keyboardType: TextInputType.multiline,
-                fillColor: AppColors.inputFill(context), // <--- UBAH DI SINI
+                fillColor: AppColors.inputFill,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 18,
@@ -207,13 +186,10 @@ class _RequestScreenState extends State<RequestScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 40), // Increased spacing
-            // Submit Button using PrimaryButton
+            const SizedBox(height: 40),
             _isLoading
                 ? Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary(context),
-                  ), // <--- UBAH DI SINI
+                  child: CircularProgressIndicator(color: AppColors.primary),
                 )
                 : PrimaryButton(
                   label: 'Submit Request',
@@ -225,24 +201,17 @@ class _RequestScreenState extends State<RequestScreen> {
     );
   }
 
-  // Helper method to wrap input fields in a consistent container for elegance
   Widget _buildInputContainer({required Widget child}) {
     return Container(
       decoration: BoxDecoration(
-        // Untuk warna background kontainer, jika Anda ingin dinamis, gunakan AppColors.cardBackground(context)
-        // Jika Anda selalu ingin putih terang, biarkan Colors.white.
-        color: AppColors.cardBackground(
-          context,
-        ), // <--- UBAH DI SINI (Opsional, tergantung keinginan)
+        color: AppColors.cardBackground,
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowColor(
-              context,
-            ).withOpacity(0.1), // <--- UBAH DI SINI
+            color: AppColors.shadowColor.withOpacity(0.1),
             spreadRadius: 2,
             blurRadius: 8,
-            offset: const Offset(0, 4), // subtle shadow
+            offset: const Offset(0, 4),
           ),
         ],
       ),

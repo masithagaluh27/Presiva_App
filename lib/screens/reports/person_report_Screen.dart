@@ -241,7 +241,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         barRods: [
           BarChartRodData(
             toY: present.toDouble(),
-            color: AppColors.success(context),
+            color: AppColors.success, // Hapus `(context)`
             width: 25,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -253,7 +253,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         barRods: [
           BarChartRodData(
             toY: absentAndPermit.toDouble(),
-            color: AppColors.error(context),
+            color: AppColors.error, // Hapus `(context)`
             width: 25,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -265,7 +265,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         barRods: [
           BarChartRodData(
             toY: late.toDouble(),
-            color: AppColors.warning(context),
+            color: AppColors.warning, // Hapus `(context)`
             width: 25,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -286,11 +286,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         decoration: BoxDecoration(
-          color: AppColors.cardBackground(context),
+          color: AppColors.cardBackground, // Hapus `(context)`
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadowColor(context),
+              color: AppColors.shadowColor, // Hapus `(context)`
               spreadRadius: 1,
               blurRadius: 3,
               offset: const Offset(0, 2),
@@ -302,14 +302,16 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
           children: [
             Text(
               title,
-              style: AppTextStyles.body2(context).copyWith(
+              style: AppTextStyles.body2.copyWith(
+                // Menggunakan AppTextStyles.body2
                 fontWeight: FontWeight.w500,
-                color: AppColors.textDark(context),
+                color: AppColors.textDark, // Hapus `(context)`
               ),
             ),
             Text(
               value.toString(),
-              style: AppTextStyles.heading4(context).copyWith(
+              style: AppTextStyles.heading4.copyWith(
+                // Menggunakan AppTextStyles.heading4
                 color: color,
               ), // Menggunakan heading4 untuk nilai, dengan warna opsional
             ),
@@ -340,9 +342,10 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       space: 16,
       child: Text(
         text,
-        style: AppTextStyles.body2(context).copyWith(
+        style: AppTextStyles.body2.copyWith(
+          // Menggunakan AppTextStyles.body2
           fontWeight: FontWeight.bold,
-          color: AppColors.textDark(context),
+          color: AppColors.textDark, // Hapus `(context)`
         ),
       ),
     );
@@ -361,29 +364,29 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
             colorScheme:
                 Theme.of(context).brightness == Brightness.light
                     ? ColorScheme.light(
-                      primary: AppColors.primary(context),
-                      onPrimary: AppColors.onPrimary(context),
-                      surface: AppColors.background(context),
-                      onSurface: AppColors.textDark(context),
+                      primary: AppColors.primary, // Hapus `(context)`
+                      onPrimary: AppColors.onPrimary, // Hapus `(context)`
+                      surface: AppColors.background, // Hapus `(context)`
+                      onSurface: AppColors.textDark, // Hapus `(context)`
                     )
                     : ColorScheme.dark(
-                      primary: AppColors.primary(context),
-                      onPrimary: AppColors.onPrimary(context),
-                      surface: AppColors.background(context),
-                      onSurface: AppColors.textDark(context),
+                      primary: AppColors.primary, // Hapus `(context)`
+                      onPrimary: AppColors.onPrimary, // Hapus `(context)`
+                      surface: AppColors.background, // Hapus `(context)`
+                      onSurface: AppColors.textDark, // Hapus `(context)`
                     ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary(context),
+                foregroundColor: AppColors.primary, // Hapus `(context)`
               ),
             ),
             appBarTheme: AppBarTheme(
-              backgroundColor: AppColors.primary(context),
-              foregroundColor: AppColors.onPrimary(context),
+              backgroundColor: AppColors.primary, // Hapus `(context)`
+              foregroundColor: AppColors.onPrimary, // Hapus `(context)`
               elevation: 0,
             ),
-            dialogTheme: DialogThemeData(
-              backgroundColor: AppColors.cardBackground(context),
+            dialogTheme: DialogTheme(
+              backgroundColor: AppColors.cardBackground, // Hapus `(context)`
             ),
           ),
           child: child!,
@@ -401,14 +404,14 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background(context),
+      backgroundColor: AppColors.background, // Hapus `(context)`
       body: FutureBuilder<void>(
         future: _reportDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: CircularProgressIndicator(
-                color: AppColors.primary(context),
+                color: AppColors.primary, // Hapus `(context)`
               ),
             );
           }
@@ -419,9 +422,9 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                 child: Text(
                   'Error loading data: ${snapshot.error}',
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.body2(
-                    context,
-                  ).copyWith(color: AppColors.error(context)),
+                  style: AppTextStyles.body2.copyWith(
+                    color: AppColors.error,
+                  ), // Menggunakan AppTextStyles.body2, Hapus `(context)`
                 ),
               ),
             );
@@ -437,8 +440,10 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.primary(context),
-                        AppColors.secondary(context).withOpacity(0.8),
+                        AppColors.primary, // Hapus `(context)`
+                        AppColors.secondary.withOpacity(
+                          0.8,
+                        ), // Hapus `(context)`
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -461,16 +466,17 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                         children: [
                           Text(
                             'Monthly Report',
-                            style: AppTextStyles.heading1(
-                              context,
-                            ).copyWith(color: AppColors.onPrimary(context)),
+                            style: AppTextStyles.heading1.copyWith(
+                              color: AppColors.onPrimary,
+                            ), // Menggunakan AppTextStyles.heading1, Hapus `(context)`
                           ),
                           Text(
                             'Review your attendance overview below.',
-                            style: AppTextStyles.body1(context).copyWith(
-                              color: AppColors.onPrimary(
-                                context,
-                              ).withOpacity(0.8),
+                            style: AppTextStyles.body1.copyWith(
+                              // Menggunakan AppTextStyles.body1
+                              color: AppColors.onPrimary.withOpacity(
+                                0.8,
+                              ), // Hapus `(context)`
                             ),
                           ),
                         ],
@@ -488,9 +494,9 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             elevation: 8,
-                            shadowColor: AppColors.primary(
-                              context,
-                            ).withOpacity(0.2),
+                            shadowColor: AppColors.primary.withOpacity(
+                              0.2,
+                            ), // Hapus `(context)`
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(
                                 16.0,
@@ -506,7 +512,9 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                     children: [
                                       Text(
                                         'Monthly Overview',
-                                        style: AppTextStyles.heading2(context),
+                                        style:
+                                            AppTextStyles
+                                                .heading2, // Menggunakan AppTextStyles.heading2
                                       ),
                                       GestureDetector(
                                         onTap: () => _selectMonth(context),
@@ -516,11 +524,13 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                             vertical: 6,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: AppColors.background(
-                                              context,
-                                            ),
+                                            color:
+                                                AppColors
+                                                    .background, // Hapus `(context)`
                                             border: Border.all(
-                                              color: AppColors.border(context),
+                                              color:
+                                                  AppColors
+                                                      .border, // Hapus `(context)`
                                             ),
                                             borderRadius: BorderRadius.circular(
                                               30,
@@ -532,9 +542,8 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                                 DateFormat('MMM yyyy')
                                                     .format(_selectedMonth)
                                                     .toUpperCase(),
-                                                style: AppTextStyles.body2(
-                                                  context,
-                                                ).copyWith(
+                                                style: AppTextStyles.body2.copyWith(
+                                                  // Menggunakan AppTextStyles.body2
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -542,9 +551,9 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                               Icon(
                                                 Icons.calendar_month,
                                                 size: 18,
-                                                color: AppColors.textDark(
-                                                  context,
-                                                ),
+                                                color:
+                                                    AppColors
+                                                        .textDark, // Hapus `(context)`
                                               ),
                                             ],
                                           ),
@@ -557,25 +566,25 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                     context,
                                     'Total Working Days',
                                     _totalWorkingDaysInMonth.toString(),
-                                    AppColors.info(context),
+                                    AppColors.info, // Hapus `(context)`
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Total Present Days',
                                     _presentCount.toString(),
-                                    AppColors.success(context),
+                                    AppColors.success, // Hapus `(context)`
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Total Absent Days',
                                     _absentCount.toString(),
-                                    AppColors.error(context),
+                                    AppColors.error, // Hapus `(context)`
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Total Izin Days',
                                     _permitCount.toString(),
-                                    AppColors.warning(context),
+                                    AppColors.warning, // Hapus `(context)`
                                   ),
                                   _buildStatListItem(
                                     context,
@@ -588,15 +597,16 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                     context,
                                     'Total Working Hours',
                                     _totalWorkingHours,
-                                    AppColors.primary(context),
+                                    AppColors.primary, // Hapus `(context)`
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Overall Attendance %',
                                     '${_overallAttendancePercentage.toStringAsFixed(0)}%',
                                     _overallAttendancePercentage >= 80
-                                        ? AppColors.success(context)
-                                        : AppColors.error(context),
+                                        ? AppColors
+                                            .success // Hapus `(context)`
+                                        : AppColors.error, // Hapus `(context)`
                                   ),
                                 ],
                               ),
@@ -608,11 +618,14 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: AppColors.background(context),
+                                color:
+                                    AppColors.background, // Hapus `(context)`
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.shadowColor(context),
+                                    color:
+                                        AppColors
+                                            .shadowColor, // Hapus `(context)`
                                     spreadRadius: 2,
                                     blurRadius: 5,
                                     offset: const Offset(0, 3),
@@ -621,7 +634,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                               ),
                               child: Icon(
                                 Icons.insert_chart_outlined,
-                                color: AppColors.primary(context),
+                                color: AppColors.primary, // Hapus `(context)`
                                 size: 30,
                               ),
                             ),

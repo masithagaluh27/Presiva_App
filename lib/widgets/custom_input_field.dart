@@ -73,31 +73,31 @@ class CustomInputField extends StatelessWidget {
       validator: customValidator ?? _defaultValidator,
       style: TextStyle(
         fontSize: 16,
-        color: AppColors.textDark(context),
+        color: AppColors.textDark,
       ), // <<< Tambahkan warna teks dinamis
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
         // labelStyle dan hintStyle juga bisa menggunakan warna dinamis jika diperlukan
         labelStyle: TextStyle(
-          color: AppColors.textLight(context),
+          color: AppColors.textLight,
         ), // <<< Tambahkan warna label dinamis
         hintStyle: TextStyle(
-          color: AppColors.placeholder(context),
+          color: AppColors.placeholder,
         ), // <<< Tambahkan warna hint dinamis
 
         prefixIcon: Icon(
           icon,
-          color: AppColors.primary(context),
+          color: AppColors.primary,
         ), // <<< Perubahan di sini
         suffixIcon:
             isPassword
                 ? IconButton(
                   icon: Icon(
                     obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: AppColors.textLight(
-                      context,
-                    ), // <<< Perubahan di sini, menggunakan warna dinamis
+                    color:
+                        AppColors
+                            .textLight, // <<< Perubahan di sini, menggunakan warna dinamis
                   ),
                   onPressed: toggleVisibility,
                 )
@@ -108,25 +108,24 @@ class CustomInputField extends StatelessWidget {
         filled: true,
         fillColor:
             fillColor ??
-            AppColors.inputFill(
-              context,
-            ), // <<< Perubahan di sini, menggunakan warna dinamis
+            AppColors
+                .inputFill, // <<< Perubahan di sini, menggunakan warna dinamis
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: AppColors.border(context),
+            color: AppColors.border,
           ), // <<< Perubahan di sini
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: AppColors.border(context),
+            color: AppColors.border,
           ), // <<< Perubahan di sini
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: AppColors.primary(context),
+            color: AppColors.primary,
           ), // <<< Perubahan di sini
         ),
       ),

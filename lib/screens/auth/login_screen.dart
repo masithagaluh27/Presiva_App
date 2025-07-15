@@ -5,7 +5,7 @@ import 'package:presiva/models/app_models.dart';
 import 'package:presiva/routes/app_routes.dart';
 import 'package:presiva/services/api_Services.dart';
 import 'package:presiva/widgets/custom_input_field.dart';
-import 'package:presiva/widgets/primary_button.dart'; // Jika PrimaryButton Anda juga perlu context, pastikan sudah diadaptasi
+import 'package:presiva/widgets/primary_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,7 +33,6 @@ class _LoginScreenState extends State<LoginScreen>
   void initState() {
     super.initState();
 
-    // Initialize animations
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -55,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen>
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
     );
 
-    // Start animations
     _fadeController.forward();
     _slideController.forward();
 
@@ -96,9 +94,7 @@ class _LoginScreenState extends State<LoginScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(response.message),
-              backgroundColor: AppColors.success(
-                context,
-              ), // Menggunakan AppColors.success(context)
+              backgroundColor: AppColors.success, // Sudah tidak ada (context)
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -118,9 +114,7 @@ class _LoginScreenState extends State<LoginScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(errorMessage),
-              backgroundColor: AppColors.error(
-                context,
-              ), // Menggunakan AppColors.error(context)
+              backgroundColor: AppColors.error, // Sudah tidak ada (context)
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -150,15 +144,11 @@ class _LoginScreenState extends State<LoginScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.background(
-                context,
-              ), // Menggunakan AppColors.background(context)
-              AppColors.background(
-                context,
-              ).withOpacity(0.8), // Menggunakan AppColors.background(context)
-              AppColors.primary(
-                context,
-              ).withOpacity(0.1), // Menggunakan AppColors.primary(context)
+              AppColors.background, // Sudah tidak ada (context)
+              AppColors.background.withOpacity(
+                0.8,
+              ), // Sudah tidak ada (context)
+              AppColors.primary.withOpacity(0.1), // Sudah tidak ada (context)
             ],
           ),
         ),
@@ -192,19 +182,17 @@ class _LoginScreenState extends State<LoginScreen>
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                AppColors.primary(context).withOpacity(
+                                AppColors.primary.withOpacity(
                                   0.8,
-                                ), // Menggunakan AppColors.primary(context)
-                                AppColors.primary(
-                                  context,
-                                ), // Menggunakan AppColors.primary(context)
+                                ), // Sudah tidak ada (context)
+                                AppColors.primary, // Sudah tidak ada (context)
                               ],
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary(context).withOpacity(
+                                color: AppColors.primary.withOpacity(
                                   0.3,
-                                ), // Menggunakan AppColors.primary(context)
+                                ), // Sudah tidak ada (context)
                                 blurRadius: 30,
                                 offset: const Offset(0, 10),
                               ),
@@ -213,9 +201,7 @@ class _LoginScreenState extends State<LoginScreen>
                           child: const Icon(
                             Icons.lock,
                             size: 60,
-                            color:
-                                Colors
-                                    .white, // Jika Anda punya AppColors.onPrimary, bisa diganti
+                            color: Colors.white,
                           ),
                         ),
 
@@ -224,8 +210,8 @@ class _LoginScreenState extends State<LoginScreen>
                         // Welcome Text
                         Text(
                           "Welcome Back",
-                          style: AppTextStyles.heading2(context).copyWith(
-                            // Menggunakan AppTextStyles.heading2(context)
+                          style: AppTextStyles.heading2.copyWith(
+                            // Hapus `()`
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.5,
@@ -236,11 +222,11 @@ class _LoginScreenState extends State<LoginScreen>
 
                         Text(
                           "Sign in to your account",
-                          style: AppTextStyles.body2(context).copyWith(
-                            // Menggunakan AppTextStyles.body2(context)
-                            color: AppColors.textDark(context).withOpacity(
+                          style: AppTextStyles.body2.copyWith(
+                            // Hapus `()`
+                            color: AppColors.textDark.withOpacity(
                               0.7,
-                            ), // Menggunakan AppColors.textDark(context)
+                            ), // Sudah tidak ada (context)
                             fontSize: 16,
                           ),
                         ),
@@ -251,9 +237,7 @@ class _LoginScreenState extends State<LoginScreen>
                         Container(
                           padding: const EdgeInsets.all(32),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(
-                              0.9,
-                            ), // Bisa diganti AppColors.surface(context) jika sesuai
+                            color: Colors.white.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
@@ -263,9 +247,7 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ],
                             border: Border.all(
-                              color: Colors.white.withOpacity(
-                                0.2,
-                              ), // Bisa diganti AppColors.inputBorder(context) jika sesuai
+                              color: Colors.white.withOpacity(0.2),
                               width: 1,
                             ),
                           ),
@@ -276,9 +258,9 @@ class _LoginScreenState extends State<LoginScreen>
                                 controller: _emailController,
                                 hintText: 'Email Address',
                                 icon: Icons.email_outlined,
-                                fillColor: AppColors.inputFill(
-                                  context,
-                                ), // Menggunakan AppColors.inputFill(context)
+                                fillColor:
+                                    AppColors
+                                        .inputFill, // Sudah tidak ada (context)
                                 customValidator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Email cannot be empty';
@@ -306,9 +288,9 @@ class _LoginScreenState extends State<LoginScreen>
                                     _isPasswordVisible = !_isPasswordVisible;
                                   });
                                 },
-                                fillColor: AppColors.inputFill(
-                                  context,
-                                ), // Menggunakan AppColors.inputFill(context)
+                                fillColor:
+                                    AppColors
+                                        .inputFill, // Sudah tidak ada (context)
                                 customValidator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Password cannot be empty';
@@ -340,11 +322,10 @@ class _LoginScreenState extends State<LoginScreen>
                                     child: Text(
                                       "Forgot Password?",
                                       style: AppTextStyles.body3(
-                                        // Menggunakan AppTextStyles.body3(context: context)
-                                        context: context, // Penting!
-                                        color: AppColors.primary(
-                                          context,
-                                        ), // Menggunakan AppColors.primary(context)
+                                        // body3 masih fungsi, jadi tetap dengan ()
+                                        color:
+                                            AppColors
+                                                .primary, // Sudah tidak ada (context)
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -362,16 +343,12 @@ class _LoginScreenState extends State<LoginScreen>
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          AppColors.primary(
-                                            context,
-                                          ).withOpacity(
+                                          AppColors.primary.withOpacity(
                                             0.7,
-                                          ), // Menggunakan AppColors.primary(context)
-                                          AppColors.primary(
-                                            context,
-                                          ).withOpacity(
+                                          ), // Sudah tidak ada (context)
+                                          AppColors.primary.withOpacity(
                                             0.5,
-                                          ), // Menggunakan AppColors.primary(context)
+                                          ), // Sudah tidak ada (context)
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(16),
@@ -396,24 +373,19 @@ class _LoginScreenState extends State<LoginScreen>
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          AppColors.primary(
-                                            context,
-                                          ), // Menggunakan AppColors.primary(context)
-                                          AppColors.primary(
-                                            context,
-                                          ).withOpacity(
+                                          AppColors
+                                              .primary, // Sudah tidak ada (context)
+                                          AppColors.primary.withOpacity(
                                             0.8,
-                                          ), // Menggunakan AppColors.primary(context)
+                                          ), // Sudah tidak ada (context)
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(16),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.primary(
-                                            context,
-                                          ).withOpacity(
+                                          color: AppColors.primary.withOpacity(
                                             0.3,
-                                          ), // Menggunakan AppColors.primary(context)
+                                          ), // Sudah tidak ada (context)
                                           blurRadius: 20,
                                           offset: const Offset(0, 10),
                                         ),
@@ -427,14 +399,13 @@ class _LoginScreenState extends State<LoginScreen>
                                         child: Center(
                                           child: Text(
                                             'Sign In',
-                                            style: AppTextStyles.body2(
-                                              context,
-                                            ).copyWith(
-                                              // Menggunakan AppTextStyles.body2(context)
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 16,
-                                            ),
+                                            style: AppTextStyles
+                                                .body2 // Hapus `()`
+                                                .copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 16,
+                                                ),
                                           ),
                                         ),
                                       ),
@@ -454,13 +425,11 @@ class _LoginScreenState extends State<LoginScreen>
                             children: [
                               Text(
                                 "Don't have an account? ",
-                                style: AppTextStyles.body2(context).copyWith(
-                                  // Menggunakan AppTextStyles.body2(context)
-                                  color: AppColors.textDark(
-                                    context,
-                                  ).withOpacity(
+                                style: AppTextStyles.body2.copyWith(
+                                  // Hapus `()`
+                                  color: AppColors.textDark.withOpacity(
                                     0.7,
-                                  ), // Menggunakan AppColors.textDark(context)
+                                  ), // Sudah tidak ada (context)
                                 ),
                               ),
                               GestureDetector(
@@ -476,13 +445,11 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                   child: Text(
                                     "Sign Up",
-                                    style: AppTextStyles.body2(
-                                      context,
-                                    ).copyWith(
-                                      // Menggunakan AppTextStyles.body2(context)
-                                      color: AppColors.primary(
-                                        context,
-                                      ), // Menggunakan AppColors.primary(context)
+                                    style: AppTextStyles.body2.copyWith(
+                                      // Hapus `()`
+                                      color:
+                                          AppColors
+                                              .primary, // Sudah tidak ada (context)
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
