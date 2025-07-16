@@ -1,4 +1,4 @@
-// lib/services/api_service.dart
+
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -9,7 +9,7 @@ class ApiService {
   static const String _baseUrl = 'https://appabsensi.mobileprojp.com/api';
   static String? _token;
 
-  // Initialize token from SharedPreferences
+  //  token from SharedPreferences
   static Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
@@ -28,13 +28,9 @@ class ApiService {
     await prefs.remove('token');
     _token = null;
   }
-
-  // Helper to get token (for external use, e.g., SplashScreen)
-  static String? getToken() {
+ static String? getToken() {
     return _token;
   }
-
-  // Helper to get headers with Authorization token
   Map<String, String> _getHeaders({bool includeAuth = false}) {
     final headers = {
       'Accept': 'application/json',
@@ -48,7 +44,7 @@ class ApiService {
 
   // --- Auth Endpoints ---
 
-  // Updated Register method to match new API structure
+  // Register 
   Future<ApiResponse<AuthData>> register({
     required String name,
     required String email,
@@ -233,16 +229,13 @@ class ApiService {
   }
 
   // --- Absence Endpoints ---
-
-  // Modified checkIn to handle both 'masuk' and 'izin' statuses
-  // Location parameters are now nullable as they are not needed for 'izin'
-  Future<ApiResponse<Absence>> checkIn({
-    double? checkInLat, // Made nullable
-    double? checkInLng, // Made nullable
-    String? checkInAddress, // Made nullable
+ Future<ApiResponse<Absence>> checkIn({
+    double? checkInLat, 
+    double? checkInLng, 
+    String? checkInAddress, 
     String? checkInTime,
-    required String status, // "masuk" or "izin"
-    String? alasanIzin, // Required if status is "izin"
+    required String status, 
+    String? alasanIzin, 
     required String attendanceDate,
   }) async {
     final url = Uri.parse('$_baseUrl/absen/check-in');
@@ -354,31 +347,27 @@ class ApiService {
       }
       // --- END DEBUGGING ADDITION ---
 
-      if (response.statusCode == 200) {
-        // --- CONDITIONAL PARSING BASED ON NULLABILITY / TYPE ---
-        final dynamic data = responseBody['data'];
+      if (response.statusCode == 200) {  final dynamic data = responseBody['data'];
         if (data == null) {
           return ApiResponse(
             message: responseBody['message'],
-            data: null, // Return null data if API returns null
-            statusCode: response.statusCode,
+            data: null,   statusCode: response.statusCode,
           );
         } else if (data is List && data.isNotEmpty) {
-          // If 'data' is a list and not empty, assume we want the first item
-          return ApiResponse(
+              return ApiResponse(
             message: responseBody['message'],
             data: AbsenceToday.fromJson(data.first),
             statusCode: response.statusCode,
           );
         } else if (data is Map<String, dynamic>) {
-          // If 'data' is a map, parse it directly
+        
           return ApiResponse(
             message: responseBody['message'],
             data: AbsenceToday.fromJson(data),
             statusCode: response.statusCode,
           );
         } else {
-          // Handle unexpected data type
+      
           return ApiResponse.fromError(
             'Unexpected data format for today\'s absence: ${data.runtimeType}',
             statusCode: response.statusCode,
@@ -531,8 +520,8 @@ class ApiService {
 
   // Modified: Update user name and gender
   Future<ApiResponse<User>> updateProfile({
-    String? name, // Changed to optional
-    String? jenisKelamin, // Changed to optional
+    String? name, 
+    String? jenisKelamin, 
   }) async {
     final url = Uri.parse('$_baseUrl/profile');
     try {
@@ -572,7 +561,7 @@ class ApiService {
 
   // New: Update profile photo
   Future<ApiResponse<User>> updateProfilePhoto({
-    required String profilePhoto, // Base64 string
+    required String profilePhoto, 
   }) async {
     final url = Uri.parse('$_baseUrl/profile/photo');
     try {
@@ -608,8 +597,7 @@ class ApiService {
         url,
         headers: _getHeaders(
           includeAuth: true,
-        ), // Assuming this endpoint requires authentication
-      );
+        ),      );
 
       final Map<String, dynamic> responseBody = jsonDecode(response.body);
 
@@ -694,10 +682,7 @@ class ApiService {
   // --- Batch Endpoints ---
   Future<ApiResponse<List<Batch>>> getBatches() async {
     final url = Uri.parse('$_baseUrl/batches');
-    try {
-      // The Postman collection shows this endpoint requires a token.
-      // Adjust if your actual API allows public access.
-      final response = await http.get(
+    try {      final response = await http.get(
         url,
         headers: _getHeaders(includeAuth: true),
       );
@@ -728,12 +713,12 @@ class ApiService {
 
   // Submit Izin Request
   Future<ApiResponse<Absence>> submitIzinRequest({
-    required String date, // Date for the izin request
-    required String alasanIzin, // Reason for the izin request
+    required String date, 
+    required String alasanIzin, 
   }) async {
     final url = Uri.parse(
       '$_baseUrl/izin',
-    ); // Dedicated endpoint for Izin requests
+    ); 
     final body = {'date': date, 'alasan_izin': alasanIzin};
 
     try {

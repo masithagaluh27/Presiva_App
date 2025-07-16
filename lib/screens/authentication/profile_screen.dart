@@ -3,9 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart'; // Import AppTextStyles
 import 'package:presiva/models/app_models.dart';
-import 'package:presiva/screens/auth/edit_profile_screen.dart';
-import 'package:presiva/services/api_Services.dart';
-import '../../routes/app_routes.dart';
+import 'package:presiva/screens/authentication/edit_profile_screen.dart';
+import 'package:presiva/api/api_Services.dart';
+import '../../endpoint/app_routes.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ValueNotifier<bool> refreshNotifier;

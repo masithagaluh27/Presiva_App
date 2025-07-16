@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart';
 import 'package:presiva/models/app_models.dart';
-import 'package:presiva/routes/app_routes.dart';
-import 'package:presiva/services/api_Services.dart';
+import 'package:presiva/endpoint/app_routes.dart';
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/widgets/custom_input_field.dart';
-import 'package:presiva/widgets/primary_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -138,6 +137,7 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -455,11 +455,12 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                 ),
                               ),
+                              SizedBox(height: 20),
                             ],
                           ),
                         ),
 
-                        const Spacer(flex: 1),
+                        const Spacer(flex: 2),
                       ],
                     ),
                   ),

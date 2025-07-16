@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:presiva/constant/app_colors.dart'; // Pastikan AppColors Anda mendukung tema
+import 'package:presiva/api/api_Services.dart';
+import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/models/app_models.dart';
-import 'package:presiva/services/api_Services.dart';
-// import 'package:presiva/screens/main_botom_navigation_bar.dart'; // Jika tidak digunakan, bisa dihapus
 
 class AttendanceListScreen extends StatefulWidget {
   final ValueNotifier<bool> refreshNotifier;
@@ -50,7 +49,9 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
   }
 
   Future<List<Absence>> _fetchAndFilterAttendances() async {
+    // Format tanggal awal bulan (_selectedMonth) ke 'YYYY-MM-01'
     final String startDate = DateFormat('yyyy-MM-01').format(_selectedMonth);
+
     final String endDate = DateFormat(
       'yyyy-MM-dd',
     ).format(DateTime(_selectedMonth.year, _selectedMonth.month + 1, 0));
@@ -69,7 +70,6 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
         });
         return fetchedAbsences;
       } else {
-        // Handle API specific errors or messages from response.message
         throw Exception(response.message);
       }
     } catch (e) {
@@ -99,7 +99,6 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            // Gunakan tema aplikasi saat ini
             colorScheme: ColorScheme.light(
               primary: AppColors.primary,
               onPrimary: Colors.white,
@@ -133,7 +132,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
 
     DateTime endDateTime = checkOut ?? DateTime.now();
     if (endDateTime.isBefore(checkIn)) {
-      return '00:00:00'; // Prevent negative duration if checkout is before checkin
+      return '00:00:00';
     }
 
     final Duration duration = endDateTime.difference(checkIn);
@@ -161,8 +160,8 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
       statusPillBackgroundColor = AppColors.warning;
       statusPillTextColor = Colors.white;
       cardBackgroundColor = AppColors.warningBackground;
+      statusIcon = Icons.info_outline;
       timeTextColor = AppColors.textDark;
-      statusIcon = Icons.info_outline; // Icon for "Izin" / "Cuti"
     } else {
       if (absence.status?.toLowerCase() == 'late') {
         barColor = AppColors.error;
@@ -170,36 +169,35 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
         statusPillTextColor = Colors.white;
         cardBackgroundColor = AppColors.dangerBackground;
         timeTextColor = AppColors.error;
-        statusIcon = Icons.hourglass_empty; // Icon for "Late"
+        statusIcon = Icons.hourglass_empty;
       } else {
         barColor = AppColors.success;
         statusPillBackgroundColor = AppColors.success;
         statusPillTextColor = Colors.white;
         cardBackgroundColor = AppColors.successBackground;
         timeTextColor = AppColors.success;
-        statusIcon = Icons.check_circle_outline; // Icon for "Masuk" / "Hadir"
+        statusIcon = Icons.check_circle_outline;
       }
     }
 
     final DateTime? displayDate = absence.attendanceDate;
-    // Format date to Indonesian
+
+    // format tanggal
     final String formattedDate =
         displayDate != null
-            ? DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(
-              displayDate,
-            ) // Full day name, day, full month name, year
-            : 'N/A';
+            ? DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(displayDate)
+            : '---';
 
     return Card(
       color: cardBackgroundColor,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      elevation: 4, // Moderate elevation for a modern look
+      elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Left bar for status color
+            // Side bar warna (indikator status)
             Container(
               width: 6.0,
               decoration: BoxDecoration(
@@ -216,9 +214,11 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Bagian tanggal dan status pill
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // Tanggal kehadiran
                         Text(
                           formattedDate,
                           style: TextStyle(
@@ -227,7 +227,8 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             color: AppColors.textDark,
                           ),
                         ),
-                        // Status Pill
+
+                        // Pill status (contoh: "MASUK", "IZIN", "LATE")
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
@@ -247,7 +248,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                absence.status?.toUpperCase() ?? 'N/A',
+                                absence.status?.toUpperCase() ?? '---',
                                 style: TextStyle(
                                   color: statusPillTextColor,
                                   fontWeight: FontWeight.bold,
@@ -260,65 +261,64 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    // Check-in, Check-out, Working Hours (if not a request type)
+                    // Detail Check In/Check Out
                     if (!isRequestType)
                       Column(
                         children: [
                           _buildTimeAndLocationRow(
                             context,
-                            Icons.login_rounded, // Modern check-in icon
+                            Icons.login_rounded,
                             'Check In',
                             absence.checkIn?.toLocal().toString().substring(
                                   11,
                                   19,
                                 ) ??
-                                'N/A',
-                            absence.checkInAddress ?? 'N/A',
+                                '---',
+                            absence.checkInAddress ?? '---',
                             timeTextColor,
                           ),
                           const SizedBox(height: 8),
                           _buildTimeAndLocationRow(
                             context,
-                            Icons.logout_rounded, // Modern check-out icon
+                            Icons.logout_rounded,
                             'Check Out',
                             absence.checkOut?.toLocal().toString().substring(
                                   11,
                                   19,
                                 ) ??
-                                'N/A',
-                            absence.checkOutAddress ?? 'N/A',
+                                '---',
+                            absence.checkOutAddress ?? '---',
                             timeTextColor,
                           ),
                           const SizedBox(height: 8),
                           _buildTimeAndLocationRow(
                             context,
-                            Icons.timer_outlined, // Modern timer icon
+                            Icons.timer_outlined,
                             'Working HR\'s',
                             _calculateWorkingHours(
                               absence.checkIn,
                               absence.checkOut,
                             ),
-                            '', // No address for working hours
+                            '', // Working HRs doesn't have an address
                             timeTextColor,
                           ),
                         ],
                       )
-                    else // Reason for "Izin" / "Cuti"
+                    else
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
-                              Icons
-                                  .description_outlined, // Modern description icon
+                              Icons.description_outlined,
                               color: AppColors.textLight.withOpacity(0.7),
                               size: 20,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Reason: ${absence.alasanIzin?.isNotEmpty == true ? absence.alasanIzin : 'N/A'}',
+                                'Reason: ${absence.alasanIzin?.isNotEmpty == true ? absence.alasanIzin : '---'}',
                                 style: TextStyle(
                                   color: AppColors.textLight,
                                   fontSize: 14,
@@ -333,22 +333,23 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                 ),
               ),
             ),
-            // Delete/Cancel button aligned to top right
+
             Align(
               alignment: Alignment.topRight,
               child: IconButton(
                 icon: Icon(
-                  Icons.cancel_outlined, // A clear cancel icon
+                  Icons.cancel_outlined,
                   color: AppColors.textLight.withOpacity(0.6),
                   size: 24,
                 ),
                 onPressed: () async {
+                  // Logika untuk  mengizinkan pembatalan 'Izin'
                   if (absence.status?.toLowerCase() != 'izin' &&
                       absence.status?.toLowerCase() != 'cuti') {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: const Text(
-                          'Only "Izin" or "Cuti" entries can be deleted.',
+                          'Only "Izin" entries can be deleted.',
                         ),
                         backgroundColor: AppColors.error,
                       ),
@@ -356,6 +357,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                     return;
                   }
 
+                  // Konfirmasi dialog sebelum menghapus
                   final confirmed = await showDialog<bool>(
                     context: context,
                     builder:
@@ -419,6 +421,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                         );
                         return;
                       }
+                      // Panggilan API untuk menghapus entri
                       final ApiResponse<Absence> deleteResponse =
                           await _apiService.deleteAbsence(absence.id);
 
@@ -430,7 +433,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             backgroundColor: AppColors.success,
                           ),
                         );
-                        await _refreshList();
+                        await _refreshList(); // Perbarui daftar setelah penghapusan berhasil
                       } else {
                         String errorMessage = deleteResponse.message;
                         if (deleteResponse.errors != null) {
@@ -472,6 +475,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
     );
   }
 
+  // Widget pembantu untuk menampilkan waktu dan lokasi (Check In/Check Out/Working HRs).
   Widget _buildTimeAndLocationRow(
     BuildContext context,
     IconData icon,
@@ -518,7 +522,6 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine if the current theme is dark or light
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -526,14 +529,11 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          'Detail Kehadiran', // Translated to Indonesian
+          'Attendance Details',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
-            color:
-                isDarkMode
-                    ? Colors.white
-                    : Colors.white, // Text color on gradient app bar
+            color: isDarkMode ? Colors.white : Colors.white,
           ),
         ),
         flexibleSpace: Container(
@@ -551,32 +551,31 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Monthly Overview Section - Modernized
+          // Bagian "Monthly Overview" dan pemilih bulan
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 16.0,
               vertical: 12.0,
             ),
             decoration: BoxDecoration(
-              color:
-                  AppColors
-                      .cardBackground, // Use card background for this section
+              color: AppColors.cardBackground,
               borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(25),
-              ), // More rounded
+              ),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.shadowColor,
-                  blurRadius: 10, // Increased blur
-                  offset: const Offset(0, 5), // More prominent shadow
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Judul "Monthly Overview"
                 Text(
-                  'Monthly Overview', // Translated to Indonesian
+                  'Monthly Overview',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -587,6 +586,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Tombol untuk memilih bulan (tanggal)
                     Expanded(
                       child: GestureDetector(
                         onTap: () => _selectMonth(context),
@@ -597,12 +597,10 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ), // Slightly less rounded for a sleek button
+                            borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: AppColors.primary.withOpacity(0.3),
-                            ), // Subtle border
+                            ),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -613,11 +611,12 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                                 color: AppColors.primary,
                               ),
                               const SizedBox(width: 8),
+                              // Menampilkan bulan dan tahun yang sedang dipilih
                               Text(
                                 DateFormat(
                                   'MMMM yyyy',
-                                  'id_ID', // Specify Indonesian locale
-                                ).format(_selectedMonth), // Full month name
+                                  'id_ID', // Format bulan dalam Bahasa Indonesia
+                                ).format(_selectedMonth),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primary,
@@ -630,6 +629,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
+                    // Tombol panah untuk navigasi bulan (sebelumnya/selanjutnya)
                     Container(
                       decoration: BoxDecoration(
                         color: AppColors.primary.withOpacity(0.1),
@@ -642,11 +642,11 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                         children: [
                           IconButton(
                             icon: Icon(
-                              Icons
-                                  .chevron_left_rounded, // More modern arrow icon
+                              Icons.chevron_left_rounded,
                               size: 24,
                               color: AppColors.primary,
                             ),
+                            // Mengurangi bulan saat ini dan me-refresh daftar
                             onPressed: () {
                               setState(() {
                                 _selectedMonth = DateTime(
@@ -660,11 +660,11 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                           ),
                           IconButton(
                             icon: Icon(
-                              Icons
-                                  .chevron_right_rounded, // More modern arrow icon
+                              Icons.chevron_right_rounded,
                               size: 24,
                               color: AppColors.primary,
                             ),
+                            // Menambah bulan saat ini dan me-refresh daftar
                             onPressed: () {
                               setState(() {
                                 _selectedMonth = DateTime(
@@ -684,10 +684,12 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 16), // Space between monthly overview and list
+          const SizedBox(height: 16),
+          // Bagian daftar kehadiran yang di-scroll
           Expanded(
             child: RefreshIndicator(
-              onRefresh: _refreshList,
+              onRefresh:
+                  _refreshList, // Fungsi untuk refresh saat ditarik ke bawah
               color: AppColors.primary,
               child: FutureBuilder<List<Absence>>(
                 future: _attendanceFuture,
@@ -726,9 +728,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             const SizedBox(height: 16),
                             ElevatedButton.icon(
                               onPressed: _refreshList,
-                              icon: const Icon(
-                                Icons.refresh_rounded,
-                              ), // Modern refresh icon
+                              icon: const Icon(Icons.refresh_rounded),
                               label: const Text('Coba Lagi'), // Translated
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
@@ -757,17 +757,10 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.no_accounts),
-                            // You can keep this image or replace it with an icon as well
-                            // Image.asset(
-                            //   'assets/images/presivabg.png', // Make sure this asset exists
-                            //   height: 150,
-                            //   width: 150,
-                            //   fit: BoxFit.contain,
-                            // ),
+                            Icon(Icons.calendar_month),
                             const SizedBox(height: 20),
                             Text(
-                              'Tidak ada catatan kehadiran yang ditemukan untuk bulan ini.', // Translated
+                              'Tidak ada catatan kehadiran yang ditemukan untuk bulan ini.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: AppColors.textLight,
@@ -781,10 +774,9 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                     );
                   }
 
+                  // ListView builder untuk menampilkan setiap tile kehadiran
                   return ListView.builder(
-                    padding: const EdgeInsets.only(
-                      bottom: 16,
-                    ), // Padding for the last item
+                    padding: const EdgeInsets.only(bottom: 16),
                     itemCount: attendances.length,
                     itemBuilder: (context, index) {
                       return _buildAttendanceTile(attendances[index]);

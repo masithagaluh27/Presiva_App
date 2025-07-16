@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:presiva/screens/attendance/attendance_list_screen.dart';
-import 'package:presiva/screens/auth/profile_screen.dart';
+import 'package:presiva/screens/authentication/profile_screen.dart';
 import 'package:presiva/screens/homescreen.dart';
 import 'package:presiva/screens/reports/person_report_Screen.dart';
 import 'package:presiva/widgets/custom_bottom_navigation_bar.dart';

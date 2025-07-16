@@ -1,10 +1,8 @@
-// constant/app_text_styles.dart
 import 'package:flutter/material.dart';
-import 'package:presiva/constant/app_colors.dart'; // Import AppColors
+import 'package:presiva/constant/app_colors.dart';
 
 class AppTextStyles {
-  AppTextStyles._(); // Tetap bagus untuk mencegah instansiasi
-
+  AppTextStyles._();
   static const TextStyle heading1 = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.bold,
@@ -38,9 +36,6 @@ class AppTextStyles {
     fontSize: 14,
     color: AppColors.textDark,
   );
-
-  // Untuk body3, karena memiliki parameter opsional, ini tetap harus menjadi fungsi.
-  // Namun, panggilannya harus AppTextStyles.body3() tanpa parameter jika Anda tidak mengaturnya.
   static TextStyle body3({Color? color, FontWeight? fontWeight}) {
     return TextStyle(
       fontSize: 12,

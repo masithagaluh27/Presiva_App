@@ -1,6 +1,3 @@
-// lib/models/app_models.dart
-
-// Helper function to safely parse int from dynamic (could be int or string)
 int? _parseIntFromDynamic(dynamic value) {
   if (value is int) {
     return value;
@@ -12,7 +9,7 @@ int? _parseIntFromDynamic(dynamic value) {
 
 // --- API Response Models ---
 class ApiResponse<T> {
-  final String message; // This is non-nullable
+  final String message;
   final T? data;
   final Map<String, dynamic>? errors;
   final int? statusCode;
@@ -27,13 +24,11 @@ class ApiResponse<T> {
     if (json.containsKey('status_code')) {
       parsedStatusCode = _parseIntFromDynamic(json['status_code']);
     }
-
-    // Safely get message, provide a default if it's null from API
     final String parsedMessage =
         json['message'] as String? ?? 'An unexpected error occurred.';
 
     return ApiResponse(
-      message: parsedMessage, // Use the safely parsed message
+      message: parsedMessage,
       data: json['data'] != null ? fromJsonT(json['data']) : null,
       errors: json['errors'] as Map<String, dynamic>?,
       statusCode: parsedStatusCode,
@@ -64,7 +59,7 @@ class AuthResponse {
     return AuthResponse(
       message:
           json['message'] as String? ??
-          'Authentication response message missing.', // Added null-check
+          'Authentication response message missing.',
       data:
           json['data'] != null
               ? AuthData.fromJson(json['data'] as Map<String, dynamic>)
@@ -96,29 +91,29 @@ class User {
   final int id;
   final String name;
   final String email;
-  final String? batch_ke; // Added new field
-  final String? training_title; // Added new field
-  final String? jenis_kelamin; // Added new field
-  final String? profile_photo; // Added new field
+  final String? batch_ke;
+  final String? training_title;
+  final String? jenis_kelamin;
+  final String? profile_photo;
   final DateTime? emailVerifiedAt;
-  final DateTime? createdAt; // Made nullable
-  final DateTime? updatedAt; // Made nullable
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final int? batchId;
   final int? trainingId;
-  final Batch? batch; // Nested Batch object
-  final Training? training; // Nested Training object
+  final Batch? batch;
+  final Training? training;
 
   User({
     required this.id,
     required this.name,
     required this.email,
-    this.batch_ke, // Added to constructor
-    this.training_title, // Added to constructor
-    this.jenis_kelamin, // Added to constructor
-    this.profile_photo, // Added to constructor
+    this.batch_ke,
+    this.training_title,
+    this.jenis_kelamin,
+    this.profile_photo,
     this.emailVerifiedAt,
-    this.createdAt, // Removed required
-    this.updatedAt, // Removed required
+    this.createdAt,
+    this.updatedAt,
     this.batchId,
     this.trainingId,
     this.batch,
@@ -127,41 +122,27 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id:
-          _parseIntFromDynamic(json['id']) ??
-          0, // Use helper, provide default for required id
-      name:
-          json['name'] as String? ??
-          'Unknown Name', // Added null-aware cast and fallback
-      email:
-          json['email'] as String? ??
-          'unknown@example.com', // Added null-aware cast and fallback
-      batch_ke: json['batch_ke'] as String?, // Parse new field
-      training_title: json['training_title'] as String?, // Parse new field
-      jenis_kelamin: json['jenis_kelamin'] as String?, // Parse new field
-      profile_photo: json['profile_photo'] as String?, // Parse new field
+      id: _parseIntFromDynamic(json['id']) ?? 0,
+      name: json['name'] as String? ?? 'Unknown Name',
+      email: json['email'] as String? ?? 'unknown@example.com',
+      batch_ke: json['batch_ke'] as String?,
+      training_title: json['training_title'] as String?,
+      jenis_kelamin: json['jenis_kelamin'] as String?,
+      profile_photo: json['profile_photo'] as String?,
       emailVerifiedAt:
           json['email_verified_at'] != null
-              ? DateTime.tryParse(
-                json['email_verified_at'] as String,
-              ) // **EDITED: Use tryParse**
+              ? DateTime.tryParse(json['email_verified_at'] as String)
               : null,
       createdAt:
           json['created_at'] != null
-              ? DateTime.tryParse(
-                json['created_at'] as String,
-              ) // **EDITED: Use tryParse**
+              ? DateTime.tryParse(json['created_at'] as String)
               : null,
       updatedAt:
           json['updated_at'] != null
-              ? DateTime.tryParse(
-                json['updated_at'] as String,
-              ) // **EDITED: Use tryParse**
+              ? DateTime.tryParse(json['updated_at'] as String)
               : null,
-      batchId: _parseIntFromDynamic(json['batch_id']), // Use helper for batchId
-      trainingId: _parseIntFromDynamic(
-        json['training_id'],
-      ), // Use helper for trainingId
+      batchId: _parseIntFromDynamic(json['batch_id']),
+      trainingId: _parseIntFromDynamic(json['training_id']),
       batch:
           json['batch'] != null
               ? Batch.fromJson(json['batch'] as Map<String, dynamic>)
@@ -178,10 +159,10 @@ class User {
       'id': id,
       'name': name,
       'email': email,
-      'batch_ke': batch_ke, // Added to toJson
-      'training_title': training_title, // Added to toJson
-      'jenis_kelamin': jenis_kelamin, // Added to toJson
-      'profile_photo': profile_photo, // Added to toJson
+      'batch_ke': batch_ke,
+      'training_title': training_title,
+      'jenis_kelamin': jenis_kelamin,
+      'profile_photo': profile_photo,
       'email_verified_at': emailVerifiedAt?.toIso8601String(),
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
@@ -195,19 +176,18 @@ class User {
 
 // --- Attendance Models ---
 class Absence {
-  // `id` dan `userId` tetap non-nullable karena Anda memberikan default `0` di `fromJson`
   final int id;
   final int userId;
-  final DateTime? checkIn; // Made nullable
+  final DateTime? checkIn;
   final String? checkInLocation;
-  final String? checkInAddress; // Made nullable
+  final String? checkInAddress;
   final DateTime? checkOut;
   final String? checkOutLocation;
   final String? checkOutAddress;
-  final String? status; // Made nullable
+  final String? status;
   final String? alasanIzin;
-  final DateTime? createdAt; // Made nullable
-  final DateTime? updatedAt; // Made nullable
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final double? checkInLat;
   final double? checkInLng;
   final double? checkOutLat;
@@ -215,8 +195,8 @@ class Absence {
   final DateTime? attendanceDate;
 
   Absence({
-    required this.id, // ID harus ada (karena kita berikan default 0)
-    required this.userId, // userId harus ada (karena kita berikan default 0)
+    required this.id,
+    required this.userId,
     this.checkIn,
     this.checkInLocation,
     this.checkInAddress,
@@ -236,32 +216,24 @@ class Absence {
 
   factory Absence.fromJson(Map<String, dynamic> json) {
     final String? attendanceDateStr = json['attendance_date'] as String?;
-    final String? checkInTimeStr =
-        json['check_in_time'] as String?; // check_in_time
-    final String? checkOutTimeStr =
-        json['check_out_time'] as String?; // check_out_time
+    final String? checkInTimeStr = json['check_in_time'] as String?;
+    final String? checkOutTimeStr = json['check_out_time'] as String?;
 
     DateTime? parsedCheckIn;
     if (attendanceDateStr != null && checkInTimeStr != null) {
-      parsedCheckIn = DateTime.tryParse(
-        '$attendanceDateStr $checkInTimeStr',
-      ); // **EDITED: Use tryParse**
+      parsedCheckIn = DateTime.tryParse('$attendanceDateStr $checkInTimeStr');
     }
 
     DateTime? parsedCheckOut;
     if (attendanceDateStr != null && checkOutTimeStr != null) {
-      parsedCheckOut = DateTime.tryParse(
-        '$attendanceDateStr $checkOutTimeStr',
-      ); // **EDITED: Use tryParse**
+      parsedCheckOut = DateTime.tryParse('$attendanceDateStr $checkOutTimeStr');
     }
-
-    // Menggunakan nilai default 0 jika id atau userId null
     final int parsedId = _parseIntFromDynamic(json['id']) ?? 0;
     final int parsedUserId = _parseIntFromDynamic(json['user_id']) ?? 0;
 
     return Absence(
-      id: parsedId, // Gunakan parsedId
-      userId: parsedUserId, // Gunakan parsedUserId
+      id: parsedId,
+      userId: parsedUserId,
       checkIn: parsedCheckIn,
       checkInLocation: json['check_in_location'] as String?,
       checkInAddress: json['check_in_address'] as String?,
@@ -272,15 +244,11 @@ class Absence {
       alasanIzin: json['alasan_izin'] as String?,
       createdAt:
           json['created_at'] != null
-              ? DateTime.tryParse(
-                json['created_at'] as String,
-              ) // **EDITED: Use tryParse**
+              ? DateTime.tryParse(json['created_at'] as String)
               : null,
       updatedAt:
           json['updated_at'] != null
-              ? DateTime.tryParse(
-                json['updated_at'] as String,
-              ) // **EDITED: Use tryParse**
+              ? DateTime.tryParse(json['updated_at'] as String)
               : null,
       checkInLat: (json['check_in_lat'] as num?)?.toDouble(),
       checkInLng: (json['check_in_lng'] as num?)?.toDouble(),
@@ -289,7 +257,7 @@ class Absence {
       attendanceDate:
           attendanceDateStr != null
               ? DateTime.tryParse(attendanceDateStr)
-              : null, // **EDITED: Use tryParse**
+              : null,
     );
   }
 
@@ -297,16 +265,10 @@ class Absence {
     return {
       'id': id,
       'user_id': userId,
-      'check_in_time': checkIn?.toLocal().toIso8601String().substring(
-        11,
-        19,
-      ), // Convert to time string if needed by API
+      'check_in_time': checkIn?.toLocal().toIso8601String().substring(11, 19),
       'check_in_location': checkInLocation,
       'check_in_address': checkInAddress,
-      'check_out_time': checkOut?.toLocal().toIso8601String().substring(
-        11,
-        19,
-      ), // Convert to time string if needed by API
+      'check_out_time': checkOut?.toLocal().toIso8601String().substring(11, 19),
       'check_out_location': checkOutLocation,
       'check_out_address': checkOutAddress,
       'status': status,
@@ -317,21 +279,18 @@ class Absence {
       'check_in_lng': checkInLng,
       'check_out_lat': checkOutLat,
       'check_out_lng': checkOutLng,
-      'attendance_date': attendanceDate?.toIso8601String().substring(
-        0,
-        10,
-      ), // Convert to date string
+      'attendance_date': attendanceDate?.toIso8601String().substring(0, 10),
     };
   }
 }
 
 class AbsenceToday {
-  final DateTime? tanggal; // Made nullable
-  final DateTime? jamMasuk; // Made nullable
+  final DateTime? tanggal;
+  final DateTime? jamMasuk;
   final DateTime? jamKeluar;
-  final String? alamatMasuk; // Made nullable
+  final String? alamatMasuk;
   final String? alamatKeluar;
-  final String? status; // Made nullable
+  final String? status;
   final String? alasanIzin;
   final DateTime? attendanceDate;
 
@@ -353,23 +312,21 @@ class AbsenceToday {
 
     DateTime? parsedJamMasuk;
     if (attendanceDateStr != null && checkInTimeStr != null) {
-      parsedJamMasuk = DateTime.tryParse(
-        '$attendanceDateStr $checkInTimeStr',
-      ); // **EDITED: Use tryParse**
+      parsedJamMasuk = DateTime.tryParse('$attendanceDateStr $checkInTimeStr');
     }
 
     DateTime? parsedJamKeluar;
     if (attendanceDateStr != null && checkOutTimeStr != null) {
       parsedJamKeluar = DateTime.tryParse(
         '$attendanceDateStr $checkOutTimeStr',
-      ); // **EDITED: Use tryParse**
+      );
     }
 
     return AbsenceToday(
       tanggal:
           attendanceDateStr != null
               ? DateTime.tryParse(attendanceDateStr)
-              : null, // **EDITED: Use tryParse**
+              : null,
       jamMasuk: parsedJamMasuk,
       jamKeluar: parsedJamKeluar,
       alamatMasuk: json['check_in_address'] as String?,
@@ -379,7 +336,7 @@ class AbsenceToday {
       attendanceDate:
           attendanceDateStr != null
               ? DateTime.tryParse(attendanceDateStr)
-              : null, // **EDITED: Use tryParse**
+              : null,
     );
   }
 }
@@ -410,18 +367,17 @@ class AbsenceStats {
 // --- Batch and Training Models ---
 class Batch {
   final int id;
-  final String batch_ke; // Corrected to match API response
-  final String? startDate; // Made nullable
-  final String? endDate; // Made nullable
+  final String batch_ke;
+  final String? startDate;
+  final String? endDate;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final List<Training>? trainings; // Nested trainings from API response
-
+  final List<Training>? trainings;
   Batch({
     required this.id,
     required this.batch_ke,
-    this.startDate, // Removed required
-    this.endDate, // Removed required
+    this.startDate,
+    this.endDate,
     this.createdAt,
     this.updatedAt,
     this.trainings,
@@ -429,23 +385,17 @@ class Batch {
 
   factory Batch.fromJson(Map<String, dynamic> json) {
     return Batch(
-      id: _parseIntFromDynamic(json['id']) ?? 0, // Use helper
-      batch_ke:
-          json['batch_ke'] as String? ??
-          'N/A', // Added null-aware cast and fallback
-      startDate: json['start_date'] as String?, // Added null-aware cast
-      endDate: json['end_date'] as String?, // Added null-aware cast
+      id: _parseIntFromDynamic(json['id']) ?? 0,
+      batch_ke: json['batch_ke'] as String? ?? 'N/A',
+      startDate: json['start_date'] as String?,
+      endDate: json['end_date'] as String?,
       createdAt:
           json['created_at'] != null
-              ? DateTime.tryParse(
-                json['created_at'] as String,
-              ) // **EDITED: Use tryParse**
+              ? DateTime.tryParse(json['created_at'] as String)
               : null,
       updatedAt:
           json['updated_at'] != null
-              ? DateTime.tryParse(
-                json['updated_at'] as String,
-              ) // **EDITED: Use tryParse**
+              ? DateTime.tryParse(json['updated_at'] as String)
               : null,
       trainings:
           (json['trainings'] as List<dynamic>?)
@@ -476,8 +426,7 @@ class Training {
   final String? duration;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final List<dynamic>?
-  units; // Assuming units and activities can be dynamic lists
+  final List<dynamic>? units;
   final List<dynamic>? activities;
 
   Training({
@@ -495,10 +444,8 @@ class Training {
 
   factory Training.fromJson(Map<String, dynamic> json) {
     return Training(
-      id: _parseIntFromDynamic(json['id']) ?? 0, // Use helper
-      title:
-          json['title'] as String? ??
-          'N/A', // Added null-aware cast and fallback
+      id: _parseIntFromDynamic(json['id']) ?? 0,
+      title: json['title'] as String? ?? 'N/A',
       description: json['description'] as String?,
       participantCount: _parseIntFromDynamic(
         json['participant_count'],
@@ -507,15 +454,11 @@ class Training {
       duration: json['duration'] as String?,
       createdAt:
           json['created_at'] != null
-              ? DateTime.tryParse(
-                json['created_at'] as String,
-              ) // **EDITED: Use tryParse**
+              ? DateTime.tryParse(json['created_at'] as String)
               : null,
       updatedAt:
           json['updated_at'] != null
-              ? DateTime.tryParse(
-                json['updated_at'] as String,
-              ) // **EDITED: Use tryParse**
+              ? DateTime.tryParse(json['updated_at'] as String)
               : null,
       units: json['units'] as List<dynamic>?,
       activities: json['activities'] as List<dynamic>?,

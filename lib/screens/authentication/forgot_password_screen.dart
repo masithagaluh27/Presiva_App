@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:presiva/constant/app_colors.dart';
-import 'package:presiva/routes/app_routes.dart';
-import 'package:presiva/services/api_Services.dart';
+import 'package:presiva/endpoint/app_routes.dart';
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/widgets/custom_input_field.dart';
 import 'package:presiva/widgets/primary_button.dart';
 

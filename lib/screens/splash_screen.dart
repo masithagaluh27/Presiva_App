@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:presiva/services/api_Services.dart';
+import 'package:presiva/api/api_Services.dart';
 
-import '../routes/app_routes.dart';
+import '../endpoint/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

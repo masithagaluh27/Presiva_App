@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart'; // Import AutoSizeText
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -8,8 +9,7 @@ import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/models/app_models.dart';
 import 'package:presiva/screens/attendance/request_screen.dart';
 import 'package:presiva/screens/main_botom_navigation_bar.dart';
-import 'package:presiva/services/api_Services.dart';
-import 'package:auto_size_text/auto_size_text.dart'; // Import AutoSizeText
+import 'package:presiva/api/api_Services.dart';
 
 class HomeScreen extends StatefulWidget {
   final ValueNotifier<bool> refreshNotifier;
@@ -415,13 +415,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String honorific = '';
 
     if (hour >= 5 && hour < 12) {
-      greeting = 'Selamat Pagi';
+      greeting = 'Selamat pagi';
     } else if (hour >= 12 && hour < 18) {
-      greeting = 'Selamat Siang';
+      greeting = 'Selamat siang';
     } else if (hour >= 18 && hour < 22) {
-      greeting = 'Selamat Malam';
+      greeting = 'Selamat malam';
     } else {
-      greeting = 'Selamat Tidur';
+      greeting = 'Selamat tidur';
     }
 
     if (_currentUser?.jenis_kelamin != null) {
@@ -444,214 +444,170 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final bool hasCheckedIn = _todayAbsence?.jamMasuk != null;
     final bool hasCheckedOut = _todayAbsence?.jamKeluar != null;
-
-    // Tinggi tombol ElevatedButton default sekitar 56 (padding vertical 16 + tinggi teks).
-    // Padding horizontal default adalah 16 di setiap sisi.
-    // Jarak dari bawah layar 16.
-    // Jarak tambahan yang diinginkan antara card check-in dan tombol. Misal 20-30.
-    // Total: Tinggi tombol (56) + padding bottom (16) + jarak ekstra (20) = ~92.
-    // Untuk memastikan ada ruang yang cukup, kita tambahkan sedikit buffer.
     const double bottomButtonAreaHeight = 92.0;
 
+    // Kecilkan tinggi header lebih lanjut
+    const double customHeaderHeight = 120.0; // Disesuaikan menjadi lebih kecil
+
     return Scaffold(
-      backgroundColor: Colors.transparent, // Background Scaffold transparan
-      extendBodyBehindAppBar: true, // Biarkan body meluas di belakang AppBar
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent, // AppBar transparan
-        elevation: 0,
-        toolbarHeight: 200, // Tinggi AppBar standar
-        flexibleSpace: Container(
-          // Tambahkan BorderRadius pada Container ini
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.primary, AppColors.primary.withOpacity(0.5)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            // Border radius hanya di bagian bawah agar tidak mengganggu layout atas
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20),
-            ), // Contoh radius
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 4.0,
+      backgroundColor: AppColors.background,
+      body: Stack(
+        children: [
+          // Custom "Header" (untuk profile/greeting)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: customHeaderHeight, // Tinggi yang lebih kecil
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary,
+                    AppColors.primary.withOpacity(0.5),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(20),
+                ),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.location_on, color: AppColors.onPrimary, size: 24),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Current Location',
-                          style: TextStyle(
-                            color: AppColors.onPrimary.withOpacity(0.8),
-                            fontSize: 12,
-                          ),
-                        ),
-                        // Menggunakan AutoSizeText untuk alamat dengan elipsis
-                        AutoSizeText(
-                          _location,
-                          maxLines: 2, // Hanya satu baris, akan di-ellipsis
-                          minFontSize:
-                              12, // Minimal font size lebih besar, jika tidak muat akan ellipsis
-                          maxFontSize: 14,
-                          overflow:
-                              TextOverflow.ellipsis, // Pastikan elipsis aktif
-                          style: TextStyle(
-                            color: AppColors.onPrimary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 4.0,
                   ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-      body: Container(
-        // Ini adalah Container utama body yang akan memiliki gradient
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.primary,
-              AppColors.primary.withOpacity(0.8),
-              AppColors.background, // Warna akhir gradient adalah abu-abu
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            stops: const [0.0, 0.2, 1.0],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // SingleChildScrollView mencakup seluruh area yang perlu digulir
-            // Padding bawah ditambahkan untuk memberi ruang pada tombol "Submit Request"
-            SingleChildScrollView(
-              padding: EdgeInsets.only(
-                top: 80, // Padding atas untuk konten agar tidak tertutup AppBar
-                bottom: bottomButtonAreaHeight, // Ruang untuk tombol di bawah
-              ),
-              child: Column(
-                children: [
-                  // Jarak antara AppBar (Lokasi) dan Profile/Greeting
-                  const SizedBox(height: 35),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          radius: 32,
-                          backgroundColor: AppColors.accent.withOpacity(0.2),
-                          backgroundImage:
-                              _currentUser?.profile_photo != null &&
-                                      _currentUser!.profile_photo!.isNotEmpty
-                                  ? NetworkImage(
-                                    'https://appabsensi.mobileprojp.com/public/${_currentUser!.profile_photo!}',
-                                  )
-                                  : null,
-                          child:
-                              _currentUser?.profile_photo == null ||
-                                      _currentUser!.profile_photo!.isEmpty
-                                  ? Icon(
-                                    Icons.person,
-                                    color: AppColors.accent,
-                                    size: 35,
-                                  )
-                                  : null,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _getGreeting(),
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.onPrimary,
-                                ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius:
+                                  28, // Ukuran avatar juga dikecilkan sedikit
+                              backgroundColor: AppColors.accent.withOpacity(
+                                0.2,
                               ),
-                              Text(
-                                'Ready for a productive day?',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppColors.textDark,
-                                ),
+                              backgroundImage:
+                                  _currentUser?.profile_photo != null &&
+                                          _currentUser!
+                                              .profile_photo!
+                                              .isNotEmpty
+                                      ? NetworkImage(
+                                        'https://appabsensi.mobileprojp.com/public/${_currentUser!.profile_photo!}',
+                                      )
+                                      : null,
+                              child:
+                                  _currentUser?.profile_photo == null ||
+                                          _currentUser!.profile_photo!.isEmpty
+                                      ? Icon(
+                                        Icons.person,
+                                        color: AppColors.accent,
+                                        size: 30, // Ukuran ikon juga dikecilkan
+                                      )
+                                      : null,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _getGreeting(),
+                                    style: TextStyle(
+                                      fontSize:
+                                          18, // Ukuran font greeting juga dikecilkan
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onPrimary,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Ready for a productive day?',
+                                    style: TextStyle(
+                                      fontSize:
+                                          14, // Ukuran font tagline juga dikecilkan
+                                      color: AppColors.onPrimary,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 50),
-                  _buildMainActionCard(context, hasCheckedIn, hasCheckedOut),
-                  // SizedBox tambahan tidak lagi diperlukan di sini karena padding bawah SingleChildScrollView sudah diatur.
-                ],
-              ),
-            ),
-            // Tombol "Submit Request" mengambang di bagian paling bawah
-            Positioned(
-              bottom: 0, // Tempelkan ke paling bawah Stack
-              left: 0,
-              right: 0,
-              child: Container(
-                // Hapus warna solid dari Container ini
-                // Biarkan gradient dari body utama yang terlihat di belakangnya
-                // Anda bisa tetap memberikan padding di sini
-                padding: const EdgeInsets.all(
-                  16.0,
-                ), // Padding di sini untuk jarak dari tepi layar
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const RequestScreen()),
-                    );
-                    if (result == true) {
-                      _fetchAttendanceData();
-                      MainBottomNavigationBar.refreshAttendanceNotifier.value =
-                          true;
-                    }
-                  },
-                  icon: Icon(Icons.add_task, color: AppColors.primary),
-                  label: Text(
-                    'Submit Request',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.onPrimary,
-                    foregroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 8,
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Main Scrollable Content
+          Positioned.fill(
+            child: SingleChildScrollView(
+              // Sesuaikan padding atas karena header lebih kecil
+              padding: EdgeInsets.only(
+                top: customHeaderHeight + 20.0, // Padding atas disesuaikan
+                bottom:
+                    bottomButtonAreaHeight + 20.0, // Tambahkan spasi di sini
+              ),
+              child: Column(
+                children: [
+                  _buildMainActionCard(context, hasCheckedIn, hasCheckedOut),
+
+                  const SizedBox(height: 20.0), // Spasi yang ditambahkan
+                ],
+              ),
+            ),
+          ),
+
+          // Bottom Button Area
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RequestScreen()),
+                  );
+                  if (result == true) {
+                    _fetchAttendanceData();
+                    MainBottomNavigationBar.refreshAttendanceNotifier.value =
+                        true;
+                  }
+                },
+                icon: Icon(Icons.add_task, color: AppColors.primary),
+                label: Text(
+                  'Izin',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.onPrimary,
+                  foregroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  elevation: 8,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -674,6 +630,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Lokasi dipindahkan ke sini
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.location_on,
+                      color: AppColors.textDark,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: AutoSizeText(
+                        _location,
+                        maxLines: 3,
+                        minFontSize: 12,
+                        maxFontSize: 16,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppColors.textDark,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [

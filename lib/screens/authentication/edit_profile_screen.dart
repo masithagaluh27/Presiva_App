@@ -4,9 +4,9 @@ import 'dart:io'; // For File operations
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart'; // Import for image picking
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/constant/app_colors.dart'; // Your dynamic AppColors
 import 'package:presiva/models/app_models.dart';
-import 'package:presiva/services/api_Services.dart';
 
 import '../../widgets/custom_input_field.dart'; // Your CustomInputField
 import '../../widgets/primary_button.dart'; // Your PrimaryButton
@@ -201,8 +201,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final String fullImageUrl =
           _initialProfilePhotoUrl!.startsWith('http')
               ? _initialProfilePhotoUrl!
-              : 'https://appabsensi.mobileprojp.com/public/' +
-                  _initialProfilePhotoUrl!;
+              : 'https://appabsensi.mobileprojp.com/public/${_initialProfilePhotoUrl!}';
       currentImageProvider = NetworkImage(fullImageUrl);
     }
 
