@@ -1,10 +1,10 @@
-import 'dart:async'; // Import for Timer
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart';
 import 'package:presiva/endpoint/app_routes.dart';
-import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/widgets/custom_input_field.dart';
 import 'package:presiva/widgets/primary_button.dart';
 
@@ -32,22 +32,19 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   // --- Variabel untuk Timer ---
   Timer? _timer;
   final int _startMinutes = 10; // Durasi OTP dalam menit
-  int _currentSeconds = 0; // Detik yang tersisa dari menit saat ini
+  int _currentSeconds = 0;
   bool _otpExpired = false; // Status OTP kadaluarsa
 
   @override
   void initState() {
     super.initState();
-    // Jika OTP sudah dikirim sebelum masuk layar ini, mulai timer.
-    // Jika layar ini adalah tempat OTP pertama kali dikirim, Anda mungkin ingin
-    // memicu _resendOtp() di sini juga. Tapi dari konteks, sepertinya OTP
-    // sudah dikirim di ForgotPasswordScreen.
+
     _startTimer();
   }
 
   // --- Fungsi Timer ---
   void _startTimer() {
-    _otpExpired = false; // Reset status kadaluarsa
+    _otpExpired = false;
     _currentSeconds = _startMinutes * 60; // Set total detik
     _timer?.cancel(); // Pastikan timer sebelumnya dibatalkan jika ada
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -71,14 +68,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return '$minutes:$seconds';
   }
 
-  // --- FUNGSI UTAMA UNTUK TOMBOL RESET PASSWORD ---
+  // untuk tombol reset password
   Future<void> _resetPasswordProcess() async {
     if (_formKey.currentState!.validate()) {
       if (_otpExpired) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('OTP telah kadaluarsa. Silakan minta OTP baru.'),
+              content: Text('The OTP has expired. Please request a new OTP.'),
             ),
           );
         }
@@ -94,7 +91,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       final String newPassword = _newPasswordController.text.trim();
       final String confirmPassword = _confirmPasswordController.text.trim();
 
-      // --- Panggil langsung API resetPassword ---
+      //memanggil Api reset password
       final resetResponse = await _apiService.resetPassword(
         email: email,
         otp: otp,
@@ -135,13 +132,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     }
   }
 
-  // --- FUNGSI UNTUK MENGIRIM ULANG OTP ---
+  // untuk mengirim ulang otp
   Future<void> _resendOtp() async {
     setState(() {
       _isLoading = true;
     });
 
-    // Panggil API forgotPassword untuk meminta OTP ulang
     final response = await _apiService.forgotPassword(email: widget.email);
 
     setState(() {
@@ -155,7 +151,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             content: Text(response.message ?? 'OTP resent successfully!'),
           ),
         );
-        _startTimer(); // Mulai ulang timer setelah OTP baru dikirim
+        _startTimer(); // Untuk Mulai ulang timer setelah OTP baru dikirim
       }
     } else {
       String errorMessage = response.message ?? 'Failed to resend OTP.';
@@ -188,17 +184,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         title: Text(
           "Reset Password",
           style: AppTextStyles.heading1.copyWith(
-            // Menggunakan AppTextStyles.heading1
-            color: AppColors.textDark, // Hapus `(context)`
+           
+            color: AppColors.textDark, 
           ),
         ),
-        backgroundColor: AppColors.background, // Hapus `(context)`
+        backgroundColor: AppColors.background, 
         elevation: 0,
         iconTheme: IconThemeData(
-          color: AppColors.textDark, // Hapus `(context)`
+          color: AppColors.textDark, 
         ),
       ),
-      backgroundColor: AppColors.background, // Hapus `(context)`
+      backgroundColor: AppColors.background, 
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
         child: Form(
@@ -207,55 +203,55 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Kode verifikasi telah dikirim ke **${widget.email}**. Masukkan kode dan password baru Anda.",
+                "A verification code has been sent to **${widget.email}**. Enter the code and your new password.",
                 style: AppTextStyles.body2.copyWith(
-                  // Menggunakan AppTextStyles.body2
-                  color: AppColors.textDark, // Hapus `(context)`
+                
+                  color: AppColors.textDark, 
                 ),
               ),
               const SizedBox(height: 10),
 
-              // --- Tampilan Timer ---
+              // Tampilan Timer
               Center(
                 child:
                     _otpExpired
                         ? Text(
-                          'OTP Kadaluarsa. Silakan minta ulang.',
+                          'OTP Expired. Please request again.',
                           style: AppTextStyles.body2.copyWith(
-                            // Menggunakan AppTextStyles.body2
-                            color: AppColors.error, // Hapus `(context)`
+                            
+                            color: AppColors.error, 
                             fontWeight: FontWeight.bold,
                           ),
                         )
                         : Text(
-                          'OTP berlaku dalam: ${_formatDuration(_currentSeconds)}',
+                          'OTP is valid in: ${_formatDuration(_currentSeconds)}',
                           style: AppTextStyles.body2.copyWith(
-                            // Menggunakan AppTextStyles.body2
+                            
                             fontSize:
-                                16, // Optional: You might have a specific style for this
+                                16, 
                             fontWeight: FontWeight.bold,
                             color:
                                 _currentSeconds < 60
                                     ? AppColors
-                                        .error // Hapus `(context)`
-                                    : AppColors.primary, // Hapus `(context)`
+                                        .error 
+                                    : AppColors.primary, 
                           ),
                         ),
               ),
               const SizedBox(height: 20),
 
-              // --- Urutan Input Field Baru ---
+              // Urutan Input Field Baru
               CustomInputField(
                 controller: _otpController,
-                hintText: 'Kode Verifikasi (OTP)',
+                hintText: 'Verification Code (OTP)',
                 icon: Icons.numbers,
                 keyboardType: TextInputType.number,
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'OTP tidak boleh kosong';
+                    return 'OTP cannot be empty';
                   }
                   if (value.length < 6) {
-                    return 'OTP minimal 6 karakter';
+                    return 'OTP minimum 6 characters';
                   }
                   return null;
                 },
@@ -264,7 +260,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
               CustomInputField(
                 controller: _newPasswordController,
-                hintText: 'Password Baru',
+                hintText: 'New Password',
                 icon: Icons.lock_outline,
                 isPassword: true,
                 obscureText: !_isNewPasswordVisible,
@@ -275,10 +271,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 },
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Password baru tidak boleh kosong';
+                    return 'New password cannot be empty.';
                   }
                   if (value.length < 8) {
-                    return 'Password minimal 8 karakter';
+                    return 'Password must be at least 8 characters';
                   }
                   return null;
                 },
@@ -287,7 +283,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
               CustomInputField(
                 controller: _confirmPasswordController,
-                hintText: 'Konfirmasi Password Baru',
+                hintText: 'Confirm New Password',
                 icon: Icons.lock_outline,
                 isPassword: true,
                 obscureText: !_isConfirmPasswordVisible,
@@ -298,10 +294,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 },
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Konfirmasi password tidak boleh kosong';
+                    return 'Confirm password cannot be empty.';
                   }
                   if (value != _newPasswordController.text) {
-                    return 'Password tidak cocok';
+                    return 'Passwords do not match';
                   }
                   return null;
                 },
@@ -312,15 +308,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 child: GestureDetector(
                   onTap: _isLoading || !_otpExpired ? null : _resendOtp,
                   child: Text(
-                    "Tidak menerima kode? Kirim ulang OTP",
+                    "Didn't receive the code? Resend the OTP",
                     style: AppTextStyles.body2.copyWith(
-                      // Menggunakan AppTextStyles.body2
+                      
                       color:
                           _isLoading || !_otpExpired
                               ? AppColors
-                                  .textLight // Jika loading/belum expired, buat sedikit pudar
+                                  .textLight 
                               : AppColors
-                                  .primary, // Jika expired dan siap kirim ulang, gunakan warna primary
+                                  .primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -331,7 +327,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               _isLoading
                   ? Center(
                     child: CircularProgressIndicator(
-                      color: AppColors.primary, // Hapus `(context)`
+                      color: AppColors.primary, 
                     ),
                   )
                   : PrimaryButton(

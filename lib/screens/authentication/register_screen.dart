@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart';
-import 'package:presiva/models/app_models.dart'; // Pastikan path ini benar
-import 'package:presiva/endpoint/app_routes.dart'; // Pastikan path ini benar
-import 'package:presiva/api/api_Services.dart'; // Pastikan path ini benar
-import 'package:presiva/widgets/custom_dropdown_input_field.dart'; // Pastikan path ini benar
-import 'package:presiva/widgets/custom_input_field.dart'; // Pastikan path ini benar
-import 'package:presiva/widgets/primary_button.dart'; // Pastikan path ini benar
+import 'package:presiva/endpoint/app_routes.dart';
+import 'package:presiva/models/app_models.dart';
+import 'package:presiva/widgets/custom_dropdown_input_field.dart';
+import 'package:presiva/widgets/custom_input_field.dart';
+import 'package:presiva/widgets/primary_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -22,36 +22,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  final ApiService _apiService = ApiService(); // Instantiate your ApiService
+  final ApiService _apiService = ApiService();
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-  bool _isLoading = false; // Add loading state
+  bool _isLoading = false;
 
-  List<Batch> _batches = []; // Keep this to fetch batches and find "Batch 2"
+  List<Batch> _batches = [];
   List<Training> _trainings = [];
   int? _selectedBatchId;
-  String _selectedBatchName =
-      'Loading Batch...'; // To display the selected batch
+  String _selectedBatchName = 'Loading Batch...';
   int? _selectedTrainingId;
-  String? _selectedGender; // Menggunakan String untuk 'L' atau 'P'
+  String? _selectedGender; // Menggunakan  'L' atau 'P'
 
   @override
   void initState() {
     super.initState();
     _fetchDropdownData();
-    // Inisialisasi _selectedGender ke nilai default, misalnya 'L'
+
     _selectedGender = 'L'; // Default ke Laki-laki
   }
 
-  // Helper function to show snackbars with specific colors
   void _showSnackBar(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor:
-            isError ? AppColors.error : AppColors.success, // Hapus `(context)`
-        behavior: SnackBarBehavior.floating, // Makes it float above content
+        backgroundColor: isError ? AppColors.error : AppColors.success,
+        behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
       ),
     );
@@ -62,15 +59,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = true;
     });
 
-    // Fetch Batches
     try {
       final batchResponse = await _apiService.getBatches();
       if (batchResponse.statusCode == 200 && batchResponse.data != null) {
         setState(() {
           _batches = batchResponse.data!;
-          // Automatically select "Batch 2" if found, otherwise select the first available batch
+
           final batch2 = _batches.firstWhere(
-            (batch) => batch.batch_ke == '2', // Correctly using batch.batch_ke
+            (batch) => batch.batch_ke == '2',
             orElse:
                 () =>
                     _batches.isNotEmpty
@@ -80,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           batch_ke: 'N/A',
                           startDate: '',
                           endDate: '',
-                        ), // Corrected Batch constructor, assuming you have this model
+                        ),
           );
           _selectedBatchId = batch2.id;
           _selectedBatchName =
@@ -107,7 +103,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
     }
 
-    // Fetch Trainings
     try {
       final trainingResponse = await _apiService.getTrainings();
       if (trainingResponse.statusCode == 200 && trainingResponse.data != null) {
@@ -137,7 +132,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedBatchId == null || _selectedBatchId == -1) {
-        // Check for valid batch ID
         _showSnackBar('Batch not selected or invalid.', isError: true);
         return;
       }
@@ -145,7 +139,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _showSnackBar('Please select a training', isError: true);
         return;
       }
-      // Tambahkan validasi untuk _selectedGender
+
       if (_selectedGender == null || _selectedGender!.isEmpty) {
         _showSnackBar('Please select your gender', isError: true);
         return;
@@ -156,14 +150,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
 
       setState(() {
-        _isLoading = true; // Set loading to true
+        _isLoading = true;
       });
 
       final String name = _nameController.text.trim();
       final String email = _emailController.text.trim();
       final String password = _passwordController.text.trim();
 
-      // Call the register method from ApiService
       final ApiResponse<AuthData> response = await _apiService.register(
         name: name,
         email: email,
@@ -174,17 +167,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       setState(() {
-        _isLoading = false; // Set loading to false
+        _isLoading = false;
       });
 
       if (response.statusCode == 200 && response.data != null) {
-        // Registration successful
         if (mounted) {
-          _showSnackBar(response.message, isError: false); // Success snackbar
+          _showSnackBar(response.message, isError: false);
           Navigator.pushReplacementNamed(context, AppRoutes.login);
         }
       } else {
-        // Registration failed, show error message
         String errorMessage = response.message;
         if (response.errors != null) {
           response.errors!.forEach((key, value) {
@@ -192,7 +183,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           });
         }
         if (mounted) {
-          _showSnackBar(errorMessage, isError: true); // Error snackbar
+          _showSnackBar(errorMessage, isError: true);
         }
       }
     }
@@ -210,7 +201,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background, // Hapus `(context)`
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -224,16 +215,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Text(
                       "Create Account",
                       style: AppTextStyles.heading2.copyWith(
-                        // Menggunakan AppTextStyles.heading2
-                        color: AppColors.primary, // Hapus `(context)`
+                        color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       "Join us to track your attendance effortlessly.",
                       style: AppTextStyles.body2.copyWith(
-                        // Menggunakan AppTextStyles.body2
-                        color: AppColors.textLight, // Hapus `(context)`
+                        color: AppColors.textLight,
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -317,7 +306,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Bagian Jenis Kelamin (Diganti dengan Radio Buttons)
+                    // Bagian Jenis Kelamin Dengan Radio Buttons
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12.0,
@@ -326,8 +315,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Text(
                         "Select Gender",
                         style: AppTextStyles.body2.copyWith(
-                          // Menggunakan AppTextStyles.body2
-                          color: AppColors.textDark, // Hapus `(context)`
+                          color: AppColors.textDark,
                         ),
                       ),
                     ),
@@ -339,7 +327,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               'Laki-laki',
                               style: AppTextStyles.body2.copyWith(
                                 color: AppColors.textDark,
-                              ), // Hapus `(context)`
+                              ),
                             ),
                             value: 'L',
                             groupValue: _selectedGender,
@@ -348,7 +336,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _selectedGender = value;
                               });
                             },
-                            activeColor: AppColors.primary, // Hapus `(context)`
+                            activeColor: AppColors.primary,
                           ),
                         ),
                         Expanded(
@@ -357,7 +345,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               'Perempuan',
                               style: AppTextStyles.body2.copyWith(
                                 color: AppColors.textDark,
-                              ), // Hapus `(context)`
+                              ),
                             ),
                             value: 'P',
                             groupValue: _selectedGender,
@@ -366,16 +354,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _selectedGender = value;
                               });
                             },
-                            activeColor: AppColors.primary, // Hapus `(context)`
+                            activeColor: AppColors.primary,
                           ),
                         ),
                       ],
                     ),
-                    // Jika Anda ingin menampilkan pesan validasi di bawah Radio Buttons, Anda bisa menambahkannya di sini.
-                    // Namun, dengan RadioListTile, pengguna dipaksa memilih salah satu.
                     if (_selectedGender == null &&
-                        _formKey.currentState?.validate() ==
-                            true) // Contoh validasi jika perlu
+                        _formKey.currentState?.validate() == true)
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
@@ -383,47 +368,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         child: Text(
                           'Please select your gender',
-                          style: AppTextStyles.body3(
-                            // Menggunakan AppTextStyles.body3
-                            color: AppColors.error, // Hapus `(context)`
-                          ),
+                          style: AppTextStyles.body3(color: AppColors.error),
                         ),
                       ),
                     const SizedBox(height: 16),
 
-                    // Display Batch Name (not a dropdown)
                     _isLoading
-                        ? Center(
-                          // child: CircularProgressIndicator(
-                          //   color: AppColors.primary, // Hapus `(context)`
-                          // ),
-                        )
+                        ? Center()
                         : Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
                             vertical: 18,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.inputFill, // Hapus `(context)`
+                            color: AppColors.inputFill,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.border, // Hapus `(context)`
-                            ),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Row(
                             children: [
                               Icon(
                                 Icons.group_outlined,
-                                color: AppColors.primary, // Hapus `(context)`
+                                color: AppColors.primary,
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   _selectedBatchName,
                                   style: AppTextStyles.body2.copyWith(
-                                    // Menggunakan AppTextStyles.body2
-                                    color:
-                                        AppColors.textDark, // Hapus `(context)`
+                                    color: AppColors.textDark,
                                   ),
                                 ),
                               ),
@@ -431,8 +404,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                     const SizedBox(height: 16),
-
-                    // Training Dropdown using CustomDropdownInputField
                     _isLoading
                         ? const SizedBox.shrink()
                         : CustomDropdownInputField<int>(
@@ -458,14 +429,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             }
                             return null;
                           },
-                          menuMaxHeight: 300.0, // Apply menuMaxHeight here
+                          menuMaxHeight: 300.0,
                         ),
                     const SizedBox(height: 32),
 
                     _isLoading
                         ? Center(
                           child: CircularProgressIndicator(
-                            color: AppColors.primary, // Hapus `(context)`
+                            color: AppColors.primary,
                           ),
                         )
                         : PrimaryButton(
@@ -481,8 +452,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Text(
                             "Already have an account? ",
                             style: AppTextStyles.body2.copyWith(
-                              // Menggunakan AppTextStyles.body2
-                              color: AppColors.textDark, // Hapus `(context)`
+                              color: AppColors.textDark,
                             ),
                           ),
                           GestureDetector(
@@ -494,13 +464,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             child: Text(
                               "Login",
                               style: AppTextStyles.body2.copyWith(
-                                // Menggunakan AppTextStyles.body2
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primary.withOpacity(0.7),
                               ),
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          '© ${DateTime.now().year} Presiva. All rights reserved.',
+                          style: TextStyle(
+                            color: AppColors.textLight.withOpacity(0.6),
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
                     ),
                   ],

@@ -1,15 +1,14 @@
-// lib/screens/profile/edit_profile_screen.dart
-import 'dart:convert'; // For base64 encoding
-import 'dart:io'; // For File operations
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Import for image picking
+import 'package:image_picker/image_picker.dart';
 import 'package:presiva/api/api_Services.dart';
-import 'package:presiva/constant/app_colors.dart'; // Your dynamic AppColors
+import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/models/app_models.dart';
 
-import '../../widgets/custom_input_field.dart'; // Your CustomInputField
-import '../../widgets/primary_button.dart'; // Your PrimaryButton
+import '../../widgets/custom_input_field.dart';
+import '../../widgets/primary_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final User currentUser;
@@ -91,7 +90,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Gagal memperbarui detail profil: $errorMessage',
+                    'Failed to update profile details: $errorMessage',
                   ),
                   backgroundColor: AppColors.error,
                 ),
@@ -106,7 +105,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Terjadi kesalahan saat memperbarui detail: $e'),
+                content: Text('An error occurred while updating details: $e'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -140,7 +139,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Gagal memperbarui foto profil: $errorMessage'),
+                  content: Text(
+                    'Failed to update profile photo: $errorMessage',
+                  ),
                   backgroundColor: AppColors.error,
                 ),
               );
@@ -154,7 +155,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Terjadi kesalahan saat memperbarui foto: $e'),
+                content: Text('An error occurred while updating the photo: $e'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -171,7 +172,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (profileDetailsChanged || profilePhotoChanged) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("Profil berhasil diperbarui!"),
+            content: const Text("Profile updated successfully!"),
             backgroundColor: AppColors.success,
           ),
         );
@@ -179,7 +180,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("Tidak ada perubahan untuk disimpan."),
+            content: const Text("There are no changes to save."),
             backgroundColor: AppColors.info,
           ),
         );
@@ -191,6 +192,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  // untuk profile
   @override
   Widget build(BuildContext context) {
     ImageProvider<Object>? currentImageProvider;
@@ -246,8 +248,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         _pickedImage != null ||
                                 (_initialProfilePhotoUrl != null &&
                                     _initialProfilePhotoUrl!.isNotEmpty)
-                            ? 'Ganti Foto'
-                            : 'Unggah Foto',
+                            ? 'Change Photo'
+                            : 'Upload Photo',
                         style: TextStyle(color: AppColors.primary),
                       ),
                     ),
@@ -257,13 +259,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(height: 24),
               CustomInputField(
                 controller: _nameController,
-                hintText: 'Nama',
-                labelText: 'Nama',
+                hintText: 'Name',
+                labelText: 'Name',
                 icon: Icons.person,
                 fillColor: AppColors.inputFill,
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Nama tidak boleh kosong';
+                    return 'Name cannot be empty';
                   }
                   return null;
                 },
@@ -275,9 +277,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: CircularProgressIndicator(color: AppColors.primary),
                   )
                   : PrimaryButton(
-                    label: 'Simpan Profil',
+                    label: 'Save Profile',
                     onPressed: _saveProfile,
                   ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    '© ${DateTime.now().year} Presiva. All rights reserved.',
+                    style: TextStyle(
+                      color: AppColors.textLight.withOpacity(0.6),
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

@@ -3,13 +3,17 @@ import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart';
-import 'package:presiva/models/app_models.dart'; // Pastikan path model Anda benar
-import 'package:presiva/api/api_Services.dart'; // Pastikan path service Anda benar
+import 'package:presiva/models/app_models.dart';
+
+// Copyright 2025 [Your Company/Name]. All rights reserved.
+// Unauthorized copying of this file, via any medium, is strictly prohibited.
+// Proprietary and confidential.
 
 class PersonReportScreen extends StatefulWidget {
-  final ValueNotifier<bool> refreshNotifier; // Gunakan tipe yang spesifik
+  final ValueNotifier<bool> refreshNotifier;
   const PersonReportScreen({super.key, required this.refreshNotifier});
 
   @override
@@ -29,7 +33,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
   int _presentCount = 0;
   int _absentCount = 0; // Untuk total 'Absen' (alpha / tanpa izin)
   int _permitCount = 0; // Untuk total 'Izin' (dengan izin)
-  int _lateInCount = 0; // Dihitung lokal
+  int _lateInCount = 0;
 
   int _totalWorkingDaysInMonth = 0;
   String _totalWorkingHours = '0hr 0min';
@@ -241,7 +245,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         barRods: [
           BarChartRodData(
             toY: present.toDouble(),
-            color: AppColors.success, // Hapus `(context)`
+            color: AppColors.success,
             width: 25,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -253,7 +257,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         barRods: [
           BarChartRodData(
             toY: absentAndPermit.toDouble(),
-            color: AppColors.error, // Hapus `(context)`
+            color: AppColors.error,
             width: 25,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -265,7 +269,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         barRods: [
           BarChartRodData(
             toY: late.toDouble(),
-            color: AppColors.warning, // Hapus `(context)`
+            color: AppColors.warning,
             width: 25,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -286,11 +290,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         decoration: BoxDecoration(
-          color: AppColors.cardBackground, // Hapus `(context)`
+          color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadowColor, // Hapus `(context)`
+              color: AppColors.shadowColor,
               spreadRadius: 1,
               blurRadius: 3,
               offset: const Offset(0, 2),
@@ -303,17 +307,13 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
             Text(
               title,
               style: AppTextStyles.body2.copyWith(
-                // Menggunakan AppTextStyles.body2
                 fontWeight: FontWeight.w500,
-                color: AppColors.textDark, // Hapus `(context)`
+                color: AppColors.textDark,
               ),
             ),
             Text(
               value.toString(),
-              style: AppTextStyles.heading4.copyWith(
-                // Menggunakan AppTextStyles.heading4
-                color: color,
-              ), // Menggunakan heading4 untuk nilai, dengan warna opsional
+              style: AppTextStyles.heading4.copyWith(color: color),
             ),
           ],
         ),
@@ -343,9 +343,8 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       child: Text(
         text,
         style: AppTextStyles.body2.copyWith(
-          // Menggunakan AppTextStyles.body2
           fontWeight: FontWeight.bold,
-          color: AppColors.textDark, // Hapus `(context)`
+          color: AppColors.textDark,
         ),
       ),
     );
@@ -364,30 +363,26 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
             colorScheme:
                 Theme.of(context).brightness == Brightness.light
                     ? ColorScheme.light(
-                      primary: AppColors.primary, // Hapus `(context)`
-                      onPrimary: AppColors.onPrimary, // Hapus `(context)`
-                      surface: AppColors.background, // Hapus `(context)`
-                      onSurface: AppColors.textDark, // Hapus `(context)`
+                      primary: AppColors.primary,
+                      onPrimary: AppColors.onPrimary,
+                      surface: AppColors.background,
+                      onSurface: AppColors.textDark,
                     )
                     : ColorScheme.dark(
-                      primary: AppColors.primary, // Hapus `(context)`
-                      onPrimary: AppColors.onPrimary, // Hapus `(context)`
-                      surface: AppColors.background, // Hapus `(context)`
-                      onSurface: AppColors.textDark, // Hapus `(context)`
+                      primary: AppColors.primary,
+                      onPrimary: AppColors.onPrimary,
+                      surface: AppColors.background,
+                      onSurface: AppColors.textDark,
                     ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary, // Hapus `(context)`
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
             appBarTheme: AppBarTheme(
-              backgroundColor: AppColors.primary, // Hapus `(context)`
-              foregroundColor: AppColors.onPrimary, // Hapus `(context)`
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.onPrimary,
               elevation: 0,
             ),
-            dialogTheme: DialogTheme(
-              backgroundColor: AppColors.cardBackground, // Hapus `(context)`
-            ),
+            dialogTheme: DialogTheme(backgroundColor: AppColors.cardBackground),
           ),
           child: child!,
         );
@@ -404,15 +399,13 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background, // Hapus `(context)`
+      backgroundColor: AppColors.background,
       body: FutureBuilder<void>(
         future: _reportDataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primary, // Hapus `(context)`
-              ),
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
           if (snapshot.hasError) {
@@ -440,10 +433,8 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.primary, // Hapus `(context)`
-                        AppColors.secondary.withOpacity(
-                          0.8,
-                        ), // Hapus `(context)`
+                        AppColors.primary,
+                        AppColors.primary.withOpacity(0.8),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -468,15 +459,12 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                             'Monthly Report',
                             style: AppTextStyles.heading1.copyWith(
                               color: AppColors.onPrimary,
-                            ), // Menggunakan AppTextStyles.heading1, Hapus `(context)`
+                            ),
                           ),
                           Text(
                             'Review your attendance overview below.',
                             style: AppTextStyles.body1.copyWith(
-                              // Menggunakan AppTextStyles.body1
-                              color: AppColors.onPrimary.withOpacity(
-                                0.8,
-                              ), // Hapus `(context)`
+                              color: AppColors.onPrimary.withOpacity(0.8),
                             ),
                           ),
                         ],
@@ -494,9 +482,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             elevation: 8,
-                            shadowColor: AppColors.primary.withOpacity(
-                              0.2,
-                            ), // Hapus `(context)`
+                            shadowColor: AppColors.primary.withOpacity(0.2),
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(
                                 16.0,
@@ -524,13 +510,9 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                             vertical: 6,
                                           ),
                                           decoration: BoxDecoration(
-                                            color:
-                                                AppColors
-                                                    .background, // Hapus `(context)`
+                                            color: AppColors.background,
                                             border: Border.all(
-                                              color:
-                                                  AppColors
-                                                      .border, // Hapus `(context)`
+                                              color: AppColors.border,
                                             ),
                                             borderRadius: BorderRadius.circular(
                                               30,
@@ -551,9 +533,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                               Icon(
                                                 Icons.calendar_month,
                                                 size: 18,
-                                                color:
-                                                    AppColors
-                                                        .textDark, // Hapus `(context)`
+                                                color: AppColors.textDark,
                                               ),
                                             ],
                                           ),
@@ -566,47 +546,45 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                     context,
                                     'Total Working Days',
                                     _totalWorkingDaysInMonth.toString(),
-                                    AppColors.info, // Hapus `(context)`
+                                    AppColors.info,
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Total Present Days',
                                     _presentCount.toString(),
-                                    AppColors.success, // Hapus `(context)`
+                                    AppColors.success,
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Total Absent Days',
                                     _absentCount.toString(),
-                                    AppColors.error, // Hapus `(context)`
+                                    AppColors.error,
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Total Izin Days',
                                     _permitCount.toString(),
-                                    AppColors.warning, // Hapus `(context)`
+                                    AppColors.warning,
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Total Late Entries',
                                     _lateInCount.toString(),
-                                    Colors
-                                        .orange, // Menggunakan Colors.orange karena AppColors.orange tidak ada
+                                    Colors.orange,
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Total Working Hours',
                                     _totalWorkingHours,
-                                    AppColors.primary, // Hapus `(context)`
+                                    AppColors.primary,
                                   ),
                                   _buildStatListItem(
                                     context,
                                     'Overall Attendance %',
                                     '${_overallAttendancePercentage.toStringAsFixed(0)}%',
                                     _overallAttendancePercentage >= 80
-                                        ? AppColors
-                                            .success // Hapus `(context)`
-                                        : AppColors.error, // Hapus `(context)`
+                                        ? AppColors.success
+                                        : AppColors.error,
                                   ),
                                 ],
                               ),
@@ -618,14 +596,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color:
-                                    AppColors.background, // Hapus `(context)`
+                                color: AppColors.background,
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color:
-                                        AppColors
-                                            .shadowColor, // Hapus `(context)`
+                                    color: AppColors.shadowColor,
                                     spreadRadius: 2,
                                     blurRadius: 5,
                                     offset: const Offset(0, 3),
@@ -634,7 +609,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                               ),
                               child: Icon(
                                 Icons.insert_chart_outlined,
-                                color: AppColors.primary, // Hapus `(context)`
+                                color: AppColors.primary,
                                 size: 30,
                               ),
                             ),
@@ -644,10 +619,20 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    const SizedBox(
-                      height: 20,
-                    ), // Memberikan sedikit ruang di bagian bawah setelah chart
-                    // Tombol "View Attendance History" telah dihapus dari sini.
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          '© ${DateTime.now().year} Presiva. All rights reserved.',
+                          style: TextStyle(
+                            color: AppColors.textLight.withOpacity(0.6),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

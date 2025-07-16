@@ -343,7 +343,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                   size: 24,
                 ),
                 onPressed: () async {
-                  // Logika untuk  mengizinkan pembatalan 'Izin'
+                  // Logika untuk  mengizinkan pembatalan 'Izin'
                   if (absence.status?.toLowerCase() != 'izin' &&
                       absence.status?.toLowerCase() != 'cuti') {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -539,7 +539,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AppColors.primary, AppColors.secondary],
+              colors: [AppColors.primary, AppColors.primary.withOpacity(0.5)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -783,6 +783,20 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                     },
                   );
                 },
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                '© ${DateTime.now().year} Presiva. All rights reserved.',
+                style: TextStyle(
+                  color: AppColors.textLight.withOpacity(0.6),
+                  fontSize: 12,
+                ),
               ),
             ),
           ),

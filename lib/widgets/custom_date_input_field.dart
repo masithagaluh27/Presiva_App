@@ -26,7 +26,7 @@ class CustomDateInputField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: labelText,
           labelStyle: TextStyle(
-            color: AppColors.textLight, // <<< Perubahan di sini
+            color: AppColors.textLight, 
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),

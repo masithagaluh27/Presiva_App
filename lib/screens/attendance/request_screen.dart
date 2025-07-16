@@ -1,8 +1,12 @@
+// Copyright 2024 Your Company Name. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/models/app_models.dart';
-import 'package:presiva/api/api_Services.dart';
 
 import '../../widgets/custom_date_input_field.dart';
 import '../../widgets/custom_input_field.dart';
@@ -82,10 +86,8 @@ class _RequestScreenState extends State<RequestScreen> {
     });
 
     try {
-      
       final String formattedDate = DateFormat(
-        'yyyy-MM-dd', 
-      
+        'yyyy-MM-dd',
       ).format(_selectedDate!);
 
       final ApiResponse<Absence> response = await _apiService.submitIzinRequest(
@@ -156,7 +158,6 @@ class _RequestScreenState extends State<RequestScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
-
             _buildInputContainer(
               child: CustomDateInputField(
                 labelText: 'Select Date',
@@ -166,9 +167,10 @@ class _RequestScreenState extends State<RequestScreen> {
                 hintText:
                     _selectedDate == null
                         ? 'Tap to choose a date'
-                        : DateFormat('dd MMMM yyyy', 'id_ID').format(
-                          _selectedDate!,
-                        ),
+                        : DateFormat(
+                          'dd MMMM yyyy',
+                          'id_ID',
+                        ).format(_selectedDate!),
               ),
             ),
             const SizedBox(height: 25),

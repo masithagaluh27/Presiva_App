@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/endpoint/app_routes.dart';
-import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/widgets/custom_input_field.dart';
 import 'package:presiva/widgets/primary_button.dart';
 
@@ -76,7 +76,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Lupa Password",
+          "Forgot Password",
           style: TextStyle(color: AppColors.textDark),
         ),
         backgroundColor: AppColors.background,
@@ -92,7 +92,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Masukkan email Anda untuk menerima kode verifikasi (OTP) untuk reset password.",
+                "Enter your email to receive a verification code (OTP) to reset your password.",
                 style: TextStyle(fontSize: 16, color: AppColors.textLight),
               ),
               const SizedBox(height: 30),
@@ -103,10 +103,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 fillColor: AppColors.inputFill,
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Email tidak boleh kosong';
+                    return 'Email cannot be empty';
                   }
                   if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Format email tidak valid';
+                    return 'Invalid email format';
                   }
                   return null;
                 },
@@ -117,9 +117,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: CircularProgressIndicator(color: AppColors.primary),
                   )
                   : PrimaryButton(
-                    label: 'Kirim Kode Verifikasi',
+                    label: 'Send Verification Code',
                     onPressed: _requestOtp,
                   ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    '© ${DateTime.now().year} Presiva. All rights reserved.',
+                    style: TextStyle(
+                      color: AppColors.textLight.withOpacity(0.6),
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

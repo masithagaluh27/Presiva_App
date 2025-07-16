@@ -59,7 +59,7 @@ class CustomInputField extends StatelessWidget {
       }
     }
 
-    return null; // valid
+    return null;
   }
 
   @override
@@ -71,33 +71,20 @@ class CustomInputField extends StatelessWidget {
       keyboardType: keyboardType,
       readOnly: readOnly,
       validator: customValidator ?? _defaultValidator,
-      style: TextStyle(
-        fontSize: 16,
-        color: AppColors.textDark,
-      ), // <<< Tambahkan warna teks dinamis
+      style: TextStyle(fontSize: 16, color: AppColors.textDark),
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
-        // labelStyle dan hintStyle juga bisa menggunakan warna dinamis jika diperlukan
-        labelStyle: TextStyle(
-          color: AppColors.textLight,
-        ), // <<< Tambahkan warna label dinamis
-        hintStyle: TextStyle(
-          color: AppColors.placeholder,
-        ), // <<< Tambahkan warna hint dinamis
+        labelStyle: TextStyle(color: AppColors.textLight),
+        hintStyle: TextStyle(color: AppColors.placeholder),
 
-        prefixIcon: Icon(
-          icon,
-          color: AppColors.primary,
-        ), // <<< Perubahan di sini
+        prefixIcon: Icon(icon, color: AppColors.primary),
         suffixIcon:
             isPassword
                 ? IconButton(
                   icon: Icon(
                     obscureText ? Icons.visibility_off : Icons.visibility,
-                    color:
-                        AppColors
-                            .textLight, // <<< Perubahan di sini, menggunakan warna dinamis
+                    color: AppColors.textLight,
                   ),
                   onPressed: toggleVisibility,
                 )
@@ -106,27 +93,18 @@ class CustomInputField extends StatelessWidget {
             contentPadding ??
             const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         filled: true,
-        fillColor:
-            fillColor ??
-            AppColors
-                .inputFill, // <<< Perubahan di sini, menggunakan warna dinamis
+        fillColor: fillColor ?? AppColors.inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: AppColors.border,
-          ), // <<< Perubahan di sini
+          borderSide: BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: AppColors.border,
-          ), // <<< Perubahan di sini
+          borderSide: BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: AppColors.primary,
-          ), // <<< Perubahan di sini
+          borderSide: BorderSide(color: AppColors.primary),
         ),
       ),
     );

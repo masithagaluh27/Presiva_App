@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:presiva/constant/app_colors.dart'; // Jika Anda ingin menggunakan AppColors
-
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
@@ -19,8 +17,8 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black, // Latar belakang hitam
-          foregroundColor: Colors.white, // Teks putih
+          backgroundColor: Colors.black, 
+          foregroundColor: Colors.white, 
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

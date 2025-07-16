@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/constant/app_text_styles.dart';
-import 'package:presiva/models/app_models.dart';
 import 'package:presiva/endpoint/app_routes.dart';
-import 'package:presiva/api/api_Services.dart';
+import 'package:presiva/models/app_models.dart';
 import 'package:presiva/widgets/custom_input_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(response.message),
-              backgroundColor: AppColors.success, // Sudah tidak ada (context)
+              backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(errorMessage),
-              backgroundColor: AppColors.error, // Sudah tidak ada (context)
+              backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -144,11 +144,9 @@ class _LoginScreenState extends State<LoginScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.background, // Sudah tidak ada (context)
-              AppColors.background.withOpacity(
-                0.8,
-              ), // Sudah tidak ada (context)
-              AppColors.primary.withOpacity(0.1), // Sudah tidak ada (context)
+              AppColors.background,
+              AppColors.background.withOpacity(0.8),
+              AppColors.primary.withOpacity(0.1),
             ],
           ),
         ),
@@ -172,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen>
                       children: [
                         const Spacer(flex: 2),
 
-                        // Logo/Icon Section with glassmorphism effect
+                        // Logo/Icon Section
                         Container(
                           width: 120,
                           height: 120,
@@ -182,17 +180,13 @@ class _LoginScreenState extends State<LoginScreen>
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                AppColors.primary.withOpacity(
-                                  0.8,
-                                ), // Sudah tidak ada (context)
-                                AppColors.primary, // Sudah tidak ada (context)
+                                AppColors.primary.withOpacity(0.8),
+                                AppColors.primary,
                               ],
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary.withOpacity(
-                                  0.3,
-                                ), // Sudah tidak ada (context)
+                                color: AppColors.primary.withOpacity(0.3),
                                 blurRadius: 30,
                                 offset: const Offset(0, 10),
                               ),
@@ -211,7 +205,6 @@ class _LoginScreenState extends State<LoginScreen>
                         Text(
                           "Welcome Back",
                           style: AppTextStyles.heading2.copyWith(
-                            // Hapus `()`
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.5,
@@ -223,17 +216,14 @@ class _LoginScreenState extends State<LoginScreen>
                         Text(
                           "Sign in to your account",
                           style: AppTextStyles.body2.copyWith(
-                            // Hapus `()`
-                            color: AppColors.textDark.withOpacity(
-                              0.7,
-                            ), // Sudah tidak ada (context)
+                            color: AppColors.textDark.withOpacity(0.7),
                             fontSize: 16,
                           ),
                         ),
 
                         const SizedBox(height: 50),
 
-                        // Form Container with glassmorphism
+                        // Form Container
                         Container(
                           padding: const EdgeInsets.all(32),
                           decoration: BoxDecoration(
@@ -258,9 +248,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 controller: _emailController,
                                 hintText: 'Email Address',
                                 icon: Icons.email_outlined,
-                                fillColor:
-                                    AppColors
-                                        .inputFill, // Sudah tidak ada (context)
+                                fillColor: AppColors.inputFill,
                                 customValidator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Email cannot be empty';
@@ -288,9 +276,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     _isPasswordVisible = !_isPasswordVisible;
                                   });
                                 },
-                                fillColor:
-                                    AppColors
-                                        .inputFill, // Sudah tidak ada (context)
+                                fillColor: AppColors.inputFill,
                                 customValidator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Password cannot be empty';
@@ -322,10 +308,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     child: Text(
                                       "Forgot Password?",
                                       style: AppTextStyles.body3(
-                                        // body3 masih fungsi, jadi tetap dengan ()
-                                        color:
-                                            AppColors
-                                                .primary, // Sudah tidak ada (context)
+                                        color: AppColors.primary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -343,12 +326,8 @@ class _LoginScreenState extends State<LoginScreen>
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          AppColors.primary.withOpacity(
-                                            0.7,
-                                          ), // Sudah tidak ada (context)
-                                          AppColors.primary.withOpacity(
-                                            0.5,
-                                          ), // Sudah tidak ada (context)
+                                          AppColors.primary.withOpacity(0.7),
+                                          AppColors.primary.withOpacity(0.5),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(16),
@@ -373,11 +352,8 @@ class _LoginScreenState extends State<LoginScreen>
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          AppColors
-                                              .primary, // Sudah tidak ada (context)
-                                          AppColors.primary.withOpacity(
-                                            0.8,
-                                          ), // Sudah tidak ada (context)
+                                          AppColors.primary,
+                                          AppColors.primary.withOpacity(0.8),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(16),
@@ -385,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen>
                                         BoxShadow(
                                           color: AppColors.primary.withOpacity(
                                             0.3,
-                                          ), // Sudah tidak ada (context)
+                                          ),
                                           blurRadius: 20,
                                           offset: const Offset(0, 10),
                                         ),
@@ -399,13 +375,11 @@ class _LoginScreenState extends State<LoginScreen>
                                         child: Center(
                                           child: Text(
                                             'Sign In',
-                                            style: AppTextStyles
-                                                .body2 // Hapus `()`
-                                                .copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 16,
-                                                ),
+                                            style: AppTextStyles.body2.copyWith(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -426,10 +400,7 @@ class _LoginScreenState extends State<LoginScreen>
                               Text(
                                 "Don't have an account? ",
                                 style: AppTextStyles.body2.copyWith(
-                                  // Hapus `()`
-                                  color: AppColors.textDark.withOpacity(
-                                    0.7,
-                                  ), // Sudah tidak ada (context)
+                                  color: AppColors.textDark.withOpacity(0.7),
                                 ),
                               ),
                               GestureDetector(
@@ -446,10 +417,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   child: Text(
                                     "Sign Up",
                                     style: AppTextStyles.body2.copyWith(
-                                      // Hapus `()`
-                                      color:
-                                          AppColors
-                                              .primary, // Sudah tidak ada (context)
+                                      color: AppColors.primary,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -461,6 +429,19 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
 
                         const Spacer(flex: 2),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              '© ${DateTime.now().year} Presiva. All rights reserved.',
+                              style: TextStyle(
+                                color: AppColors.textLight.withOpacity(0.6),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
