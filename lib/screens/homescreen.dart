@@ -456,6 +456,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final bool hasCheckedIn = _todayAbsence?.jamMasuk != null;
     final bool hasCheckedOut = _todayAbsence?.jamKeluar != null;
     const double bottomButtonAreaHeight = 92.0;
+    // Tambahkan tinggi untuk copyright text
+    const double copyrightTextHeight = 40.0;
 
     const double customHeaderHeight = 120.0;
 
@@ -563,8 +565,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               // Sesuaikan padding atas karena header lebih kecil
               padding: EdgeInsets.only(
                 top: customHeaderHeight + 20.0, // Padding atas disesuaikan
-                bottom:
-                    bottomButtonAreaHeight + 20.0, // Tambahkan spasi di sini
+                // Menambahkan copyrightTextHeight ke bottom padding
+                bottom: bottomButtonAreaHeight + copyrightTextHeight + 20.0,
               ),
               child: Column(
                 children: [
@@ -578,7 +580,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
           // Bottom Button Area
           Positioned(
-            bottom: 0,
+            bottom:
+                copyrightTextHeight -
+                10, // Sesuaikan posisi agar tidak menumpuk
             left: 0,
             right: 0,
             child: Container(
@@ -612,6 +616,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   elevation: 8,
+                ),
+              ),
+            ),
+          ),
+          // Copyright text di paling bawah
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  '© ${DateTime.now().year} Presiva. All rights reserved.',
+                  style: TextStyle(
+                    color: AppColors.textLight.withOpacity(0.6),
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ),
@@ -806,7 +829,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     Color textColor,
   ) {
     bool isNA =
-        timeValue.isEmpty || timeValue == '--' || timeValue == '00:00:00';
+        timeValue.isEmpty || timeValue == '---' || timeValue == '00:00:00';
     return Column(
       children: [
         Icon(icon, color: iconColor, size: 30),
