@@ -172,7 +172,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (profileDetailsChanged || profilePhotoChanged) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("Profile updated successfully!"),
+            content: const Text("Profil berhasil diperbarui!"),
             backgroundColor: AppColors.success,
           ),
         );
@@ -180,7 +180,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("There are no changes to save."),
+            content: const Text("Tidak ada perubahan yang perlu disimpan."),
             backgroundColor: AppColors.info,
           ),
         );
@@ -248,8 +248,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         _pickedImage != null ||
                                 (_initialProfilePhotoUrl != null &&
                                     _initialProfilePhotoUrl!.isNotEmpty)
-                            ? 'Change Photo'
-                            : 'Upload Photo',
+                            ? 'Ganti Foto'
+                            : 'Unggah Foto',
                         style: TextStyle(color: AppColors.primary),
                       ),
                     ),
@@ -265,7 +265,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 fillColor: AppColors.inputFill,
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Name cannot be empty';
+                    return 'Nama tidak boleh kosong';
                   }
                   return null;
                 },
@@ -277,7 +277,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: CircularProgressIndicator(color: AppColors.primary),
                   )
                   : PrimaryButton(
-                    label: 'Save Profile',
+                    label: 'Simpan Profil',
                     onPressed: _saveProfile,
                   ),
               Padding(

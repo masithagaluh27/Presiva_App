@@ -1,6 +1,3 @@
-// Copyright 2024 Your Company Name. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -73,11 +70,11 @@ class _RequestScreenState extends State<RequestScreen> {
 
   Future<void> _submitRequest() async {
     if (_selectedDate == null) {
-      _showSnackBar('Please select a date.');
+      _showSnackBar('Silakan pilih tanggal.');
       return;
     }
     if (_reasonController.text.isEmpty) {
-      _showSnackBar('Please enter a reason for the request.');
+      _showSnackBar('Harap masukkan alasan permintaan.');
       return;
     }
 
@@ -97,7 +94,7 @@ class _RequestScreenState extends State<RequestScreen> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (mounted) {
-          _showSnackBar('Request submitted successfully!');
+          _showSnackBar('Permintaan berhasil dikirimkan!');
           Navigator.pop(context, true);
         }
       } else {
@@ -108,12 +105,12 @@ class _RequestScreenState extends State<RequestScreen> {
           });
         }
         if (mounted) {
-          _showSnackBar('Failed to submit request: $errorMessage');
+          _showSnackBar('Gagal mengirim permintaan: $errorMessage');
         }
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar('An error occurred: $e');
+        _showSnackBar('Terjadi kesalahan: $e');
       }
     } finally {
       setState(() {
@@ -134,7 +131,7 @@ class _RequestScreenState extends State<RequestScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
-          'Izin Request',
+          'Permintaan Izin',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.primary,
@@ -149,7 +146,7 @@ class _RequestScreenState extends State<RequestScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Fill out the form to submit your leave or absence request.',
+              'Isi formulir untuk mengajukan permohonan cuti atau ketidakhadiran Anda.',
               style: TextStyle(
                 fontSize: 16.0,
                 color: AppColors.textDark.withOpacity(0.7),
@@ -160,13 +157,13 @@ class _RequestScreenState extends State<RequestScreen> {
             const SizedBox(height: 30),
             _buildInputContainer(
               child: CustomDateInputField(
-                labelText: 'Select Date',
+                labelText: 'Pilih Tanggal',
                 icon: Icons.calendar_today,
                 selectedDate: _selectedDate,
                 onTap: () => _selectDate(context),
                 hintText:
                     _selectedDate == null
-                        ? 'Tap to choose a date'
+                        ? 'Ketuk untuk memilih tanggal'
                         : DateFormat(
                           'dd MMMM yyyy',
                           'id_ID',
@@ -177,8 +174,8 @@ class _RequestScreenState extends State<RequestScreen> {
             _buildInputContainer(
               child: CustomInputField(
                 controller: _reasonController,
-                labelText: 'Reason for Request',
-                hintText: 'e.g., Annual leave, sick leave, personal matters',
+                labelText: 'Alasan Permintaan',
+                hintText: 'misalnya cuti tahunan, cuti sakit, urusan pribadi',
                 icon: Icons.edit_note,
                 maxLines: 5,
                 keyboardType: TextInputType.multiline,
@@ -189,7 +186,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 ),
                 customValidator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Reason cannot be empty';
+                    return 'Alasan tidak boleh kosong';
                   }
                   return null;
                 },
@@ -200,10 +197,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 ? Center(
                   child: CircularProgressIndicator(color: AppColors.primary),
                 )
-                : PrimaryButton(
-                  label: 'Submit Izin',
-                  onPressed: _submitRequest,
-                ),
+                : PrimaryButton(label: 'Kirim Izin', onPressed: _submitRequest),
           ],
         ),
       ),

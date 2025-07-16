@@ -1,3 +1,7 @@
+// Copyright 2024 Your Company Name. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart'; // Import AutoSizeText
@@ -5,11 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:presiva/api/api_Services.dart';
 import 'package:presiva/constant/app_colors.dart';
 import 'package:presiva/models/app_models.dart';
 import 'package:presiva/screens/attendance/request_screen.dart';
 import 'package:presiva/screens/main_botom_navigation_bar.dart';
-import 'package:presiva/api/api_Services.dart';
 
 class HomeScreen extends StatefulWidget {
   final ValueNotifier<bool> refreshNotifier;
@@ -23,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final ApiService _apiService = ApiService();
 
   User? _currentUser;
-  String _location = 'Getting Location...';
+  String _location = 'Mendapatkan Lokasi...';
   String _currentDate = '';
   String _currentTime = '';
   Timer? _timer;
@@ -131,10 +135,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       if (mounted) {
-        _showErrorDialog('Location services are disabled. Please enable them.');
+        _showErrorDialog('Layanan lokasi dinonaktifkan. Mohon aktifkan.');
       }
       setState(() {
-        _location = 'Location services disabled';
+        _location = 'Layanan lokasi dinonaktifkan';
         _permissionGranted = false;
       });
       return;
@@ -146,11 +150,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       if (permission == LocationPermission.denied) {
         if (mounted) {
           _showErrorDialog(
-            'Location permissions are denied. Please grant them in settings.',
+            'Izin lokasi ditolak. Mohon berikan izin di pengaturan.',
           );
         }
         setState(() {
-          _location = 'Location permissions denied';
+          _location = 'Izin lokasi ditolak';
           _permissionGranted = false;
         });
         return;
@@ -160,11 +164,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (permission == LocationPermission.deniedForever) {
       if (mounted) {
         _showErrorDialog(
-          'Location permissions are permanently denied, we cannot request permissions.',
+          'Izin lokasi ditolak secara permanen, kami tidak dapat meminta izin.',
         );
       }
       setState(() {
-        _location = 'Location permissions permanently denied';
+        _location = 'Izin lokasi ditolak secara permanen';
         _permissionGranted = false;
       });
       return;
@@ -182,10 +186,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     } catch (e) {
       print('Error getting current location: $e');
       if (mounted) {
-        _showErrorDialog('Failed to get current location: $e');
+        _showErrorDialog('Gagal mendapatkan lokasi saat ini: $e');
       }
       setState(() {
-        _location = 'Failed to get location';
+        _location = 'Gagal mendapatkan lokasi';
         _permissionGranted = false;
       });
     }
@@ -210,18 +214,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               .join(', ');
 
           if (_location.isEmpty) {
-            _location = 'Unknown address';
+            _location = 'Alamat tidak ditemukan';
           }
         });
       } else {
         setState(() {
-          _location = 'Address not found';
+          _location = 'Alamat tidak ditemukan';
         });
       }
     } catch (e) {
       print('Error getting address from coordinates: $e');
       setState(() {
-        _location = 'Address not found';
+        _location = 'Alamat tidak ditemukan';
       });
     }
   }
@@ -248,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<void> _handleCheckIn() async {
     if (!_permissionGranted || _currentPosition == null) {
       _showErrorDialog(
-        'Location not available. Please ensure location services are enabled and permissions are granted.',
+        'Lokasi tidak tersedia. Pastikan layanan lokasi diaktifkan dan izin diberikan.',
       );
       await _determinePosition();
       return;
@@ -291,12 +295,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           });
         }
         if (mounted) {
-          _showErrorDialog('Check In Failed: $errorMessage');
+          _showErrorDialog('Masuk gagal: $errorMessage');
         }
       }
     } catch (e) {
       if (mounted) {
-        _showErrorDialog('An error occurred during check-in: $e');
+        _showErrorDialog('Terjadi kesalahan saat check-in: $e');
       }
     } finally {
       setState(() {
@@ -308,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<void> _handleCheckOut() async {
     if (!_permissionGranted || _currentPosition == null) {
       _showErrorDialog(
-        'Location not available. Please ensure location services are enabled and permissions are granted.',
+        'Lokasi tidak tersedia. Pastikan layanan lokasi diaktifkan dan izin diberikan.',
       );
       await _determinePosition();
       return;
@@ -350,12 +354,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           });
         }
         if (mounted) {
-          _showErrorDialog('Check Out Failed: $errorMessage');
+          _showErrorDialog('Keluar gagal: $errorMessage');
         }
       }
     } catch (e) {
       if (mounted) {
-        _showErrorDialog('An error occurred during check-out: $e');
+        _showErrorDialog('Terjadi kesalahan saat check-out: $e');
       }
     } finally {
       setState(() {
@@ -370,7 +374,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       builder:
           (context) => AlertDialog(
             backgroundColor: AppColors.background,
-            title: Text('Error', style: TextStyle(color: AppColors.textDark)),
+            title: Text(
+              'Kesalahan',
+              style: TextStyle(color: AppColors.textDark),
+            ),
             content: Text(message, style: TextStyle(color: AppColors.textDark)),
             actions: [
               TextButton(
@@ -415,28 +422,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String honorific = '';
 
     if (hour >= 5 && hour < 12) {
-      greeting = 'Selamat pagi';
+      greeting = 'Selamat pagi,';
     } else if (hour >= 12 && hour < 18) {
-      greeting = 'Selamat siang';
+      greeting = 'Selamat siang,';
     } else if (hour >= 18 && hour < 22) {
-      greeting = 'Selamat malam';
+      greeting = 'Selamat malam,';
     } else {
-      greeting = 'Selamat tidur';
+      greeting = 'tidur nyenyak,';
     }
 
     if (_currentUser?.jenis_kelamin != null) {
       final userGender = _currentUser!.jenis_kelamin!.toLowerCase();
       if (userGender == 'l' || userGender == 'laki-laki') {
-        honorific = 'gantengku';
+        honorific = 'ganteng!';
       } else if (userGender == 'p' || userGender == 'perempuan') {
-        honorific = 'cantikku';
+        honorific = 'cantik!';
       }
     }
 
+    String name = _currentUser?.name ?? 'Pengguna';
+    List<String> nameParts = name.split(' ');
+    String firstName = nameParts.isNotEmpty ? nameParts[0] : '';
+
     if (honorific.isNotEmpty) {
-      return '$greeting $honorific!';
+      return '$greeting $firstName $honorific';
     } else {
-      return '$greeting, ${_currentUser?.name ?? 'Pengguna'}!';
+      return '$greeting $firstName!';
     }
   }
 
@@ -446,19 +457,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final bool hasCheckedOut = _todayAbsence?.jamKeluar != null;
     const double bottomButtonAreaHeight = 92.0;
 
-    // Kecilkan tinggi header lebih lanjut
-    const double customHeaderHeight = 120.0; // Disesuaikan menjadi lebih kecil
+    const double customHeaderHeight = 120.0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // Custom "Header" (untuk profile/greeting)
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            height: customHeaderHeight, // Tinggi yang lebih kecil
+            height: customHeaderHeight,
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -528,7 +537,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   Text(
-                                    'Ready for a productive day?',
+                                    'Siap untuk hari yang produktif?',
                                     style: TextStyle(
                                       fontSize:
                                           14, // Ukuran font tagline juga dikecilkan
@@ -725,9 +734,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           : Text(
                             hasCheckedIn
                                 ? (hasCheckedOut
-                                    ? 'Checked Out for Today'
-                                    : 'Check Out')
-                                : 'Check In',
+                                    ? 'Telah keluar untuk hari ini'
+                                    : 'Keluar')
+                                : 'Masuk',
                             style: TextStyle(
                               color: AppColors.onPrimary,
                               fontSize: 22,
@@ -752,7 +761,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           'HH:mm:ss',
                         ).format(_todayAbsence!.jamMasuk!.toLocal())
                         : '',
-                    'Check In',
+                    'Masuk',
                     AppColors.primary,
                     _todayAbsence?.jamMasuk == null
                         ? AppColors.textLight.withOpacity(0.7)
@@ -765,7 +774,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           'HH:mm:ss',
                         ).format(_todayAbsence!.jamKeluar!.toLocal())
                         : '',
-                    'Check Out',
+                    'Keluar',
                     AppColors.error,
                     _todayAbsence?.jamKeluar == null
                         ? AppColors.textLight.withOpacity(0.7)
@@ -774,7 +783,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   _buildTimeDetail(
                     Icons.timer,
                     _calculateWorkingHours(),
-                    'Working Hours',
+                    'Jam Kerja',
                     AppColors.warning,
                     _todayAbsence?.jamMasuk == null
                         ? AppColors.textLight.withOpacity(0.7)
@@ -797,7 +806,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     Color textColor,
   ) {
     bool isNA =
-        timeValue.isEmpty || timeValue == 'N/A' || timeValue == '00:00:00';
+        timeValue.isEmpty || timeValue == '--' || timeValue == '00:00:00';
     return Column(
       children: [
         Icon(icon, color: iconColor, size: 30),

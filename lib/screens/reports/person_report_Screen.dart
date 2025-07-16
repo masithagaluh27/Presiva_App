@@ -9,8 +9,8 @@ import 'package:presiva/constant/app_text_styles.dart';
 import 'package:presiva/models/app_models.dart';
 
 // Copyright 2025 [Your Company/Name]. All rights reserved.
-// Unauthorized copying of this file, via any medium, is strictly prohibited.
-// Proprietary and confidential.
+// Dilarang menyalin file ini tanpa izin, melalui media apa pun.
+// Hak milik dan rahasia.
 
 class PersonReportScreen extends StatefulWidget {
   final ValueNotifier<bool> refreshNotifier;
@@ -36,7 +36,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
   int _lateInCount = 0;
 
   int _totalWorkingDaysInMonth = 0;
-  String _totalWorkingHours = '0hr 0min';
+  String _totalWorkingHours = '0j 0mnt';
   double _overallAttendancePercentage = 0.0;
 
   List<BarChartGroupData> _barChartGroupData = [];
@@ -58,7 +58,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
   void _handleRefreshSignal() {
     if (widget.refreshNotifier.value) {
       print(
-        'PersonReportScreen: Refresh signal received, refreshing reports...',
+        'PersonReportScreen: Sinyal refresh diterima, menyegarkan laporan...',
       );
       setState(() {
         _reportDataFuture = _fetchAndCalculateMonthlyReports();
@@ -74,7 +74,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       _permitCount = 0;
       _lateInCount = 0;
       _totalWorkingDaysInMonth = 0;
-      _totalWorkingHours = '0hr 0min';
+      _totalWorkingHours = '0j 0mnt';
       _overallAttendancePercentage = 0.0;
       _barChartGroupData = [];
       _maxYValue = 10.0;
@@ -91,11 +91,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
           _absentCount = stats.totalAbsen;
         });
       } else {
-        print('Failed to get absence stats: ${statsResponse.message}');
+        print('Gagal mendapatkan statistik absensi: ${statsResponse.message}');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to load summary: ${statsResponse.message}'),
+              content: Text('Gagal memuat ringkasan: ${statsResponse.message}'),
             ),
           );
         }
@@ -122,7 +122,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       if (historyResponse.statusCode == 200 && historyResponse.data != null) {
         for (var absence in historyResponse.data!) {
           if (absence.attendanceDate == null) {
-            print('Skipping absence entry due to null attendanceDate.');
+            print('Melewatkan entri absensi karena attendanceDate null.');
             continue;
           }
 
@@ -158,13 +158,13 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         }
       } else {
         print(
-          'Failed to get absence history for working hours: ${historyResponse.message}',
+          'Gagal mendapatkan riwayat absensi untuk jam kerja: ${historyResponse.message}',
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Failed to load working hours: ${historyResponse.message}',
+                'Gagal memuat jam kerja: ${historyResponse.message}',
               ),
             ),
           );
@@ -174,7 +174,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
       final int totalHours = totalWorkingDuration.inHours;
       final int remainingMinutes = totalWorkingDuration.inMinutes.remainder(60);
       String formattedTotalWorkingHours =
-          '${totalHours}hr ${remainingMinutes}min';
+          '${totalHours}j ${remainingMinutes}mnt';
 
       double calculatedAttendancePercentage = 0.0;
       if (_totalWorkingDaysInMonth > 0) {
@@ -197,12 +197,12 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         );
       });
     } catch (e) {
-      print('Error fetching and calculating monthly reports: $e');
-      _updateSummaryCounts(0, 0, 0, 0, 0, '0hr 0min', 0.0);
+      print('Error mengambil dan menghitung laporan bulanan: $e');
+      _updateSummaryCounts(0, 0, 0, 0, 0, '0j 0mnt', 0.0);
       _updateBarChartData(0, 0, 0);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An error occurred loading reports: $e')),
+          SnackBar(content: Text('Terjadi kesalahan saat memuat laporan: $e')),
         );
       }
     }
@@ -413,7 +413,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  'Error loading data: ${snapshot.error}',
+                  'Error memuat data: ${snapshot.error}',
                   textAlign: TextAlign.center,
                   style: AppTextStyles.body2.copyWith(
                     color: AppColors.error,
@@ -456,13 +456,13 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Monthly Report',
+                            'Laporan Bulanan',
                             style: AppTextStyles.heading1.copyWith(
                               color: AppColors.onPrimary,
                             ),
                           ),
                           Text(
-                            'Review your attendance overview below.',
+                            'Tinjau ringkasan kehadiran Anda di bawah.',
                             style: AppTextStyles.body1.copyWith(
                               color: AppColors.onPrimary.withOpacity(0.8),
                             ),
@@ -497,7 +497,7 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Monthly Overview',
+                                        'Ringkasan Bulanan',
                                         style:
                                             AppTextStyles
                                                 .heading2, // Menggunakan AppTextStyles.heading2
@@ -544,43 +544,43 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
                                   const SizedBox(height: 20),
                                   _buildStatListItem(
                                     context,
-                                    'Total Working Days',
+                                    'Total Hari Kerja',
                                     _totalWorkingDaysInMonth.toString(),
                                     AppColors.info,
                                   ),
                                   _buildStatListItem(
                                     context,
-                                    'Total Present Days',
+                                    'Total Hari Masuk',
                                     _presentCount.toString(),
                                     AppColors.success,
                                   ),
                                   _buildStatListItem(
                                     context,
-                                    'Total Absent Days',
+                                    'Total Hari Absen',
                                     _absentCount.toString(),
                                     AppColors.error,
                                   ),
                                   _buildStatListItem(
                                     context,
-                                    'Total Izin Days',
+                                    'Total Hari Izin',
                                     _permitCount.toString(),
                                     AppColors.warning,
                                   ),
                                   _buildStatListItem(
                                     context,
-                                    'Total Late Entries',
+                                    'Total Keterlambatan',
                                     _lateInCount.toString(),
                                     Colors.orange,
                                   ),
                                   _buildStatListItem(
                                     context,
-                                    'Total Working Hours',
+                                    'Total Jam Kerja',
                                     _totalWorkingHours,
                                     AppColors.primary,
                                   ),
                                   _buildStatListItem(
                                     context,
-                                    'Overall Attendance %',
+                                    'Persentase Kehadiran Keseluruhan',
                                     '${_overallAttendancePercentage.toStringAsFixed(0)}%',
                                     _overallAttendancePercentage >= 80
                                         ? AppColors.success

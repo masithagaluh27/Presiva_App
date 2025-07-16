@@ -76,7 +76,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Forgot Password",
+          "Lupa Sandi",
           style: TextStyle(color: AppColors.textDark),
         ),
         backgroundColor: AppColors.background,
@@ -92,7 +92,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Enter your email to receive a verification code (OTP) to reset your password.",
+                "Masukkan email Anda untuk menerima kode verifikasi (OTP) untuk mengatur ulang kata sandi Anda.",
                 style: TextStyle(fontSize: 16, color: AppColors.textLight),
               ),
               const SizedBox(height: 30),
@@ -103,10 +103,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 fillColor: AppColors.inputFill,
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Email cannot be empty';
+                    return 'Format email tidak valid';
                   }
                   if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Invalid email format';
+                    return 'Format email tidak valid';
                   }
                   return null;
                 },
@@ -117,7 +117,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: CircularProgressIndicator(color: AppColors.primary),
                   )
                   : PrimaryButton(
-                    label: 'Send Verification Code',
+                    label: 'Kirim Kode Verifikasi',
                     onPressed: _requestOtp,
                   ),
               Padding(

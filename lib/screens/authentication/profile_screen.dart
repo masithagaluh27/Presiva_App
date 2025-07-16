@@ -50,7 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (response.statusCode == 200 && response.data != null) {
       setState(() => _currentUser = response.data);
     } else {
-      print('Failed to load user profile: ${response.message}');
+      print('Gagal memuat profil pengguna: ${response.message}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -72,11 +72,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder:
           (context) => AlertDialog(
             title: Text(
-              'Logout Confirmation',
+              'Konfirmasi Keluar',
               style: AppTextStyles.heading3.copyWith(color: AppColors.textDark),
             ),
             content: Text(
-              'Are you sure you want to log out?',
+              'Apakah Anda yakin ingin keluar??',
               style: AppTextStyles.body2.copyWith(color: AppColors.textLight),
             ),
             backgroundColor: AppColors.cardBackground,
@@ -98,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   foregroundColor: AppColors.onError,
                 ),
                 child: Text(
-                  'Logout',
+                  'Keluar',
                   style: AppTextStyles.body1.copyWith(color: AppColors.onError),
                 ),
               ),
@@ -119,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'User data not loaded yet. Please wait.',
+            'Data pengguna belum dimuat. Harap tunggu.',
             style: TextStyle(color: AppColors.onError),
           ),
           backgroundColor: AppColors.error,
@@ -149,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ? 'Laki-laki'
             : _currentUser?.jenis_kelamin == 'P'
             ? 'Perempuan'
-            : 'N/A';
+            : 'Tidak Diketahui';
     final String profilePhotoUrl = _currentUser?.profile_photo ?? '';
     final String designation = _currentUser?.training_title ?? 'Employee';
 
@@ -281,7 +281,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Personal Details',
+                'Detail Profil',
                 style: AppTextStyles.heading3.copyWith(
                   color: AppColors.textDark.withOpacity(0.9),
                 ),
@@ -299,9 +299,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
               Divider(color: AppColors.border, height: 25),
-              _buildDetailRow('Gender', jenisKelamin, Icons.transgender),
+              _buildDetailRow('Kelamin', jenisKelamin, Icons.transgender),
               Divider(color: AppColors.border, height: 25),
-              _buildDetailRow('Designation', designation, Icons.work_outline),
+              _buildDetailRow('Jurusan', designation, Icons.work_outline),
               Divider(color: AppColors.border, height: 25),
             ],
           ),
@@ -404,7 +404,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ListTile(
               leading: Icon(Icons.logout_rounded, color: AppColors.error),
               title: Text(
-                'Logout',
+                'Keluar',
                 style: AppTextStyles.body1.copyWith(
                   color: AppColors.error,
                   fontSize: 17,

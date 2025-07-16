@@ -75,7 +75,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('The OTP has expired. Please request a new OTP.'),
+              content: Text('OTP telah kedaluwarsa. Silakan minta OTP baru.'),
             ),
           );
         }
@@ -108,7 +108,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                resetResponse.message ?? 'Password reset successfully!',
+                resetResponse.message ?? 'Reset kata sandi berhasil!',
               ),
             ),
           );
@@ -117,7 +117,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       } else {
         // Handle error dari resetPassword API
         String errorMessage =
-            resetResponse.message ?? 'Failed to reset password.';
+            resetResponse.message ?? 'Gagal mengatur ulang kata sandi.';
         if (resetResponse.errors != null) {
           resetResponse.errors!.forEach((key, value) {
             errorMessage += '\n$key: ${(value as List).join(', ')}';
@@ -182,7 +182,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Reset Password",
+          "Reset Kata Sandi",
           style: AppTextStyles.heading1.copyWith(
            
             color: AppColors.textDark, 
@@ -203,7 +203,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "A verification code has been sent to **${widget.email}**. Enter the code and your new password.",
+                "Kode verifikasi telah dikirim ke **${widget.email}**. Masukkan kode dan kata sandi baru Anda.",
                 style: AppTextStyles.body2.copyWith(
                 
                   color: AppColors.textDark, 
@@ -243,15 +243,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               // Urutan Input Field Baru
               CustomInputField(
                 controller: _otpController,
-                hintText: 'Verification Code (OTP)',
+                hintText: 'Kode Verifikasi (OTP)',
                 icon: Icons.numbers,
                 keyboardType: TextInputType.number,
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'OTP cannot be empty';
+                    return 'OTP tidak boleh kosong';
                   }
                   if (value.length < 6) {
-                    return 'OTP minimum 6 characters';
+                    return 'OTP minimal 6 karakter';
                   }
                   return null;
                 },
@@ -260,7 +260,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
               CustomInputField(
                 controller: _newPasswordController,
-                hintText: 'New Password',
+                hintText: 'Kata Sandi Baru',
                 icon: Icons.lock_outline,
                 isPassword: true,
                 obscureText: !_isNewPasswordVisible,
@@ -271,10 +271,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 },
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'New password cannot be empty.';
+                    return 'Kata sandi baru tidak boleh kosong.';
                   }
                   if (value.length < 8) {
-                    return 'Password must be at least 8 characters';
+                    return 'Kata sandi harus minimal 8 karakter';
                   }
                   return null;
                 },
@@ -283,7 +283,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
               CustomInputField(
                 controller: _confirmPasswordController,
-                hintText: 'Confirm New Password',
+                hintText: 'Konfirmasi Kata Sandi Baru',
                 icon: Icons.lock_outline,
                 isPassword: true,
                 obscureText: !_isConfirmPasswordVisible,
@@ -294,10 +294,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 },
                 customValidator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Confirm password cannot be empty.';
+                    return 'Konfirmasi kata sandi tidak boleh kosong.';
                   }
                   if (value != _newPasswordController.text) {
-                    return 'Passwords do not match';
+                    return 'Kata sandi tidak cocok';
                   }
                   return null;
                 },
@@ -308,7 +308,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 child: GestureDetector(
                   onTap: _isLoading || !_otpExpired ? null : _resendOtp,
                   child: Text(
-                    "Didn't receive the code? Resend the OTP",
+                    "Tidak menerima kode? Kirim ulang OTP",
                     style: AppTextStyles.body2.copyWith(
                       
                       color:
@@ -331,7 +331,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     ),
                   )
                   : PrimaryButton(
-                    label: 'Reset Password',
+                    label: 'Reset Sandi',
                     onPressed: _resetPasswordProcess,
                   ),
             ],

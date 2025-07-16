@@ -203,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                         // Welcome Text
                         Text(
-                          "Welcome Back",
+                          "Selamat Datang kembali",
                           style: AppTextStyles.heading2.copyWith(
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
@@ -214,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen>
                         const SizedBox(height: 8),
 
                         Text(
-                          "Sign in to your account",
+                          "Masuk ke akun Anda",
                           style: AppTextStyles.body2.copyWith(
                             color: AppColors.textDark.withOpacity(0.7),
                             fontSize: 16,
@@ -246,12 +246,12 @@ class _LoginScreenState extends State<LoginScreen>
                               // Email Field
                               CustomInputField(
                                 controller: _emailController,
-                                hintText: 'Email Address',
+                                hintText: 'Email ',
                                 icon: Icons.email_outlined,
                                 fillColor: AppColors.inputFill,
                                 customValidator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Email cannot be empty';
+                                    return 'Email tidak boleh kosong';
                                   }
                                   if (!RegExp(
                                     r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
@@ -267,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen>
                               // Password Field
                               CustomInputField(
                                 controller: _passwordController,
-                                hintText: 'Password',
+                                hintText: 'Sandi',
                                 icon: Icons.lock_outline,
                                 isPassword: true,
                                 obscureText: !_isPasswordVisible,
@@ -279,10 +279,10 @@ class _LoginScreenState extends State<LoginScreen>
                                 fillColor: AppColors.inputFill,
                                 customValidator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Password cannot be empty';
+                                    return 'Kata sandi tidak boleh kosong';
                                   }
                                   if (value.length < 6) {
-                                    return 'Password must be at least 6 characters';
+                                    return 'Kata sandi harus minimal 6 karakter';
                                   }
                                   return null;
                                 },
@@ -306,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       vertical: 8,
                                     ),
                                     child: Text(
-                                      "Forgot Password?",
+                                      "Lupa Password?",
                                       style: AppTextStyles.body3(
                                         color: AppColors.primary,
                                         fontWeight: FontWeight.w600,
@@ -415,7 +415,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     vertical: 4,
                                   ),
                                   child: Text(
-                                    "Sign Up",
+                                    "Daftar",
                                     style: AppTextStyles.body2.copyWith(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.w600,

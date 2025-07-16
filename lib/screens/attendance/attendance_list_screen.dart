@@ -318,7 +318,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Reason: ${absence.alasanIzin?.isNotEmpty == true ? absence.alasanIzin : '---'}',
+                                'Alasan: ${absence.alasanIzin?.isNotEmpty == true ? absence.alasanIzin : '---'}',
                                 style: TextStyle(
                                   color: AppColors.textLight,
                                   fontSize: 14,
@@ -529,7 +529,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(
-          'Attendance Details',
+          'Detail Kehadiran',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -575,7 +575,7 @@ class _AttendanceListScreenState extends State<AttendanceListScreen> {
               children: [
                 // Judul "Monthly Overview"
                 Text(
-                  'Monthly Overview',
+                  'Ringkasan Bulanan',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

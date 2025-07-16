@@ -31,7 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   List<Batch> _batches = [];
   List<Training> _trainings = [];
   int? _selectedBatchId;
-  String _selectedBatchName = 'Loading Batch...';
+  String _selectedBatchName = 'Memuat Angkatan...';
   int? _selectedTrainingId;
   String? _selectedGender; // Menggunakan  'L' atau 'P'
 
@@ -80,7 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
           _selectedBatchId = batch2.id;
           _selectedBatchName =
-              'Batch ${batch2.batch_ke}'; // Display as "Batch 2"
+              'Angkatan ${batch2.batch_ke}'; // Display as "Batch 2"
         });
       } else {
         if (mounted) {
@@ -213,14 +213,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Create Account",
+                      "Buat Akun Baru",
                       style: AppTextStyles.heading2.copyWith(
                         color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Join us to track your attendance effortlessly.",
+                      "Bergabunglah dengan kami untuk melacak kehadiran Anda dengan mudah.",
                       style: AppTextStyles.body2.copyWith(
                         color: AppColors.textLight,
                       ),
@@ -234,7 +234,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       icon: Icons.person_outline,
                       customValidator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Name cannot be empty';
+                          return 'Nama tidak boleh kosong';
                         }
                         return null;
                       },
@@ -249,7 +249,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       keyboardType: TextInputType.emailAddress,
                       customValidator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Email cannot be empty';
+                          return 'Email tidak boleh kosong';
                         }
                         if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                           return 'Enter a valid email address';
@@ -262,7 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     // Password
                     CustomInputField(
                       controller: _passwordController,
-                      hintText: "Password",
+                      hintText: "Sandi",
                       icon: Icons.lock_outline,
                       isPassword: true,
                       obscureText: !_isPasswordVisible,
@@ -272,10 +272,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           }),
                       customValidator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Password cannot be empty';
+                          return 'Kata sandi tidak boleh kosong';
                         }
                         if (value.length < 6) {
-                          return 'Password must be at least 6 characters long';
+                          return 'Kata sandi harus minimal 6 karakter';
                         }
                         return null;
                       },
@@ -285,7 +285,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     // Confirm Password
                     CustomInputField(
                       controller: _confirmPasswordController,
-                      hintText: "Confirm Password",
+                      hintText: "Konfirmasi Sandi",
                       icon: Icons.lock_outline,
                       isPassword: true,
                       obscureText: !_isConfirmPasswordVisible,
@@ -296,10 +296,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           }),
                       customValidator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Confirm password cannot be empty';
+                          return 'Konfirmasi kata sandi tidak boleh kosong';
                         }
                         if (value != _passwordController.text) {
-                          return 'Passwords do not match';
+                          return 'Kata sandi tidak cocok';
                         }
                         return null;
                       },
@@ -313,7 +313,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         vertical: 8.0,
                       ),
                       child: Text(
-                        "Select Gender",
+                        "Jenis kelamin",
                         style: AppTextStyles.body2.copyWith(
                           color: AppColors.textDark,
                         ),
@@ -367,7 +367,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           vertical: 4.0,
                         ),
                         child: Text(
-                          'Please select your gender',
+                          'Silakan pilih jenis kelamin Anda',
                           style: AppTextStyles.body3(color: AppColors.error),
                         ),
                       ),
@@ -407,8 +407,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     _isLoading
                         ? const SizedBox.shrink()
                         : CustomDropdownInputField<int>(
-                          labelText: 'Select Training',
-                          hintText: 'Select Training',
+                          labelText: 'Pilih pelatihan',
+                          hintText: 'Pilih pelatihan',
                           icon: Icons.school_outlined,
                           value: _selectedTrainingId,
                           items:
@@ -425,7 +425,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                           validator: (value) {
                             if (value == null) {
-                              return 'Please select a training';
+                              return 'Silakan pilih pelatihan';
                             }
                             return null;
                           },
@@ -440,7 +440,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         )
                         : PrimaryButton(
-                          label: "Register",
+                          label: "Daftar",
                           onPressed: _register,
                         ),
                     const SizedBox(height: 20),
@@ -450,7 +450,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Already have an account? ",
+                            "Sudah punya akun? ",
                             style: AppTextStyles.body2.copyWith(
                               color: AppColors.textDark,
                             ),
@@ -462,7 +462,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   AppRoutes.login,
                                 ),
                             child: Text(
-                              "Login",
+                              "Masuk",
                               style: AppTextStyles.body2.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primary.withOpacity(0.7),
