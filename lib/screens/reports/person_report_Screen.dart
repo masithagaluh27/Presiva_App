@@ -337,15 +337,11 @@ class _PersonReportScreenState extends State<PersonReportScreen> {
         text = '';
         break;
     }
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 16,
-      child: Text(
-        text,
-        style: AppTextStyles.body2.copyWith(
-          fontWeight: FontWeight.bold,
-          color: AppColors.textDark,
-        ),
+    return Text(
+      text,
+      style: AppTextStyles.body2.copyWith(
+        fontWeight: FontWeight.bold,
+        color: AppColors.textDark,
       ),
     );
   }

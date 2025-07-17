@@ -78,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    'assets/images/presivabg.png',
+                    'assets/images/Presiva_logo.png',
                     fit: BoxFit.cover,
                   ),
                 ),
